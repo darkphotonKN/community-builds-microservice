@@ -15,18 +15,18 @@ func NewItemService(repo *ItemRepository) *ItemService {
 	}
 }
 
-func (s *ItemService) AddItemToBuildService(memberId uuid.UUID, item models.Item) error {
-	return s.Repo.CreateItem(item)
+func (s *ItemService) CreateItemService(createItemReq CreateItemRequest) error {
+	return s.Repo.CreateItem(createItemReq)
 }
 
-func (s *ItemService) CreateItemService(createItemReq models.Item) error {
-	return s.Repo.CreateItem(createItemReq)
+func (s *ItemService) AddItemToBuildService(memberId uuid.UUID, item CreateItemRequest) error {
+	return s.Repo.CreateItem(item)
 }
 
 func (s *ItemService) GetItemsService(memberId uuid.UUID) (*[]models.Item, error) {
 	return s.Repo.GetItems(memberId)
 }
 
-func (s *ItemService) UpdateItemsService(memberId uuid.UUID, id uuid.UUID, updateItemReq UpdateItemReq) (*models.Item, error) {
-	return s.Repo.UpdateItemById(memberId, id, updateItemReq)
+func (s *ItemService) UpdateItemsService(id uuid.UUID, updateItemReq UpdateItemReq) (*models.Item, error) {
+	return s.Repo.UpdateItemById(id, updateItemReq)
 }

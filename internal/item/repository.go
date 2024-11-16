@@ -20,7 +20,7 @@ func NewItemRepository(db *sqlx.DB) *ItemRepository {
 	}
 }
 
-func (r *ItemRepository) CreateItem(createItemReq models.Item) error {
+func (r *ItemRepository) CreateItem(createItemReq CreateItemRequest) error {
 	query := `
 		INSERT INTO items(name, category, class, type, image_url)
 		VALUES(:name, :category, :class, :type,  :image_url)
@@ -54,7 +54,7 @@ func (r *ItemRepository) GetItems(userId uuid.UUID) (*[]models.Item, error) {
 	return &items, nil
 }
 
-func (r *ItemRepository) UpdateItemById(userId uuid.UUID, id uuid.UUID, updateItemReq UpdateItemReq) (*models.Item, error) {
+func (r *ItemRepository) UpdateItemById(id uuid.UUID, updateItemReq UpdateItemReq) (*models.Item, error) {
 	var item models.Item
 
 	query := `
@@ -62,22 +62,19 @@ func (r *ItemRepository) UpdateItemById(userId uuid.UUID, id uuid.UUID, updateIt
 	SET name = :name,
 		category = :category,
 		type = :type,
-		description = :description,
-		price_per_unit = :price_per_unit,
-		stock_quantity = :stock_quantity
+		class = :class,
+		img_url = :img_url,
 	WHERE user_id = :user_id AND id = :id
 	RETURNING *;
 	`
 
 	params := map[string]interface{}{
-		"id":             id,
-		"user_id":        userId,
-		"name":           updateItemReq.Name,
-		"type":           updateItemReq.Type,
-		"category":       updateItemReq.Category,
-		"description":    updateItemReq.Description,
-		"price_per_unit": updateItemReq.PricePerUnit,
-		"stock_quantity": updateItemReq.StockQuantity,
+		"id":       id,
+		"name":     updateItemReq.Name,
+		"type":     updateItemReq.Type,
+		"category": updateItemReq.Category,
+		"class":    updateItemReq.Class,
+		"img_url":  updateItemReq.ImageURL,
 	}
 
 	rows, err := r.DB.NamedQuery(query, params)

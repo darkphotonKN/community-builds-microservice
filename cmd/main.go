@@ -6,6 +6,9 @@ import (
 	"os"
 
 	"github.com/darkphotonKN/community-builds/config"
+	"github.com/darkphotonKN/community-builds/internal/validation"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 )
 
@@ -25,6 +28,11 @@ func main() {
 
 	// router setup
 	router := config.SetupRouter()
+
+	// Register custom validators
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		validation.RegisterValidators(v)
+	}
 
 	defaultDevPort := ":8080"
 

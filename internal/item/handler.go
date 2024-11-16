@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/darkphotonKN/community-builds/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -20,10 +19,11 @@ func NewItemHandler(service *ItemService) *ItemHandler {
 }
 
 func (h *ItemHandler) CreateItemHandler(c *gin.Context) {
-	var createItemReq models.Item
+	var createItemReq CreateItemRequest
 
 	if err := c.ShouldBindJSON(&createItemReq); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON.")})
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON: %s", err)})
+		return
 	}
 
 	err := h.Service.CreateItemService(createItemReq)
@@ -39,7 +39,7 @@ func (h *ItemHandler) CreateItemHandler(c *gin.Context) {
 func (h *ItemHandler) AddItemToBuildHandler(c *gin.Context) {
 	buildId, _ := c.Get("buildId")
 
-	var item models.Item
+	var item CreateItemRequest
 
 	if err := c.ShouldBindJSON(&item); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON.")})
@@ -70,9 +70,6 @@ func (h *ItemHandler) GetItemsHandler(c *gin.Context) {
 }
 
 func (h *ItemHandler) UpdateItemsHandler(c *gin.Context) {
-	// user id
-	buildId, _ := c.Get("buildId")
-
 	// item id to update
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
@@ -89,12 +86,12 @@ func (h *ItemHandler) UpdateItemsHandler(c *gin.Context) {
 		return
 	}
 
-	updatedItem, err := h.Service.UpdateItemsService(buildId.(uuid.UUID), id, updateItemReq)
+	updatedItem, err := h.Service.UpdateItemsService(id, updateItemReq)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to update item with id: %s for user id: %s\n error: %s\n", id, buildId, err)})
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to update item with id: %s\n error: %s\n", id, err)})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all items.", "result": updatedItem})
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully updated item.", "result": updatedItem})
 }
