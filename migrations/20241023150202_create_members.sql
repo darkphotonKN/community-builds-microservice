@@ -1,4 +1,4 @@
--- Users Table
+-- Members Table
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS members (

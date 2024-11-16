@@ -1,4 +1,6 @@
 -- Items Table
+-- Many to Many with Builds
+
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS items (

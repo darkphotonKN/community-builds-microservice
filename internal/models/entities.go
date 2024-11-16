@@ -6,7 +6,11 @@ import (
 )
 
 /**
-* Shared entities that are imported by more than one package.
+* Types here are shared model entities that are imported by more than one package.
+**/
+
+/**
+* Member
 **/
 type Member struct {
 	BaseDBDateModel
@@ -25,6 +29,10 @@ type Rating struct {
 	Rating   int       `db:"rating" json:"rating"`
 }
 
+/**
+* Items
+**/
+
 type Item struct {
 	BaseDBDateModel
 	MemberID      uuid.UUID `db:"member_id" json:"memberId"`
@@ -35,6 +43,42 @@ type Item struct {
 	Description   string    `db:"description" json:"description"`
 	PricePerUnit  float64   `db:"price_per_unit" json:"pricePerUnit"`
 	StockQuantity int       `db:"stock_quantity" json:"stockQuantity"`
+}
+
+/**
+* Skills
+**/
+
+type Skill struct {
+	ID        uuid.UUID `db:"id" json:"id"`
+	Name      string    `db:"name" json:"name"`
+	Type      string    `db:"type" json:"type"` // "active" or "support"
+	CreatedAt time.Time `db:"created_at" json:"createdAt"`
+	UpdatedAt time.Time `db:"updated_at" json:"updatedAt"`
+}
+
+/**
+* Build
+**/
+type Build struct {
+	BaseDBDateModel
+	MemberID    uuid.UUID `db:"member_id" json:"memberId"`
+	Title       string    `db:"title" json:"title"`
+	Description string    `db:"description" json:"description"`
+	MainSkill   string    `db:"main_skill" json:"mainSkill"`
+}
+
+type BuildItem struct {
+	ID      uuid.UUID `db:"id" json:"id"`
+	BuildID uuid.UUID `db:"build_id" json:"buildId"`
+	ItemID  uuid.UUID `db:"item_id" json:"itemId"`
+	Slot    string    `db:"slot" json:"slot"`
+}
+
+type BuildSkill struct {
+	ID      uuid.UUID `db:"id" json:"id"`
+	BuildID uuid.UUID `db:"build_id" json:"buildId"`
+	SkillID uuid.UUID `db:"skill_id" json:"skillId"`
 }
 
 /**
