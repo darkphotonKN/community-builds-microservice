@@ -2,7 +2,9 @@ package item
 
 import (
 	"database/sql"
+	"fmt"
 
+	"github.com/darkphotonKN/community-builds/internal/errorutils"
 	"github.com/darkphotonKN/community-builds/internal/models"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -18,16 +20,18 @@ func NewItemRepository(db *sqlx.DB) *ItemRepository {
 	}
 }
 
-func (r *ItemRepository) CreateItem(item models.Item) error {
+func (r *ItemRepository) CreateItem(createItemReq models.Item) error {
 	query := `
-		INSERT INTO items(user_id, product_id, name, description, price_per_unit, stock_quantity)
-	VALUES(:user_id, :product_id, :name, :description, :price_per_unit, :stock_quantity)
+		INSERT INTO items(name, category, class, type, image_url)
+		VALUES(:name, :category, :class, :type,  :image_url)
 	`
 
-	_, err := r.DB.NamedExec(query, item)
+	_, err := r.DB.NamedExec(query, createItemReq)
+
+	fmt.Print("Error when creating item:", err)
 
 	if err != nil {
-		return err
+		return errorutils.AnalyzeDBErr(err)
 	}
 
 	return nil

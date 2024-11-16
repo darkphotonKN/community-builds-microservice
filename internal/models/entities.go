@@ -23,38 +23,36 @@ type Member struct {
 	TotalTrades   int     `db:"total_trades"`
 }
 
-type Rating struct {
-	BaseIDModel
-	MemberID uuid.UUID `db:"member_id" json:"memberId"`
-	Rating   int       `db:"rating" json:"rating"`
-}
-
 /**
 * Items
 **/
-
 type Item struct {
 	BaseDBDateModel
-	MemberID      uuid.UUID `db:"member_id" json:"memberId"`
-	ProductID     uuid.UUID `db:"product_id" json:"productId"`
-	Category      string    `db:"category" json:"category"`
-	Type          string    `db:"type" json:"type"`
-	Name          string    `db:"name" json:"name"`
-	Description   string    `db:"description" json:"description"`
-	PricePerUnit  float64   `db:"price_per_unit" json:"pricePerUnit"`
-	StockQuantity int       `db:"stock_quantity" json:"stockQuantity"`
+	Category string `db:"category" json:"category"`
+	Class    string `db:"class" json:"class"`
+	Type     string `db:"type" json:"type"`
+	Name     string `db:"name" json:"name"`
+	ImageURL string `db:"image_url" json:"imageUrl"`
 }
 
 /**
 * Skills
 **/
-
 type Skill struct {
 	ID        uuid.UUID `db:"id" json:"id"`
 	Name      string    `db:"name" json:"name"`
 	Type      string    `db:"type" json:"type"` // "active" or "support"
 	CreatedAt time.Time `db:"created_at" json:"createdAt"`
 	UpdatedAt time.Time `db:"updated_at" json:"updatedAt"`
+}
+
+/**
+* Ratings
+**/
+type Rating struct {
+	BaseIDModel
+	BuildID uuid.UUID `db:"build_id" json:"memberId"`
+	Rating  int       `db:"rating" json:"rating"`
 }
 
 /**

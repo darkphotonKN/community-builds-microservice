@@ -20,7 +20,24 @@ func NewItemHandler(service *ItemService) *ItemHandler {
 }
 
 func (h *ItemHandler) CreateItemHandler(c *gin.Context) {
-	userId, _ := c.Get("userId")
+	var createItemReq models.Item
+
+	if err := c.ShouldBindJSON(&createItemReq); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON.")})
+	}
+
+	err := h.Service.CreateItemService(createItemReq)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to create item: %s", err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusCreated, "message": "Successfully created item."})
+}
+
+func (h *ItemHandler) AddItemToBuildHandler(c *gin.Context) {
+	buildId, _ := c.Get("buildId")
 
 	var item models.Item
 
@@ -29,7 +46,7 @@ func (h *ItemHandler) CreateItemHandler(c *gin.Context) {
 		return
 	}
 
-	err := h.Service.CreateItemService(userId.(uuid.UUID), item)
+	err := h.Service.AddItemToBuildService(buildId.(uuid.UUID), item)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"statusCode": http.StatusInternalServerError, "message": fmt.Sprintf("Error when attempting to create item: %s", err.Error())})
@@ -40,12 +57,12 @@ func (h *ItemHandler) CreateItemHandler(c *gin.Context) {
 }
 
 func (h *ItemHandler) GetItemsHandler(c *gin.Context) {
-	userId, _ := c.Get("userId")
+	buildId, _ := c.Get("buildId")
 
-	items, err := h.Service.GetItemsService(userId.(uuid.UUID))
+	items, err := h.Service.GetItemsService(buildId.(uuid.UUID))
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to retrieve all items from user id: %s, \n error: %s\n", userId, err.Error())})
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to retrieve all items from user id: %s, \n error: %s\n", buildId, err.Error())})
 		return
 	}
 
@@ -54,7 +71,7 @@ func (h *ItemHandler) GetItemsHandler(c *gin.Context) {
 
 func (h *ItemHandler) UpdateItemsHandler(c *gin.Context) {
 	// user id
-	userId, _ := c.Get("userId")
+	buildId, _ := c.Get("buildId")
 
 	// item id to update
 	idParam := c.Param("id")
@@ -72,10 +89,10 @@ func (h *ItemHandler) UpdateItemsHandler(c *gin.Context) {
 		return
 	}
 
-	updatedItem, err := h.Service.UpdateItemsService(userId.(uuid.UUID), id, updateItemReq)
+	updatedItem, err := h.Service.UpdateItemsService(buildId.(uuid.UUID), id, updateItemReq)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to update item with id: %s for user id: %s\n error: %s\n", id, userId, err)})
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to update item with id: %s for user id: %s\n error: %s\n", id, buildId, err)})
 		return
 	}
 

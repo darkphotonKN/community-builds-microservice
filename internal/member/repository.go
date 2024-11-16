@@ -3,6 +3,7 @@ package member
 import (
 	"fmt"
 
+	"github.com/darkphotonKN/community-builds/internal/errorutils"
 	"github.com/darkphotonKN/community-builds/internal/models"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -24,7 +25,7 @@ func (r *MemberRepository) Create(member models.Member) error {
 	_, err := r.DB.NamedExec(query, member)
 
 	if err != nil {
-		return err
+		return errorutils.AnalyzeDBErr(err)
 	}
 
 	return nil

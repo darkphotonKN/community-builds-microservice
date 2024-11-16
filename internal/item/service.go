@@ -1,8 +1,6 @@
 package item
 
 import (
-	"fmt"
-
 	"github.com/darkphotonKN/community-builds/internal/models"
 	"github.com/google/uuid"
 )
@@ -17,15 +15,12 @@ func NewItemService(repo *ItemRepository) *ItemService {
 	}
 }
 
-func (s *ItemService) CreateItemService(memberId uuid.UUID, item models.Item) error {
-	fmt.Println("Creating item with memberId:", memberId)
-	// creating item for a specific user
-	item.MemberID = memberId
-
-	// generate a new product id
-	newProdId := uuid.New()
-	item.ProductID = newProdId
+func (s *ItemService) AddItemToBuildService(memberId uuid.UUID, item models.Item) error {
 	return s.Repo.CreateItem(item)
+}
+
+func (s *ItemService) CreateItemService(createItemReq models.Item) error {
+	return s.Repo.CreateItem(createItemReq)
 }
 
 func (s *ItemService) GetItemsService(memberId uuid.UUID) (*[]models.Item, error) {
