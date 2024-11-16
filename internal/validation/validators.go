@@ -2,6 +2,7 @@ package validation
 
 import (
 	"github.com/darkphotonKN/community-builds/internal/item"
+	"github.com/darkphotonKN/community-builds/internal/skill"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -18,4 +19,10 @@ func RegisterValidators(v *validator.Validate) {
 	v.RegisterValidation("type", func(fl validator.FieldLevel) bool {
 		return item.IsValidType(fl.Field().String())
 	})
+
+	v.RegisterValidation("skillType",
+		func(fl validator.FieldLevel) bool {
+			return skill.IsValidType(fl.Field().String())
+		},
+	)
 }

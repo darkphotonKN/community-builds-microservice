@@ -1,6 +1,8 @@
 package item
 
-// Valid categories for items
+// --- Validation Maps ---
+
+// -- Item Categories --
 var validCategories = map[string]bool{
 	"Flasks":            true,
 	"Other":             true,
@@ -11,7 +13,7 @@ var validCategories = map[string]bool{
 	"Armor":             true,
 }
 
-// Valid classes for items
+// -- Item Classes --
 var validClasses = map[string]bool{
 	// Flasks
 	"Life Flasks":   true,
@@ -51,13 +53,13 @@ var validClasses = map[string]bool{
 	"Helmets":      true,
 }
 
-// Valid types for items
+// -- Item Types --
 var validTypes = map[string]bool{
 	"Glorious Plate": true,
 	"Vaal Axe":       true,
 }
 
-// Helper functions to check validity
+// --- Validation Helpers ---
 func IsValidCategory(category string) bool {
 	return validCategories[category]
 }

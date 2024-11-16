@@ -37,18 +37,17 @@ func (r *ItemRepository) CreateItem(createItemReq CreateItemRequest) error {
 	return nil
 }
 
-func (r *ItemRepository) GetItems(userId uuid.UUID) (*[]models.Item, error) {
+func (r *ItemRepository) GetItems() (*[]models.Item, error) {
 	var items []models.Item
 
 	query := `
 	SELECT * FROM items
-	WHERE user_id = $1
 	`
 
-	err := r.DB.Select(&items, query, userId)
+	err := r.DB.Select(&items, query)
 
 	if err != nil {
-		return nil, err
+		return nil, errorutils.AnalyzeDBErr(err)
 	}
 
 	return &items, nil

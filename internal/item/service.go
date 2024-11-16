@@ -23,8 +23,8 @@ func (s *ItemService) AddItemToBuildService(memberId uuid.UUID, item CreateItemR
 	return s.Repo.CreateItem(item)
 }
 
-func (s *ItemService) GetItemsService(memberId uuid.UUID) (*[]models.Item, error) {
-	return s.Repo.GetItems(memberId)
+func (s *ItemService) GetItemsService() (*[]models.Item, error) {
+	return s.Repo.GetItems()
 }
 
 func (s *ItemService) UpdateItemsService(id uuid.UUID, updateItemReq UpdateItemReq) (*models.Item, error) {
