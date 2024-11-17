@@ -5,6 +5,7 @@ import (
 	"github.com/darkphotonKN/community-builds/internal/item"
 	"github.com/darkphotonKN/community-builds/internal/member"
 	"github.com/darkphotonKN/community-builds/internal/rating"
+	"github.com/darkphotonKN/community-builds/internal/skill"
 	"github.com/gin-gonic/gin"
 )
 
@@ -50,6 +51,18 @@ func SetupRouter() *gin.Engine {
 	itemRoutes.GET("/", itemHandler.GetItemsHandler)
 	itemRoutes.POST("/", itemHandler.CreateItemHandler)
 	itemRoutes.PATCH("/:id", itemHandler.UpdateItemsHandler)
+
+	// -- SKILL --
+
+	// --- Skill Setup ---
+	skillRepo := skill.NewSkillRepository(DB)
+	skillService := skill.NewSkillService(skillRepo)
+	skillHandler := skill.NewSkillHandler(skillService)
+
+	// --- Skill Routes ---
+	skillRoutes := api.Group("/skill")
+	skillRoutes.GET("/", skillHandler.CreateSkillHandler)
+	skillRoutes.POST("/", skillHandler.CreateSkillHandler)
 
 	return router
 }
