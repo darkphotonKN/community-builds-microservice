@@ -2,6 +2,8 @@ package skill
 
 import (
 	"github.com/darkphotonKN/community-builds/internal/errorutils"
+	"github.com/darkphotonKN/community-builds/internal/models"
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -28,4 +30,21 @@ func (s *SkillRepository) CreateSkill(createSkillRequest CreateSkillRequest) err
 	}
 
 	return nil
+}
+
+func (s *SkillRepository) GetSkill(id uuid.UUID) (*models.Skill, error) {
+	var skill models.Skill
+
+	query := `
+	SELECT * FROM skills
+	WHERE id = $1
+	`
+
+	err := s.DB.Get(&skill, query, id)
+
+	if err != nil {
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return &skill, nil
 }

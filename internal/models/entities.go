@@ -61,9 +61,9 @@ type Rating struct {
 type Build struct {
 	BaseDBDateModel
 	MemberID    uuid.UUID `db:"member_id" json:"memberId"`
+	MainSkillID uuid.UUID `db:"main_skill" json:"mainSkill"`
 	Title       string    `db:"title" json:"title"`
 	Description string    `db:"description" json:"description"`
-	MainSkill   string    `db:"main_skill" json:"mainSkill"`
 }
 
 type BuildItem struct {

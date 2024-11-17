@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/darkphotonKN/community-builds/internal/auth"
+	"github.com/darkphotonKN/community-builds/internal/build"
 	"github.com/darkphotonKN/community-builds/internal/item"
 	"github.com/darkphotonKN/community-builds/internal/member"
 	"github.com/darkphotonKN/community-builds/internal/rating"
@@ -61,8 +62,24 @@ func SetupRouter() *gin.Engine {
 
 	// --- Skill Routes ---
 	skillRoutes := api.Group("/skill")
+	// Protected Routes
+	skillRoutes.Use(auth.AuthMiddleware())
 	skillRoutes.GET("/", skillHandler.CreateSkillHandler)
 	skillRoutes.POST("/", skillHandler.CreateSkillHandler)
+
+	// -- BUILD --
+
+	// --- Build Setup ---
+	buildRepo := build.NewBuildRepository(DB)
+	buildService := build.NewBuildService(buildRepo, skillService)
+	buildHandler := build.NewBuildHandler(buildService)
+
+	// --- Build Routes ---
+	buildRoutes := api.Group("/build")
+	// Protected Routes
+	buildRoutes.Use(auth.AuthMiddleware())
+	buildRoutes.GET("/", buildHandler.CreateBuildHandler)
+	buildRoutes.POST("/", buildHandler.CreateBuildHandler)
 
 	return router
 }
