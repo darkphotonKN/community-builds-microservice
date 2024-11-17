@@ -31,6 +31,43 @@ func (r *MemberRepository) Create(member models.Member) error {
 	return nil
 }
 
+func (r *MemberRepository) UpdatePassword(data MemberUpdatePasswordRequest) error {
+	query := `UPDATE members SET password = :password WHERE id = :id`
+
+	_, err := r.DB.NamedExec(query, data)
+
+	if err != nil {
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	return nil
+}
+
+func (r *MemberRepository) UpdateInfo(member models.Member) error {
+	query := `UPDATE members SET name = :name, status = :status WHERE id = :id`
+
+	_, err := r.DB.NamedExec(query, member)
+
+	if err != nil {
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	return nil
+}
+func (r *MemberRepository) GetByIdWithPassword(id uuid.UUID) (*models.Member, error) {
+	query := `SELECT * FROM members WHERE members.id = $1`
+
+	var member models.Member
+
+	err := r.DB.Get(&member, query, id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &member, nil
+}
+
 func (r *MemberRepository) GetById(id uuid.UUID) (*models.Member, error) {
 	query := `SELECT * FROM members WHERE members.id = $1`
 

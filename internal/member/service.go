@@ -21,6 +21,10 @@ func NewMemberService(repo *MemberRepository) *MemberService {
 	}
 }
 
+func (s *MemberService) GetMemberByIdWithPasswordService(id uuid.UUID) (*models.Member, error) {
+	return s.Repo.GetByIdWithPassword(id)
+}
+
 func (s *MemberService) GetMemberByIdService(id uuid.UUID) (*models.Member, error) {
 	return s.Repo.GetById(id)
 }
@@ -36,6 +40,35 @@ func (s *MemberService) CreateMemberService(user models.Member) error {
 	user.Password = hashedPw
 
 	return s.Repo.Create(user)
+}
+
+func (s *MemberService) UpdatePasswordMemberService(data MemberUpdatePasswordRequest) error {
+	fmt.Println("data", data)
+
+	user, _ := s.GetMemberByIdWithPasswordService(data.ID)
+
+	if data.NewPassword != data.RepeatNewPassword {
+		return fmt.Errorf("NewPassword and RepeatNewPassword are different")
+	}
+
+	isSame, _ := s.ComparePasswords(user.Password, data.Password)
+	if !isSame {
+		return fmt.Errorf("Stored password and input password are different")
+	}
+
+	hashedPw, err := s.HashPassword(data.NewPassword)
+	if err != nil {
+		return fmt.Errorf("Error when attempting to hash password.")
+	}
+
+	// update user's password with hashed password.
+	data.Password = hashedPw
+
+	return s.Repo.UpdatePassword(data)
+}
+
+func (s *MemberService) UpdateInfoMemberHandler(user models.Member) error {
+	return s.Repo.UpdateInfo(user)
 }
 
 func (s *MemberService) LoginMemberService(loginReq MemberLoginRequest) (*MemberLoginResponse, error) {
@@ -76,4 +109,19 @@ func (s *MemberService) HashPassword(password string) (string, error) {
 		return "", err
 	}
 	return string(hash), nil
+}
+
+func (s *MemberService) ComparePasswords(storedPassword string, inputPassword string) (bool, error) {
+	// Compare the hashed password with the user-provided password
+	err := bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(inputPassword))
+	if err != nil {
+		// If error is not nil, the passwords do not match
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			return false, nil // Passwords do not match
+		}
+		// Handle other potential errors (e.g., hash format issues)
+		return false, err
+	}
+	// If err is nil, the passwords match
+	return true, nil
 }

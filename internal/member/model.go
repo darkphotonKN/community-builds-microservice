@@ -1,6 +1,9 @@
 package member
 
-import "github.com/darkphotonKN/community-builds/internal/models"
+import (
+	"github.com/darkphotonKN/community-builds/internal/models"
+	"github.com/google/uuid"
+)
 
 type MemberResponse struct {
 	models.BaseDBDateModel
@@ -20,6 +23,13 @@ type MemberLoginResponse struct {
 	RefreshExpiresIn int    `json:"refreshExpiresIn"`
 
 	MemberInfo *models.Member `json:"memberInfo"`
+}
+
+type MemberUpdatePasswordRequest struct {
+	ID                uuid.UUID `db:"id" json:"id"`
+	Password          string    `db:"password" json:"password"`
+	NewPassword       string    `json:"newPassword"`
+	RepeatNewPassword string    `json:"repeatNewPassword"`
 }
 
 type RefreshTokenRequest struct {

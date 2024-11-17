@@ -37,6 +37,8 @@ func SetupRouter() *gin.Engine {
 	memberRoutes.GET("/:id", memberHandler.GetMemberByIdHandler)
 	memberRoutes.POST("/signup", memberHandler.CreateMemberHandler)
 	memberRoutes.POST("/signin", memberHandler.LoginMemberHandler)
+	memberRoutes.POST("/update-password", memberHandler.UpdatePasswordMemberHandler)
+	memberRoutes.POST("/update-info", memberHandler.UpdateInfoMemberHandler)
 
 	// -- ITEM --
 
