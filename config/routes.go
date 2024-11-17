@@ -78,7 +78,7 @@ func SetupRouter() *gin.Engine {
 	buildRoutes := api.Group("/build")
 	// Protected Routes
 	buildRoutes.Use(auth.AuthMiddleware())
-	buildRoutes.GET("/", buildHandler.CreateBuildHandler)
+	buildRoutes.GET("/", buildHandler.GetBuildsForMemberHandler)
 	buildRoutes.POST("/", buildHandler.CreateBuildHandler)
 
 	return router

@@ -3,6 +3,7 @@ package build
 import (
 	"fmt"
 
+	"github.com/darkphotonKN/community-builds/internal/models"
 	"github.com/darkphotonKN/community-builds/internal/skill"
 	"github.com/google/uuid"
 )
@@ -19,18 +20,23 @@ func NewBuildService(repo *BuildRepository, skillService *skill.SkillService) *B
 	}
 }
 
-func (s *BuildService) CreateBuildService(memberId uuid.UUID, createBuildRequest CreateBuildRequest) {
+const (
+	maxBuildCount = 6
+)
+
+func (s *BuildService) CreateBuildService(memberId uuid.UUID, createBuildRequest CreateBuildRequest) error {
 	// confirm skill exists
-	skill, err := s.SkillService.GetSkillService(createBuildRequest.SkillID)
+	_, err := s.SkillService.GetSkillService(createBuildRequest.SkillID)
 
 	if err != nil {
-		fmt.Println("Error:", err)
-		// return fmt.Errorf("Main skill id could not be found when attempting to create build for it.")
+		return fmt.Errorf("main skill id could not be found when attempting to create build for it.")
 	}
 
-	fmt.Printf("Skill queried from DB: %+v", skill)
-
 	// create build with this skill and for this member
+	return s.Repo.CreateBuild(memberId, createBuildRequest)
+}
 
-	// return s.Repo.CreateBuild(memberId, createBuildRequest)
+func (s *BuildService) GetBuildsForMemberService(memberId uuid.UUID) (*[]models.Build, error) {
+
+	return s.Repo.GetBuildsByMemberId(memberId)
 }

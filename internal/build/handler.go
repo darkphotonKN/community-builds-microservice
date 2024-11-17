@@ -27,12 +27,26 @@ func (h *BuildHandler) CreateBuildHandler(c *gin.Context) {
 		return
 	}
 
-	h.Service.CreateBuildService(memberId.(uuid.UUID), createBuildReq)
+	err := h.Service.CreateBuildService(memberId.(uuid.UUID), createBuildReq)
 
-	// if err != nil {
-	// 	c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to create a build %s", err.Error())})
-	// 	return
-	// }
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to create a build: %s", err.Error())})
+		return
+	}
 
 	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusCreated, "message": "Successfully created the build."})
+}
+
+func (h *BuildHandler) GetBuildsForMemberHandler(c *gin.Context) {
+	memberId, _ := c.Get("userId")
+
+	builds, err := h.Service.GetBuildsForMemberService(memberId.(uuid.UUID))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to create a build: %s", err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusCreated, "message": "Successfully created the build.", "result": builds})
+
 }
