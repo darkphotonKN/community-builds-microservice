@@ -37,16 +37,32 @@ func (h *BuildHandler) CreateBuildHandler(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusCreated, "message": "Successfully created the build."})
 }
 
+/**
+* Get list of builds by a signed-in member's ID.
+**/
 func (h *BuildHandler) GetBuildsForMemberHandler(c *gin.Context) {
 	memberId, _ := c.Get("userId")
 
 	builds, err := h.Service.GetBuildsForMemberService(memberId.(uuid.UUID))
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to create a build: %s", err.Error())})
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all builds for memberId %s: %s", memberId, err.Error())})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusCreated, "message": "Successfully created the build.", "result": builds})
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all builds for member.", "result": builds})
 
+}
+
+func (h *BuildHandler) GetBuildsTemplate(c *gin.Context) {
+	memberId, _ := c.Get("userId")
+
+	builds, err := h.Service.GetBuildsForMemberService(memberId.(uuid.UUID))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all builds for memberId %s: %s", memberId, err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all builds for member.", "result": builds})
 }

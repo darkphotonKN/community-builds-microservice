@@ -21,7 +21,7 @@ func NewBuildService(repo *BuildRepository, skillService *skill.SkillService) *B
 }
 
 const (
-	maxBuildCount = 6
+	maxBuildCount = 10
 )
 
 func (s *BuildService) CreateBuildService(memberId uuid.UUID, createBuildRequest CreateBuildRequest) error {
@@ -36,6 +36,9 @@ func (s *BuildService) CreateBuildService(memberId uuid.UUID, createBuildRequest
 	return s.Repo.CreateBuild(memberId, createBuildRequest)
 }
 
+/**
+* Get list builds available to a member.
+**/
 func (s *BuildService) GetBuildsForMemberService(memberId uuid.UUID) (*[]models.Build, error) {
 
 	return s.Repo.GetBuildsByMemberId(memberId)

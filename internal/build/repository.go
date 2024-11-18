@@ -43,7 +43,7 @@ func (r *BuildRepository) GetBuildsByMemberId(memberId uuid.UUID) (*[]models.Bui
 
 	query := `
 	SELECT * FROM builds
-	WHERE id = $1
+	WHERE member_id = $1
 	`
 
 	err := r.DB.Select(&builds, query, memberId)

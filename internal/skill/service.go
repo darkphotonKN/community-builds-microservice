@@ -32,6 +32,6 @@ func (s *SkillService) GetSkillByIdService(id uuid.UUID) (*models.Skill, error) 
 /**
 * Get list of skills available.
 **/
-func (s *SkillService) GetSkills() (*[]models.Skill, error) {
+func (s *SkillService) GetSkillsService() (*[]models.Skill, error) {
 	return s.Repo.GetSkills()
 }

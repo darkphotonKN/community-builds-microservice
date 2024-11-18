@@ -37,12 +37,12 @@ func (h *SkillHandler) CreateSkillHandler(c *gin.Context) {
 }
 
 func (h *SkillHandler) GetSkillsHandler(c *gin.Context) {
-	skills, err := h.Service.GetSkills()
+	skills, err := h.Service.GetSkillsService()
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all skills %s", err.Error())})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusCreated, "message": "Successfully retrieved all skills.", "result": skills})
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all skills.", "result": skills})
 }
