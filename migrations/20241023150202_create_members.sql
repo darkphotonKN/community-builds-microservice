@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS members (
 );
 
 -- Create function to auto-update the updated_at column
-CREATE OR REPLACE FUNCTION update_updated_at_column()
+CREATE OR REPLACE FUNCTION update_members_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at = CURRENT_TIMESTAMP;
@@ -33,7 +33,7 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER set_updated_at
 BEFORE UPDATE ON members
 FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
+EXECUTE FUNCTION update_members_updated_at();
 
 -- +goose StatementEnd
 
@@ -42,7 +42,7 @@ EXECUTE FUNCTION update_updated_at_column();
 
 -- Drop trigger and function
 DROP TRIGGER IF EXISTS set_updated_at ON members;
-DROP FUNCTION IF EXISTS update_updated_at_column;
+DROP FUNCTION IF EXISTS update_members_updated_at;
 
 -- Drop members table
 DROP TABLE IF EXISTS members;
