@@ -68,7 +68,7 @@ func SetupRouter() *gin.Engine {
 	skillRoutes := api.Group("/skill")
 	// Protected Routes
 	skillRoutes.Use(auth.AuthMiddleware())
-	skillRoutes.GET("/", skillHandler.CreateSkillHandler)
+	skillRoutes.GET("/", skillHandler.GetSkillsHandler)
 	skillRoutes.POST("/", skillHandler.CreateSkillHandler)
 
 	// -- BUILD --

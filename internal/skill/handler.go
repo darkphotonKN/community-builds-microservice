@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/darkphotonKN/community-builds/internal/models"
 	"github.com/gin-gonic/gin"
 )
 
@@ -45,5 +44,5 @@ func (h *SkillHandler) GetSkillsHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusCreated, "message": "Successfully created skill.", "result": skills})
+	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusCreated, "message": "Successfully retrieved all skills.", "result": skills})
 }

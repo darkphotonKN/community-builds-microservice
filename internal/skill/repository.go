@@ -48,3 +48,17 @@ func (s *SkillRepository) GetSkill(id uuid.UUID) (*models.Skill, error) {
 
 	return &skill, nil
 }
+
+func (s *SkillRepository) GetSkills() (*[]models.Skill, error) {
+	var skills []models.Skill
+
+	query := `SELECT * FROM skills`
+
+	err := s.DB.Select(&skills, query)
+
+	if err != nil {
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return &skills, nil
+}
