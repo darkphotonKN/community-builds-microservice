@@ -21,6 +21,10 @@ func NewMemberService(repo *MemberRepository) *MemberService {
 	}
 }
 
+func (s *MemberService) GetMemberByIdWithPasswordService(id uuid.UUID) (*models.Member, error) {
+	return s.Repo.GetByIdWithPassword(id)
+}
+
 func (s *MemberService) GetMemberByIdService(id uuid.UUID) (*models.Member, error) {
 	return s.Repo.GetById(id)
 }
@@ -36,6 +40,41 @@ func (s *MemberService) CreateMemberService(user models.Member) error {
 	user.Password = hashedPw
 
 	return s.Repo.Create(user)
+}
+
+func (s *MemberService) UpdatePasswordMemberService(requestData MemberUpdatePasswordRequest, userId uuid.UUID) error {
+
+	user, _ := s.GetMemberByIdWithPasswordService(userId)
+
+	if requestData.NewPassword != requestData.RepeatNewPassword {
+		return fmt.Errorf("NewPassword and RepeatNewPassword are different")
+	}
+
+	isSame, _ := s.ComparePasswords(user.Password, requestData.Password)
+	if !isSame {
+		return fmt.Errorf("Stored password and input password are different")
+	}
+
+	hashedPw, err := s.HashPassword(requestData.NewPassword)
+	if err != nil {
+		return fmt.Errorf("Error when attempting to hash password.")
+	}
+
+	params := MemberUpdatePasswordParams{
+		ID:       userId,
+		Password: hashedPw,
+	}
+
+	return s.Repo.UpdatePassword(params)
+}
+
+func (s *MemberService) UpdateInfoMemberHandler(request MemberUpdateInfoRequest, userId uuid.UUID) error {
+	params := MemberUpdateInfoParams{
+		ID:     userId,
+		Name:   request.Name,
+		Status: request.Status,
+	}
+	return s.Repo.UpdateInfo(params, userId)
 }
 
 func (s *MemberService) LoginMemberService(loginReq MemberLoginRequest) (*MemberLoginResponse, error) {
@@ -76,4 +115,19 @@ func (s *MemberService) HashPassword(password string) (string, error) {
 		return "", err
 	}
 	return string(hash), nil
+}
+
+func (s *MemberService) ComparePasswords(storedPassword string, inputPassword string) (bool, error) {
+	// Compare the hashed password with the user-provided password
+	err := bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(inputPassword))
+	if err != nil {
+		// If error is not nil, the passwords do not match
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			return false, nil // Passwords do not match
+		}
+		// Handle other potential errors (e.g., hash format issues)
+		return false, err
+	}
+	// If err is nil, the passwords match
+	return true, nil
 }

@@ -31,6 +31,62 @@ func (r *MemberRepository) Create(member models.Member) error {
 	return nil
 }
 
+func (r *MemberRepository) UpdatePassword(params MemberUpdatePasswordParams) error {
+	query := `UPDATE members SET password = :password WHERE id = :id`
+
+	result, err := r.DB.NamedExec(query, params)
+	if err != nil {
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check affected rows: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("no member found with id: %v", params.ID)
+	}
+
+	return nil
+}
+
+func (r *MemberRepository) UpdateInfo(params MemberUpdateInfoParams, userId uuid.UUID) error {
+	query := `UPDATE members SET name = :name, status = :status WHERE id = :id`
+
+	result, err := r.DB.NamedExec(query, params)
+
+	fmt.Println("result", result)
+	if err != nil {
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check affected rows: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("no member found with id: %v", params.ID)
+	}
+
+	return nil
+}
+
+func (r *MemberRepository) GetByIdWithPassword(id uuid.UUID) (*models.Member, error) {
+	query := `SELECT * FROM members WHERE members.id = $1`
+
+	var member models.Member
+
+	err := r.DB.Get(&member, query, id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &member, nil
+}
+
 func (r *MemberRepository) GetById(id uuid.UUID) (*models.Member, error) {
 	query := `SELECT * FROM members WHERE members.id = $1`
 
