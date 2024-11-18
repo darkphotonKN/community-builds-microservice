@@ -1,8 +1,9 @@
 package models
 
 import (
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 /**
@@ -19,8 +20,6 @@ type Member struct {
 	Password      string  `db:"password" json:"password,omitempty"`
 	Status        string  `db:"status" json:"status"`
 	AverageRating float64 `db:"average_rating"`
-	ResponseTime  int     `db:"response_time"`
-	TotalTrades   int     `db:"total_trades"`
 }
 
 /**
