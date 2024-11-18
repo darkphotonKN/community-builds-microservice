@@ -39,6 +39,7 @@ migrate-down-to:
 	fi; \
 	goose -dir ./migrations postgres "$(DB_STRING)" down-to $(VERSION)
 
+# drop ALL table
 migrate-reset:
 	@goose -dir ./migrations postgres "$(DB_STRING)" reset
 

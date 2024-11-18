@@ -26,7 +26,7 @@ const (
 
 func (s *BuildService) CreateBuildService(memberId uuid.UUID, createBuildRequest CreateBuildRequest) error {
 	// confirm skill exists
-	_, err := s.SkillService.GetSkillService(createBuildRequest.SkillID)
+	_, err := s.SkillService.GetSkillByIdService(createBuildRequest.SkillID)
 
 	if err != nil {
 		return fmt.Errorf("main skill id could not be found when attempting to create build for it.")
