@@ -26,10 +26,25 @@ type MemberLoginResponse struct {
 }
 
 type MemberUpdatePasswordRequest struct {
-	ID                uuid.UUID `db:"id" json:"id"`
-	Password          string    `db:"password" json:"password"`
-	NewPassword       string    `json:"newPassword"`
-	RepeatNewPassword string    `json:"repeatNewPassword"`
+	Password          string `db:"password" json:"password"`
+	NewPassword       string `json:"newPassword"`
+	RepeatNewPassword string `json:"repeatNewPassword"`
+}
+
+type MemberUpdatePasswordParams struct {
+	ID       uuid.UUID `db:"id" json:"id"`
+	Password string    `db:"password" json:"password"`
+}
+
+type MemberUpdateInfoRequest struct {
+	Name   string `db:"name" json:"name"`
+	Status string `db:"status" json:"status"`
+}
+
+type MemberUpdateInfoParams struct {
+	ID     uuid.UUID `db:"id" json:"id"`
+	Name   string    `db:"name" json:"name"`
+	Status string    `db:"status" json:"status"`
 }
 
 type RefreshTokenRequest struct {

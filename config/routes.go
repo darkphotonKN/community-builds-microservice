@@ -34,9 +34,11 @@ func SetupRouter() *gin.Engine {
 
 	// --- Member Routes ---
 	memberRoutes := api.Group("/member")
+
 	memberRoutes.GET("/:id", memberHandler.GetMemberByIdHandler)
 	memberRoutes.POST("/signup", memberHandler.CreateMemberHandler)
 	memberRoutes.POST("/signin", memberHandler.LoginMemberHandler)
+	memberRoutes.Use(auth.AuthMiddleware())
 	memberRoutes.POST("/update-password", memberHandler.UpdatePasswordMemberHandler)
 	memberRoutes.POST("/update-info", memberHandler.UpdateInfoMemberHandler)
 

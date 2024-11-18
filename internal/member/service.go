@@ -42,33 +42,39 @@ func (s *MemberService) CreateMemberService(user models.Member) error {
 	return s.Repo.Create(user)
 }
 
-func (s *MemberService) UpdatePasswordMemberService(data MemberUpdatePasswordRequest) error {
-	fmt.Println("data", data)
+func (s *MemberService) UpdatePasswordMemberService(requestData MemberUpdatePasswordRequest, userId uuid.UUID) error {
 
-	user, _ := s.GetMemberByIdWithPasswordService(data.ID)
+	user, _ := s.GetMemberByIdWithPasswordService(userId)
 
-	if data.NewPassword != data.RepeatNewPassword {
+	if requestData.NewPassword != requestData.RepeatNewPassword {
 		return fmt.Errorf("NewPassword and RepeatNewPassword are different")
 	}
 
-	isSame, _ := s.ComparePasswords(user.Password, data.Password)
+	isSame, _ := s.ComparePasswords(user.Password, requestData.Password)
 	if !isSame {
 		return fmt.Errorf("Stored password and input password are different")
 	}
 
-	hashedPw, err := s.HashPassword(data.NewPassword)
+	hashedPw, err := s.HashPassword(requestData.NewPassword)
 	if err != nil {
 		return fmt.Errorf("Error when attempting to hash password.")
 	}
 
-	// update user's password with hashed password.
-	data.Password = hashedPw
+	params := MemberUpdatePasswordParams{
+		ID:       userId,
+		Password: hashedPw,
+	}
 
-	return s.Repo.UpdatePassword(data)
+	return s.Repo.UpdatePassword(params)
 }
 
-func (s *MemberService) UpdateInfoMemberHandler(user models.Member) error {
-	return s.Repo.UpdateInfo(user)
+func (s *MemberService) UpdateInfoMemberHandler(request MemberUpdateInfoRequest, userId uuid.UUID) error {
+	params := MemberUpdateInfoParams{
+		ID:     userId,
+		Name:   request.Name,
+		Status: request.Status,
+	}
+	return s.Repo.UpdateInfo(params, userId)
 }
 
 func (s *MemberService) LoginMemberService(loginReq MemberLoginRequest) (*MemberLoginResponse, error) {

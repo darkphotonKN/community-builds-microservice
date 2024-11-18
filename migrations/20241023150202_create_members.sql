@@ -1,6 +1,8 @@
--- Members Table
+-- Members Table with Auto-update Trigger
 -- +goose Up
 -- +goose StatementBegin
+
+-- Create members table
 CREATE TABLE IF NOT EXISTS members (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -15,11 +17,34 @@ CREATE TABLE IF NOT EXISTS members (
     -- Trade Specific --
     average_rating DECIMAL(2, 1) DEFAULT 0 CHECK (average_rating >= 0 AND average_rating <= 5),
     response_time INT DEFAULT 0,  -- Response time in seconds
-    total_trades INT DEFAULT 0  -- Tracks the number of items traded or posted
+    total_trades INT DEFAULT 0   -- Tracks the number of items traded or posted
 );
+
+-- Create function to auto-update the updated_at column
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create trigger for the members table
+CREATE TRIGGER set_updated_at
+BEFORE UPDATE ON members
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
+
+-- Drop trigger and function
+DROP TRIGGER IF EXISTS set_updated_at ON members;
+DROP FUNCTION IF EXISTS update_updated_at_column;
+
+-- Drop members table
 DROP TABLE IF EXISTS members;
+
 -- +goose StatementEnd

@@ -41,14 +41,15 @@ func (h *MemberHandler) CreateMemberHandler(c *gin.Context) {
 }
 
 func (h *MemberHandler) UpdatePasswordMemberHandler(c *gin.Context) {
-	var data MemberUpdatePasswordRequest
+	var requestData MemberUpdatePasswordRequest
+	userId, _ := c.Get("userId")
 
-	if err := c.ShouldBindJSON(&data); err != nil {
+	if err := c.ShouldBindJSON(&requestData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with parsing payload as JSON.")})
 		return
 	}
 
-	err := h.Service.UpdatePasswordMemberService(data)
+	err := h.Service.UpdatePasswordMemberService(requestData, userId.(uuid.UUID))
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"statusCode": http.StatusInternalServerError, "message": fmt.Sprintf("Error when attempting to update user: %s", err.Error())})
@@ -59,14 +60,15 @@ func (h *MemberHandler) UpdatePasswordMemberHandler(c *gin.Context) {
 }
 
 func (h *MemberHandler) UpdateInfoMemberHandler(c *gin.Context) {
-	var user models.Member
+	var requestData MemberUpdateInfoRequest
+	userId, _ := c.Get("userId")
 
-	if err := c.ShouldBindJSON(&user); err != nil {
+	if err := c.ShouldBindJSON(&requestData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with parsing payload as JSON.")})
 		return
 	}
 
-	err := h.Service.UpdateInfoMemberHandler(user)
+	err := h.Service.UpdateInfoMemberHandler(requestData, userId.(uuid.UUID))
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"statusCode": http.StatusInternalServerError, "message": fmt.Sprintf("Error when attempting to create user: %s", err.Error())})
