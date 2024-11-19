@@ -40,6 +40,5 @@ func (s *BuildService) CreateBuildService(memberId uuid.UUID, createBuildRequest
 * Get list builds available to a member.
 **/
 func (s *BuildService) GetBuildsForMemberService(memberId uuid.UUID) (*[]models.Build, error) {
-
 	return s.Repo.GetBuildsByMemberId(memberId)
 }

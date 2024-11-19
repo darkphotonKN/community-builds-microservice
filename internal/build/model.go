@@ -7,3 +7,13 @@ type CreateBuildRequest struct {
 	Title       string    `json:"title" binding:"required,min=6" db:"title"`
 	Description string    `json:"description" binding:"required,min=10" db:"description"`
 }
+
+type SecondarySkillAndLinks struct {
+	Skill uuid.UUID   `json:"skill"`
+	Links []uuid.UUID `json:"links"`
+}
+
+type AddSkillsToBuildRequest struct {
+	MainSkillLinks   []uuid.UUID              `json:"mainSkillLinks" binding:"required"`
+	AdditionalSkills []SecondarySkillAndLinks `json:"additionalSkills" binding:"required"`
+}

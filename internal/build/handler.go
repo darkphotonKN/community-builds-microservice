@@ -18,6 +18,9 @@ func NewBuildHandler(service *BuildService) *BuildHandler {
 	}
 }
 
+/**
+* Create build for a signed-in member.
+**/
 func (h *BuildHandler) CreateBuildHandler(c *gin.Context) {
 	memberId, _ := c.Get("userId")
 	var createBuildReq CreateBuildRequest
@@ -54,6 +57,25 @@ func (h *BuildHandler) GetBuildsForMemberHandler(c *gin.Context) {
 
 }
 
+/**
+* Adds primary, secondary, and other skills and links to a existing build.
+**/
+func (h *BuildHandler) AddSkillsToBuild(c *gin.Context) {
+	memberId, _ := c.Get("userId")
+
+	builds, err := h.Service.GetBuildsForMemberService(memberId.(uuid.UUID))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all builds for memberId %s: %s", memberId, err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all builds for member.", "result": builds})
+}
+
+/**
+* Quick example setup for quick creation of extra handlers.
+**/
 func (h *BuildHandler) GetBuildsTemplate(c *gin.Context) {
 	memberId, _ := c.Get("userId")
 
