@@ -61,9 +61,30 @@ func (s *BuildService) AddSkillsToBuildService(memberId uuid.UUID, buildId uuid.
 		return err
 	}
 
-	// create skills for build
-	// TODO: remove create one for test and replace with loop.
-	err = s.Repo.InsertSkillToBuild(buildId, request.AdditionalSkills[0].Skill)
+	// -- create skills --
+
+	// --- main skill ---
+
+	// add main skill
+	err = s.Repo.InsertSkillToBuild(buildId, request.MainSkillLinks.Skill)
+
+	// add main skill's links
+	for _, mainSkill := range request.MainSkillLinks.Links {
+		err = s.Repo.InsertSkillToBuild(buildId, mainSkill)
+	}
+
+	// --- additional skills ---
+
+	for _, secondarySkills := range request.AdditionalSkills {
+
+		// add secondary skill
+		err = s.Repo.InsertSkillToBuild(buildId, secondarySkills.Skill)
+
+		// add secondary skill's links
+		for _, secondarySkillLinks := range secondarySkills.Links {
+			err = s.Repo.InsertSkillToBuild(buildId, secondarySkillLinks)
+		}
+	}
 
 	return err
 }
