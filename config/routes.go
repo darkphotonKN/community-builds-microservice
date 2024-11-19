@@ -7,6 +7,7 @@ import (
 	"github.com/darkphotonKN/community-builds/internal/member"
 	"github.com/darkphotonKN/community-builds/internal/rating"
 	"github.com/darkphotonKN/community-builds/internal/skill"
+	"github.com/darkphotonKN/community-builds/internal/tag"
 	"github.com/gin-gonic/gin"
 )
 
@@ -84,6 +85,20 @@ func SetupRouter() *gin.Engine {
 	buildRoutes.Use(auth.AuthMiddleware())
 	buildRoutes.GET("/", buildHandler.GetBuildsForMemberHandler)
 	buildRoutes.POST("/", buildHandler.CreateBuildHandler)
+
+	// -- TAG --
+
+	// --- Tag Setup ---
+	tagRepo := tag.NewTagRepository(DB)
+	tagService := tag.NewTagService(tagRepo)
+	tagHandler := tag.NewTagHandler(tagService)
+	// --- Tag Routes ---
+	tagRoutes := api.Group("/tag")
+	// Protected Routes
+	tagRoutes.Use(auth.AuthMiddleware())
+	tagRoutes.GET("/", tagHandler.GetTagsHandler)
+	tagRoutes.POST("/", tagHandler.CreateTagHandler)
+	tagRoutes.PATCH("/:id", tagHandler.UpdateTagsHandler)
 
 	return router
 }
