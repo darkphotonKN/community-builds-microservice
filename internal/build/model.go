@@ -8,12 +8,12 @@ type CreateBuildRequest struct {
 	Description string    `json:"description" binding:"required,min=10" db:"description"`
 }
 
-type SecondarySkillAndLinks struct {
-	Skill uuid.UUID   `json:"skill"`
-	Links []uuid.UUID `json:"links"`
+type SkillLinks struct {
+	Skill uuid.UUID   `json:"skill" binding:"required,uuid"`
+	Links []uuid.UUID `json:"links" binding:"required,max=6,dive,uuid"`
 }
 
 type AddSkillsToBuildRequest struct {
-	MainSkillLinks   []uuid.UUID              `json:"mainSkillLinks" binding:"required"`
-	AdditionalSkills []SecondarySkillAndLinks `json:"additionalSkills" binding:"required"`
+	MainSkillLinks   SkillLinks   `json:"mainSkillLinks" binding:"required"`
+	AdditionalSkills []SkillLinks `json:"additionalSkills" binding:"required,max=6"`
 }

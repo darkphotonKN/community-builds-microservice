@@ -54,3 +54,40 @@ func (r *BuildRepository) GetBuildsByMemberId(memberId uuid.UUID) (*[]models.Bui
 
 	return &builds, nil
 }
+
+func (r *BuildRepository) GetBuildForMemberById(memberId uuid.UUID, buildId uuid.UUID) (*models.Build, error) {
+	var build models.Build
+
+	query := `
+	SELECT * FROM builds
+	WHERE member_id = $1
+	AND id = $2
+	`
+
+	err := r.DB.Get(&build, query, memberId, buildId)
+
+	if err != nil {
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return &build, nil
+}
+
+func (r *BuildRepository) InsertSkillToBuild(buildId uuid.UUID, skillId uuid.UUID) error {
+	query := `
+	INSERT INTO build_skills(build_id, skill_id)
+	VALUES(:build_id, :skill_id)
+	`
+	params := map[string]interface{}{
+		"build_id": buildId,
+		"skill_id": skillId,
+	}
+
+	_, err := r.DB.NamedExec(query, params)
+
+	if err != nil {
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	return nil
+}

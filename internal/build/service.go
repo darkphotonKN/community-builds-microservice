@@ -42,3 +42,28 @@ func (s *BuildService) CreateBuildService(memberId uuid.UUID, createBuildRequest
 func (s *BuildService) GetBuildsForMemberService(memberId uuid.UUID) (*[]models.Build, error) {
 	return s.Repo.GetBuildsByMemberId(memberId)
 }
+
+/**
+* Get a single build for a member by Id.
+**/
+func (s *BuildService) GetBuildForMemberByIdService(memberId uuid.UUID, buildId uuid.UUID) (*models.Build, error) {
+	return s.Repo.GetBuildForMemberById(memberId, buildId)
+}
+
+/**
+* Adds primary and secondary skills and links to an existing build.
+**/
+func (s *BuildService) AddSkillsToBuildService(memberId uuid.UUID, buildId uuid.UUID, request AddSkillsToBuildRequest) error {
+	// get build and check if it exists
+	_, err := s.GetBuildForMemberByIdService(memberId, buildId)
+
+	if err != nil {
+		return err
+	}
+
+	// create skills for build
+	// TODO: remove create one for test and replace with loop.
+	err = s.Repo.InsertSkillToBuild(buildId, request.AdditionalSkills[0].Skill)
+
+	return err
+}
