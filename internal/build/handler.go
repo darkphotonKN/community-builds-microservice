@@ -57,6 +57,31 @@ func (h *BuildHandler) GetBuildsForMemberHandler(c *gin.Context) {
 }
 
 /**
+* Get all information for a build by ID for a particular member.
+**/
+func (h *BuildHandler) GetBuildInfoForMemberHandler(c *gin.Context) {
+	memberId, _ := c.Get("userId")
+
+	idParam := c.Param("id")
+
+	id, err := uuid.Parse(idParam)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.", id)})
+		return
+	}
+
+	build, err := h.Service.GetBuildInfoForMemberService(memberId.(uuid.UUID), id)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all build information for memberId %s: %s", memberId, err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved build for member.", "result": build})
+}
+
+/**
 * Adds primary, secondary, and other skills and links to a existing build.
 **/
 func (h *BuildHandler) AddSkillsToBuild(c *gin.Context) {
@@ -67,7 +92,6 @@ func (h *BuildHandler) AddSkillsToBuild(c *gin.Context) {
 	id, err := uuid.Parse(idParam)
 
 	if err != nil {
-
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.", id)})
 		return
 	}

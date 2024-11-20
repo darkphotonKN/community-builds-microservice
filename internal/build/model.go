@@ -1,6 +1,11 @@
 package build
 
-import "github.com/google/uuid"
+import (
+	"github.com/darkphotonKN/community-builds/internal/models"
+	"github.com/google/uuid"
+)
+
+// --- Request ---
 
 type CreateBuildRequest struct {
 	SkillID     uuid.UUID `json:"skillId" binding:"required" db:"main_skill_id"`
@@ -16,4 +21,23 @@ type SkillLinks struct {
 type AddSkillsToBuildRequest struct {
 	MainSkillLinks   SkillLinks   `json:"mainSkillLinks" binding:"required"`
 	AdditionalSkills []SkillLinks `json:"additionalSkills" binding:"required,max=6"`
+}
+
+// --- Response ---
+
+// temp type to hold raw rows data
+type BuildInfoRows struct {
+	ID          uuid.UUID `db:"id"`
+	Title       string    `db:"title"`
+	Description string    `db:"description"`
+	SkillID     uuid.UUID `db:"skill_id"`
+	SkillName   string    `db:"skill_name"`
+	SkillType   string    `db:"skill_type"`
+}
+
+type BuildInfoResponse struct {
+	ID          uuid.UUID      `json:"id"`
+	Title       string         `json:"title"`
+	Description string         `json:"description"`
+	Skills      []models.Skill `json:"skills"`
 }

@@ -51,6 +51,13 @@ func (s *BuildService) GetBuildForMemberByIdService(memberId uuid.UUID, buildId 
 }
 
 /**
+* Get a single build with all information by ID for a member.
+**/
+func (s *BuildService) GetBuildInfoForMemberService(memberId uuid.UUID, buildId uuid.UUID) (*BuildInfoResponse, error) {
+	return s.Repo.GetBuildInfo(memberId, buildId)
+}
+
+/**
 * Adds primary and secondary skills and links to an existing build.
 **/
 func (s *BuildService) AddSkillsToBuildService(memberId uuid.UUID, buildId uuid.UUID, request AddSkillsToBuildRequest) error {
@@ -74,7 +81,6 @@ func (s *BuildService) AddSkillsToBuildService(memberId uuid.UUID, buildId uuid.
 	}
 
 	// --- additional skills ---
-
 	for _, secondarySkills := range request.AdditionalSkills {
 
 		// add secondary skill
