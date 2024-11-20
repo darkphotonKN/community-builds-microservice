@@ -5,6 +5,7 @@ import (
 	"github.com/darkphotonKN/community-builds/internal/models"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type BuildRepository struct {
@@ -20,19 +21,25 @@ func NewBuildRepository(db *sqlx.DB) *BuildRepository {
 func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest CreateBuildRequest) error {
 	query := `
 	INSERT INTO builds(member_id, main_skill_id, title, description)
-	VALUES(:member_id, :main_skill_id, :title, :description)
+	VALUES($1, $2, $3, $4)
+	RETURNING id
 	`
-	params := map[string]interface{}{
-		"member_id":     memberId,
-		"main_skill_id": createBuildRequest.SkillID,
-		"title":         createBuildRequest.Title,
-		"description":   createBuildRequest.Description,
-	}
+	var buildId uuid.UUID
 
-	_, err := r.DB.NamedExec(query, params)
+	err := r.DB.QueryRowx(query, memberId, createBuildRequest.SkillID, createBuildRequest.Title, createBuildRequest.Description).Scan(&buildId)
 
 	if err != nil {
 		return errorutils.AnalyzeDBErr(err)
+	}
+
+	buildTagQuery := `
+	INSERT INTO build_tags(build_id, tag_id)
+	VALUES($1, unnest($2::uuid[]))
+	`
+
+	_, buildTagsErr := r.DB.Exec(buildTagQuery, buildId, pq.Array(createBuildRequest.TagIDs))
+	if buildTagsErr != nil {
+		return errorutils.AnalyzeDBErr(buildTagsErr)
 	}
 
 	return nil
