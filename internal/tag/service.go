@@ -2,7 +2,6 @@ package tag
 
 import (
 	"github.com/darkphotonKN/community-builds/internal/models"
-	"github.com/google/uuid"
 )
 
 type TagService struct {
@@ -19,8 +18,8 @@ func (s *TagService) CreateTagService(createTagReq CreateTagRequest) error {
 	return s.Repo.CreateTag(createTagReq)
 }
 
-func (s *TagService) UpdateTagsService(id uuid.UUID, updateItemReq UpdateTagRequest) (*UpdateTagRequest, error) {
-	return s.Repo.UpdateTag(id, updateItemReq)
+func (s *TagService) UpdateTagsService(updateTagReq UpdateTagRequest) error {
+	return s.Repo.UpdateTag(updateTagReq)
 }
 
 func (s *TagService) GetTagsService() (*[]models.Tag, error) {

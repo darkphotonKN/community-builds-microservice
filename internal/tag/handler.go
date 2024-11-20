@@ -66,12 +66,12 @@ func (h *TagHandler) UpdateTagsHandler(c *gin.Context) {
 		return
 	}
 
-	updatedTag, err := h.Service.UpdateTagsService(id, updateTagReq)
+	resErr := h.Service.UpdateTagsService(updateTagReq)
 
-	if err != nil {
+	if resErr != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to update tag with id: %s\n error: %s\n", id, err)})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully updated tag.", "result": updatedTag})
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully updated tag."})
 }

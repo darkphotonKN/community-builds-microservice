@@ -7,7 +7,8 @@ type CreateTagRequest struct {
 }
 
 type UpdateTagRequest struct {
-	Name string `json:"name" binding:"required" db:"name"`
+	ID   uuid.UUID `db:"id" json:"id"`
+	Name string    `json:"name" binding:"required" db:"name"`
 }
 
 type UpdateTagParams struct {

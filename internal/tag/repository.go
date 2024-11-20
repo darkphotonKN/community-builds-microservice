@@ -6,7 +6,6 @@ import (
 
 	"github.com/darkphotonKN/community-builds/internal/errorutils"
 	"github.com/darkphotonKN/community-builds/internal/models"
-	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -51,23 +50,19 @@ func (r *TagRepository) GetTags() (*[]models.Tag, error) {
 	return &tags, nil
 }
 
-func (r *TagRepository) UpdateTag(id uuid.UUID, payload UpdateTagRequest) (*UpdateTagRequest, error) {
+func (r *TagRepository) UpdateTag(payload UpdateTagRequest) error {
 
-	params := UpdateTagParams{
-		ID:   id,
-		Name: payload.Name,
-	}
 	query := `UPDATE tags SET name = :name WHERE id = :id`
 
-	result, err := r.DB.NamedExec(query, params)
+	result, err := r.DB.NamedExec(query, payload)
 
 	if err != nil {
-		return nil, errorutils.AnalyzeDBErr(err)
+		return errorutils.AnalyzeDBErr(err)
 	}
 
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
-		return nil, errors.New("no rows updated")
+		return errors.New("no rows updated")
 	}
-	return &payload, nil
+	return nil
 }
