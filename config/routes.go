@@ -84,6 +84,7 @@ func SetupRouter() *gin.Engine {
 	buildRoutes.Use(auth.AuthMiddleware())
 	buildRoutes.GET("/", buildHandler.GetBuildsForMemberHandler)
 	buildRoutes.POST("/", buildHandler.CreateBuildHandler)
+	buildRoutes.POST("/:id/addSkills", buildHandler.AddSkillsToBuild)
 
 	return router
 }

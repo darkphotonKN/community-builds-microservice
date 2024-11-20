@@ -13,10 +13,9 @@ CREATE TABLE IF NOT EXISTS members (
     email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
     status SMALLINT NOT NULL DEFAULT 1 CHECK (status IN (1, 2)), -- account status 1: Member, 2: Author
-
+    
     -- extra --
     average_rating DECIMAL(2, 1) DEFAULT 0 CHECK (average_rating >= 0 AND average_rating <= 5)
-
 );
 
 -- Create function to auto-update the updated_at column

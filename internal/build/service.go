@@ -40,6 +40,51 @@ func (s *BuildService) CreateBuildService(memberId uuid.UUID, createBuildRequest
 * Get list builds available to a member.
 **/
 func (s *BuildService) GetBuildsForMemberService(memberId uuid.UUID) (*[]models.Build, error) {
-
 	return s.Repo.GetBuildsByMemberId(memberId)
+}
+
+/**
+* Get a single build for a member by Id.
+**/
+func (s *BuildService) GetBuildForMemberByIdService(memberId uuid.UUID, buildId uuid.UUID) (*models.Build, error) {
+	return s.Repo.GetBuildForMemberById(memberId, buildId)
+}
+
+/**
+* Adds primary and secondary skills and links to an existing build.
+**/
+func (s *BuildService) AddSkillsToBuildService(memberId uuid.UUID, buildId uuid.UUID, request AddSkillsToBuildRequest) error {
+	// get build and check if it exists
+	_, err := s.GetBuildForMemberByIdService(memberId, buildId)
+
+	if err != nil {
+		return err
+	}
+
+	// -- create skills --
+
+	// --- main skill ---
+
+	// add main skill
+	err = s.Repo.InsertSkillToBuild(buildId, request.MainSkillLinks.Skill)
+
+	// add main skill's links
+	for _, mainSkill := range request.MainSkillLinks.Links {
+		err = s.Repo.InsertSkillToBuild(buildId, mainSkill)
+	}
+
+	// --- additional skills ---
+
+	for _, secondarySkills := range request.AdditionalSkills {
+
+		// add secondary skill
+		err = s.Repo.InsertSkillToBuild(buildId, secondarySkills.Skill)
+
+		// add secondary skill's links
+		for _, secondarySkillLinks := range secondarySkills.Links {
+			err = s.Repo.InsertSkillToBuild(buildId, secondarySkillLinks)
+		}
+	}
+
+	return err
 }
