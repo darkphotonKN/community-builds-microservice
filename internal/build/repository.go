@@ -78,7 +78,7 @@ func (r *BuildRepository) GetBuildForMemberById(memberId uuid.UUID, buildId uuid
 * join table build skills, builds, and skills.
 **/
 func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*BuildInfoResponse, error) {
-	var tempRowData []BuildInfoRows
+	var buildRowData []BuildInfoRows
 
 	query := `
 	SELECT 
@@ -94,7 +94,7 @@ func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*
 	WHERE builds.id = $1 AND builds.member_id = $2
 	`
 
-	err := r.DB.Select(&tempRowData, query, buildId, memberId)
+	err := r.DB.Select(&buildRowData, query, buildId, memberId)
 
 	if err != nil {
 		return nil, errorutils.AnalyzeDBErr(err)
@@ -102,13 +102,13 @@ func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*
 
 	// build up base of the response
 	result := BuildInfoResponse{
-		ID:          tempRowData[0].ID,
-		Title:       tempRowData[0].Title,
-		Description: tempRowData[0].Description,
+		ID:          buildRowData[0].ID,
+		Title:       buildRowData[0].Title,
+		Description: buildRowData[0].Description,
 	}
 
 	// group up all skill information
-	for _, row := range tempRowData {
+	for _, row := range buildRowData {
 		result.Skills = append(result.Skills, models.Skill{
 			ID:   row.ID,
 			Name: row.SkillName,

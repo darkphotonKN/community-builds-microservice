@@ -25,7 +25,7 @@ type AddSkillsToBuildRequest struct {
 
 // --- Response ---
 
-// temp type to hold raw rows data
+// To TEMP hold rows of builds JOIN build_skills JOIN skills data
 type BuildInfoRows struct {
 	ID          uuid.UUID `db:"id"`
 	Title       string    `db:"title"`
