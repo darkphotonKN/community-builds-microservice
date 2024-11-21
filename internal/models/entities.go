@@ -79,6 +79,14 @@ type BuildSkill struct {
 }
 
 /**
+* Items
+**/
+type Tag struct {
+	BaseDBDateModel
+	Name string `db:"name" json:"name"`
+}
+
+/**
 * Base models for default table columns.
 **/
 
