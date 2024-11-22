@@ -82,7 +82,7 @@ func (h *BuildHandler) GetBuildInfoForMemberHandler(c *gin.Context) {
 }
 
 /**
-* Adds primary, secondary, and other skills and links to a existing build.
+* Adds primary, secondary, and other skills and links to an existing build.
 **/
 func (h *BuildHandler) AddSkillsToBuild(c *gin.Context) {
 	memberId, _ := c.Get("userId")

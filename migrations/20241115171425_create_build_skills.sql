@@ -1,11 +1,11 @@
 -- Build Skills Table
--- Join Table between Skills and Builds
+-- Join Table between Build Skill Groups and Skills
 
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS build_skills (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    build_id UUID NOT NULL REFERENCES builds(id) ON DELETE CASCADE,
+    build_id UUID NOT NULL REFERENCES build_skill_groups(id) ON DELETE CASCADE,
     skill_id UUID NOT NULL REFERENCES skills(id) ON DELETE CASCADE
 );
 -- +goose StatementEnd

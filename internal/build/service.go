@@ -32,6 +32,17 @@ func (s *BuildService) CreateBuildService(memberId uuid.UUID, createBuildRequest
 		return fmt.Errorf("main skill id could not be found when attempting to create build for it.")
 	}
 
+	// check how many builds a user has, prevent creation if over the limit
+	builds, err := s.GetBuildsForMemberService(memberId)
+
+	if len(*builds) > maxBuildCount {
+		return fmt.Errorf("Number of builds allowed have reached maximum capacity.")
+	}
+
+	if err != nil {
+		return err
+	}
+
 	// create build with this skill and for this member
 	return s.Repo.CreateBuild(memberId, createBuildRequest)
 }
