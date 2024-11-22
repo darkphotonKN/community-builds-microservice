@@ -15,8 +15,9 @@ type CreateBuildRequest struct {
 }
 
 type SkillLinks struct {
-	Skill uuid.UUID   `json:"skill" binding:"required,uuid"`
-	Links []uuid.UUID `json:"links" binding:"required,max=6,dive,uuid"`
+	SkillLinkName string      `json:"skillLinkName" binding:"required"`
+	Skill         uuid.UUID   `json:"skill" binding:"required,uuid"`
+	Links         []uuid.UUID `json:"links" binding:"required,max=6,dive,uuid"`
 }
 
 type AddSkillsToBuildRequest struct {

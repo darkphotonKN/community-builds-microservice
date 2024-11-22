@@ -84,7 +84,7 @@ func (h *BuildHandler) GetBuildInfoForMemberHandler(c *gin.Context) {
 /**
 * Adds primary, secondary, and other skills and links to an existing build.
 **/
-func (h *BuildHandler) AddSkillsToBuild(c *gin.Context) {
+func (h *BuildHandler) AddSkillLinksToBuildHandler(c *gin.Context) {
 	memberId, _ := c.Get("userId")
 
 	idParam := c.Param("id")
@@ -103,7 +103,7 @@ func (h *BuildHandler) AddSkillsToBuild(c *gin.Context) {
 		return
 	}
 
-	err = h.Service.AddSkillsToBuildService(memberId.(uuid.UUID), id, request)
+	err = h.Service.AddSkillLinksToBuildService(memberId.(uuid.UUID), id, request)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all builds for memberId %s: %s", memberId, err.Error())})

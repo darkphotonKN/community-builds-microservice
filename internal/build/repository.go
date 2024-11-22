@@ -126,14 +126,44 @@ func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*
 	return &result, nil
 }
 
-func (r *BuildRepository) InsertSkillToBuild(buildId uuid.UUID, skillId uuid.UUID) error {
+/**
+* Creates a skill link group for a build.
+**/
+func (r *BuildRepository) CreateBuildSkillLink(buildId uuid.UUID, name string, isMain bool) (uuid.UUID, error) {
+	var newId uuid.UUID
+
 	query := `
-	INSERT INTO build_skills(build_id, skill_id)
-	VALUES(:build_id, :skill_id)
+	INSERT INTO build_skill_links(build_id, name, is_main)
+	VALUES(:build_id, :name, :is_main)
+	RETURNING id
 	`
 	params := map[string]interface{}{
 		"build_id": buildId,
-		"skill_id": skillId,
+		"name":     name,
+		"is_main":  isMain,
+	}
+
+	err := r.DB.QueryRowx(query, params).Scan(&newId)
+
+	if err != nil {
+		return uuid.Nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return newId, nil
+}
+
+/**
+* Adds a skill to a existing skill link.
+**/
+func (r *BuildRepository) AddSkillToLink(buildSkillLinkId uuid.UUID, skillId uuid.UUID) error {
+	query := `
+	INSERT INTO build_skill_link_skills(build_skill_link_id, skill_id)
+	VALUES(build_skill_link_id, skill_id)
+	`
+
+	params := map[string]interface{}{
+		"build_skill_link_id": buildSkillLinkId,
+		"skill_id":            skillId,
 	}
 
 	_, err := r.DB.NamedExec(query, params)

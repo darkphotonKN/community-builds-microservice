@@ -19,6 +19,6 @@ CREATE TABLE IF NOT EXISTS builds (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS builds;
+DROP TABLE IF EXISTS builds 
 -- +goose StatementEnd
 

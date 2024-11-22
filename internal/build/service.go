@@ -71,7 +71,7 @@ func (s *BuildService) GetBuildInfoForMemberService(memberId uuid.UUID, buildId 
 /**
 * Adds primary and secondary skills and links to an existing build.
 **/
-func (s *BuildService) AddSkillsToBuildService(memberId uuid.UUID, buildId uuid.UUID, request AddSkillsToBuildRequest) error {
+func (s *BuildService) AddSkillLinksToBuildService(memberId uuid.UUID, buildId uuid.UUID, request AddSkillsToBuildRequest) error {
 	// get build and check if it exists
 	_, err := s.GetBuildForMemberByIdService(memberId, buildId)
 
@@ -79,29 +79,41 @@ func (s *BuildService) AddSkillsToBuildService(memberId uuid.UUID, buildId uuid.
 		return err
 	}
 
-	// -- create skills --
+	// -- CREATE SKILL LINKS FOR BUILD --
 
-	// --- main skill ---
+	// --- primary links ---
 
-	// add main skill
-	err = s.Repo.InsertSkillToBuild(buildId, request.MainSkillLinks.Skill)
+	// add main skill group
+	mainSkillLinkId, err := s.Repo.CreateBuildSkillLink(buildId, request.MainSkillLinks.SkillLinkName, true)
 
-	// add main skill's links
-	for _, mainSkill := range request.MainSkillLinks.Links {
-		err = s.Repo.InsertSkillToBuild(buildId, mainSkill)
-	}
-
-	// --- additional skills ---
-	for _, secondarySkills := range request.AdditionalSkills {
-
-		// add secondary skill
-		err = s.Repo.InsertSkillToBuild(buildId, secondarySkills.Skill)
-
-		// add secondary skill's links
-		for _, secondarySkillLinks := range secondarySkills.Links {
-			err = s.Repo.InsertSkillToBuild(buildId, secondarySkillLinks)
+	// create skill relations under this main skill link, one skill at a time
+	for _, skillId := range request.MainSkillLinks.Links {
+		err := s.Repo.AddSkillToLink(mainSkillLinkId, skillId)
+		if err != nil {
+			return err
 		}
 	}
 
-	return err
+	// --- other links ---
+
+	errors := err.Error() // create base error to build upon, grouping up all create errors
+	for _, skillLinks := range request.AdditionalSkills {
+
+		// add secondary skill group
+		secondarySkillLinkId, err := s.Repo.CreateBuildSkillLink(buildId, skillLinks.SkillLinkName, false)
+
+		// create skill relations under this secondary skill link, one skill at a time
+		for _, skillId := range skillLinks.Links {
+			err := s.Repo.AddSkillToLink(secondarySkillLinkId, skillId)
+			if err != nil {
+				return err
+			}
+		}
+
+		if err != nil {
+			errors += fmt.Sprintf(", %s", err.Error()) // add to error group
+		}
+	}
+
+	return fmt.Errorf(errors)
 }
