@@ -1,6 +1,8 @@
 package build
 
 import (
+	"fmt"
+
 	"github.com/darkphotonKN/community-builds/internal/errorutils"
 	"github.com/darkphotonKN/community-builds/internal/models"
 	"github.com/google/uuid"
@@ -134,18 +136,14 @@ func (r *BuildRepository) CreateBuildSkillLink(buildId uuid.UUID, name string, i
 
 	query := `
 	INSERT INTO build_skill_links(build_id, name, is_main)
-	VALUES(:build_id, :name, :is_main)
+	VALUES($1, $2, $3)
 	RETURNING id
 	`
-	params := map[string]interface{}{
-		"build_id": buildId,
-		"name":     name,
-		"is_main":  isMain,
-	}
 
-	err := r.DB.QueryRowx(query, params).Scan(&newId)
+	err := r.DB.QueryRowx(query, buildId, name, isMain).Scan(&newId)
 
 	if err != nil {
+		fmt.Printf("Error when attempting to insert into build_skill_links: %s", err)
 		return uuid.Nil, errorutils.AnalyzeDBErr(err)
 	}
 
@@ -158,7 +156,7 @@ func (r *BuildRepository) CreateBuildSkillLink(buildId uuid.UUID, name string, i
 func (r *BuildRepository) AddSkillToLink(buildSkillLinkId uuid.UUID, skillId uuid.UUID) error {
 	query := `
 	INSERT INTO build_skill_link_skills(build_skill_link_id, skill_id)
-	VALUES(build_skill_link_id, skill_id)
+	VALUES(:build_skill_link_id, :skill_id)
 	`
 
 	params := map[string]interface{}{
@@ -169,6 +167,7 @@ func (r *BuildRepository) AddSkillToLink(buildSkillLinkId uuid.UUID, skillId uui
 	_, err := r.DB.NamedExec(query, params)
 
 	if err != nil {
+		fmt.Printf("Error when attempting to insert into join table build_skill_link_skills: %s", err)
 		return errorutils.AnalyzeDBErr(err)
 	}
 

@@ -99,6 +99,8 @@ func (h *BuildHandler) AddSkillLinksToBuildHandler(c *gin.Context) {
 	var request AddSkillsToBuildRequest
 
 	if err := c.ShouldBindJSON(&request); err != nil {
+
+		fmt.Printf("Failed to bind JSON payload: %+v, Error: %s", request, err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON: %s", err)})
 		return
 	}
@@ -106,7 +108,7 @@ func (h *BuildHandler) AddSkillLinksToBuildHandler(c *gin.Context) {
 	err = h.Service.AddSkillLinksToBuildService(memberId.(uuid.UUID), id, request)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all builds for memberId %s: %s", memberId, err.Error())})
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting add skills to builds, buildId %s: memberId: %s, error: %s", id, memberId, err.Error())})
 		return
 	}
 

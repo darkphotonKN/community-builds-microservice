@@ -22,7 +22,7 @@ type SkillLinks struct {
 
 type AddSkillsToBuildRequest struct {
 	MainSkillLinks   SkillLinks   `json:"mainSkillLinks" binding:"required"`
-	AdditionalSkills []SkillLinks `json:"additionalSkills" binding:"required,max=6"`
+	AdditionalSkills []SkillLinks `json:"additionalSkills" binding:"required"`
 }
 
 // --- Response ---
