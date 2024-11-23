@@ -108,6 +108,7 @@ func (s *BuildService) AddSkillLinksToBuildService(memberId uuid.UUID, buildId u
 	}
 
 	// --- other links ---
+
 	for _, skillLinks := range request.AdditionalSkills {
 
 		// add secondary skill group

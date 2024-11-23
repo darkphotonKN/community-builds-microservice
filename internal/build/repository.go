@@ -154,7 +154,22 @@ func (r *BuildRepository) CreateBuildSkillLink(buildId uuid.UUID, name string, i
 * Adds a skill to a existing skill link.
 **/
 func (r *BuildRepository) AddSkillToLink(buildSkillLinkId uuid.UUID, skillId uuid.UUID) error {
-	query := `
+	// TODO: still does not work
+	// validate that skill doesn't already exists first
+	var count int
+
+	query := ` 
+	SELECT Count(1) FROM build_skill_link_skills 
+	WHERE build_skill_link_id = $1 AND skill_id = $2
+	`
+	err := r.DB.Get(&count, query, buildSkillLinkId, skillId)
+
+	if count > 0 {
+		// return resource already exists error
+		return errorutils.ErrDuplicateResource
+	}
+
+	query = `
 	INSERT INTO build_skill_link_skills(build_skill_link_id, skill_id)
 	VALUES(:build_skill_link_id, :skill_id)
 	`
@@ -164,7 +179,7 @@ func (r *BuildRepository) AddSkillToLink(buildSkillLinkId uuid.UUID, skillId uui
 		"skill_id":            skillId,
 	}
 
-	_, err := r.DB.NamedExec(query, params)
+	_, err = r.DB.NamedExec(query, params)
 
 	if err != nil {
 		fmt.Printf("Error when attempting to insert into join table build_skill_link_skills: %s", err)
