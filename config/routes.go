@@ -8,6 +8,7 @@ import (
 	"github.com/darkphotonKN/community-builds/internal/rating"
 	"github.com/darkphotonKN/community-builds/internal/skill"
 	"github.com/darkphotonKN/community-builds/internal/tag"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,6 +17,14 @@ import (
 **/
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
+
+	// TODO: CORS for development, remove in PROD
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3666"},
+		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
+		AllowHeaders:     []string{"Content-Type", "Authorization"},
+		AllowCredentials: true,
+	}))
 
 	// base route
 	api := router.Group("/api")

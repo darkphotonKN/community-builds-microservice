@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/darkphotonKN/community-builds/internal/auth"
+	"github.com/darkphotonKN/community-builds/internal/errorutils"
 	"github.com/darkphotonKN/community-builds/internal/models"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -86,7 +87,7 @@ func (s *MemberService) LoginMemberService(loginReq MemberLoginRequest) (*Member
 
 	// extract password, and compare hashes
 	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginReq.Password)); err != nil {
-		return nil, errors.New("The credentials provided was incorrect.")
+		return nil, errorutils.ErrUnauthorized
 	}
 
 	// construct response with both user info and auth credentials

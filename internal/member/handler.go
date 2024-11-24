@@ -1,9 +1,11 @@
 package member
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
+	"github.com/darkphotonKN/community-builds/internal/errorutils"
 	"github.com/darkphotonKN/community-builds/internal/models"
 	"github.com/darkphotonKN/community-builds/internal/rating"
 	"github.com/gin-gonic/gin"
@@ -90,7 +92,10 @@ func (h *MemberHandler) LoginMemberHandler(c *gin.Context) {
 
 	userLoginRes, err := h.Service.LoginMemberService(loginReq)
 
-	if err != nil {
+	if errors.Is(err, errorutils.ErrUnauthorized) {
+		c.JSON(http.StatusUnauthorized, gin.H{"statusCode": http.StatusUnauthorized, "message": errorutils.ErrUnauthorized.Error()})
+		return
+	} else if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to login user: %s\n", err)})
 		return
 	}

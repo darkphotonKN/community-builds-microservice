@@ -90,17 +90,28 @@ func (s *BuildService) AddSkillLinksToBuildService(memberId uuid.UUID, buildId u
 
 	// --- transaction commit or rollback ---
 	defer func() {
-		tx.Rollback()
-		// recover, rollback, then re-throw panic
+		// roll back during crashes or unexpected events
 		if p := recover(); p != nil {
+
+			fmt.Println("Rolling back due to a crash or unexpected event.")
 			tx.Rollback()
 
 			// re-throw panic after rollback
 			panic(p)
+
+			// rollback due to an error occuring during transaction
 		} else if err != nil {
+			fmt.Println("Rolling back due to an error during transaction.")
 			tx.Rollback()
-		} else {
-			err = tx.Commit()
+
+		}
+
+		// commit but check for errors
+		if commitErr := tx.Commit(); commitErr != nil {
+			// Log failure to commit
+			fmt.Printf("Failed to commit transaction: %v\n", commitErr)
+			tx.Rollback()
+			return
 		}
 	}()
 
@@ -152,6 +163,7 @@ func (s *BuildService) AddSkillLinksToBuildService(memberId uuid.UUID, buildId u
 		// create skill relations under this secondary skill link, one skill at a time
 		for _, skillId := range skillLinks.Links {
 			err := s.Repo.AddSkillToLinkTx(tx, secondarySkillLinkId, skillId)
+			fmt.Println("Error setting for secondary skill:", err)
 			if err != nil {
 				return err
 			}

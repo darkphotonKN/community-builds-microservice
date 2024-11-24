@@ -11,4 +11,6 @@ var (
 	ErrInvalidInput        = errors.New("Invalid input.")
 	ErrDuplicateResource   = errors.New("Resource already exists.")
 	ErrConstraintViolation = errors.New("Input does not follow column constraints.")
+	ErrForbidden           = errors.New("You do not have permission to access this resource.")
+	ErrUnauthorized        = errors.New("Incorrect credentials entered during when attempting to authenticate.")
 )
