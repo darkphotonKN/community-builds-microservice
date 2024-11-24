@@ -1,6 +1,8 @@
 package build
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/darkphotonKN/community-builds/internal/errorutils"
@@ -154,19 +156,22 @@ func (r *BuildRepository) CreateBuildSkillLink(buildId uuid.UUID, name string, i
 * Adds a skill to a existing skill link.
 **/
 func (r *BuildRepository) AddSkillToLink(buildSkillLinkId uuid.UUID, skillId uuid.UUID) error {
-	// TODO: still does not work
-	// validate that skill doesn't already exists first
-	var count int
 
-	query := ` 
-	SELECT Count(1) FROM build_skill_link_skills 
+	// validate that skill doesn't already exists first
+	var existsId uuid.UUID
+
+	query := `
+	SELECT id FROM build_skill_link_skills 
 	WHERE build_skill_link_id = $1 AND skill_id = $2
 	`
-	err := r.DB.Get(&count, query, buildSkillLinkId, skillId)
 
-	if count > 0 {
-		// return resource already exists error
-		return errorutils.ErrDuplicateResource
+	fmt.Printf("Executing Query: %s\nParameters: buildSkillLinkId: %s, skillId: %s\n", query, buildSkillLinkId, skillId)
+
+	err := r.DB.Get(&existsId, query, buildSkillLinkId, skillId)
+
+	// if resource IS found, don't create duplicate skill-link to skill relation insert
+	if !errors.Is(err, sql.ErrNoRows) {
+		fmt.Println("WOW! Error was resource not found.")
 	}
 
 	query = `

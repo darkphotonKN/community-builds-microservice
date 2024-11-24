@@ -107,8 +107,7 @@ func (s *BuildService) AddSkillLinksToBuildService(memberId uuid.UUID, buildId u
 		}
 	}
 
-	// --- other links ---
-
+	// --- other links --
 	for _, skillLinks := range request.AdditionalSkills {
 
 		// add secondary skill group
@@ -119,7 +118,7 @@ func (s *BuildService) AddSkillLinksToBuildService(memberId uuid.UUID, buildId u
 			return err
 		}
 
-		fmt.Printf("secondarySkillLinkId created, id: %s\n", mainSkillLinkId)
+		fmt.Printf("secondarySkillLinkId created, id: %s\n", secondarySkillLinkId)
 
 		// add main skill relation to secondary link
 		err = s.Repo.AddSkillToLink(secondarySkillLinkId, skillLinks.Skill)
