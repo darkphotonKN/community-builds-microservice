@@ -81,10 +81,33 @@ func (s *BuildService) AddSkillLinksToBuildService(memberId uuid.UUID, buildId u
 
 	// -- CREATE SKILL LINKS FOR BUILD --
 
+	// --- transaction start ---
+	tx, err := s.Repo.DB.Beginx() // NOTE: use "beginx" for the *sqlx* version
+
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+
+	// --- transaction commit or rollback ---
+	defer func() {
+		tx.Rollback()
+		// recover, rollback, then re-throw panic
+		if p := recover(); p != nil {
+			tx.Rollback()
+
+			// re-throw panic after rollback
+			panic(p)
+		} else if err != nil {
+			tx.Rollback()
+		} else {
+			err = tx.Commit()
+		}
+	}()
+
 	// --- primary links ---
 
 	// add main skill group
-	mainSkillLinkId, err := s.Repo.CreateBuildSkillLink(buildId, request.MainSkillLinks.SkillLinkName, true)
+	mainSkillLinkId, err := s.Repo.CreateBuildSkillLinkTx(tx, buildId, request.MainSkillLinks.SkillLinkName, true)
 
 	// stop adding skills if link wasn't created successfully
 	if mainSkillLinkId == uuid.Nil {
@@ -94,14 +117,14 @@ func (s *BuildService) AddSkillLinksToBuildService(memberId uuid.UUID, buildId u
 	fmt.Printf("mainSkillLink created, id: %s\n", mainSkillLinkId)
 
 	// add main skill relation to main skill link
-	err = s.Repo.AddSkillToLink(mainSkillLinkId, request.MainSkillLinks.Skill)
+	err = s.Repo.AddSkillToLinkTx(tx, mainSkillLinkId, request.MainSkillLinks.Skill)
 	if err != nil {
 		return err
 	}
 
 	// create skill relations under this main skill link, one skill at a time
 	for _, skillId := range request.MainSkillLinks.Links {
-		err := s.Repo.AddSkillToLink(mainSkillLinkId, skillId)
+		err := s.Repo.AddSkillToLinkTx(tx, mainSkillLinkId, skillId)
 		if err != nil {
 			return err
 		}
@@ -111,7 +134,7 @@ func (s *BuildService) AddSkillLinksToBuildService(memberId uuid.UUID, buildId u
 	for _, skillLinks := range request.AdditionalSkills {
 
 		// add secondary skill group
-		secondarySkillLinkId, err := s.Repo.CreateBuildSkillLink(buildId, skillLinks.SkillLinkName, false)
+		secondarySkillLinkId, err := s.Repo.CreateBuildSkillLinkTx(tx, buildId, skillLinks.SkillLinkName, false)
 
 		// stop adding skills if link wasn't created successfully
 		if secondarySkillLinkId == uuid.Nil {
@@ -121,14 +144,14 @@ func (s *BuildService) AddSkillLinksToBuildService(memberId uuid.UUID, buildId u
 		fmt.Printf("secondarySkillLinkId created, id: %s\n", secondarySkillLinkId)
 
 		// add main skill relation to secondary link
-		err = s.Repo.AddSkillToLink(secondarySkillLinkId, skillLinks.Skill)
+		err = s.Repo.AddSkillToLinkTx(tx, secondarySkillLinkId, skillLinks.Skill)
 		if err != nil {
 			return err
 		}
 
 		// create skill relations under this secondary skill link, one skill at a time
 		for _, skillId := range skillLinks.Links {
-			err := s.Repo.AddSkillToLink(secondarySkillLinkId, skillId)
+			err := s.Repo.AddSkillToLinkTx(tx, secondarySkillLinkId, skillId)
 			if err != nil {
 				return err
 			}

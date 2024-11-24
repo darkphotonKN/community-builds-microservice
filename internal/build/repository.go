@@ -133,7 +133,7 @@ func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*
 /**
 * Creates a skill link group for a build.
 **/
-func (r *BuildRepository) CreateBuildSkillLink(buildId uuid.UUID, name string, isMain bool) (uuid.UUID, error) {
+func (r *BuildRepository) CreateBuildSkillLinkTx(tx *sqlx.Tx, buildId uuid.UUID, name string, isMain bool) (uuid.UUID, error) {
 
 	// validate that skill doesn't already exists first
 	var existsId uuid.UUID
@@ -171,7 +171,7 @@ func (r *BuildRepository) CreateBuildSkillLink(buildId uuid.UUID, name string, i
 /**
 * Adds a skill to a existing skill link.
 **/
-func (r *BuildRepository) AddSkillToLink(buildSkillLinkId uuid.UUID, skillId uuid.UUID) error {
+func (r *BuildRepository) AddSkillToLinkTx(tx *sqlx.Tx, buildSkillLinkId uuid.UUID, skillId uuid.UUID) error {
 
 	// validate that skill doesn't already exists first
 	var existsId uuid.UUID
