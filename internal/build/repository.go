@@ -134,15 +134,31 @@ func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*
 * Creates a skill link group for a build.
 **/
 func (r *BuildRepository) CreateBuildSkillLink(buildId uuid.UUID, name string, isMain bool) (uuid.UUID, error) {
-	var newId uuid.UUID
+
+	// validate that skill doesn't already exists first
+	var existsId uuid.UUID
 
 	query := `
+	SELECT id FROM build_skill_links
+	WHERE build_id = $1 AND name = $2
+	`
+
+	err := r.DB.Get(&existsId, query, buildId, name)
+
+	if !errors.Is(err, sql.ErrNoRows) {
+		fmt.Printf("SkillLink with the same name already exists for this build.")
+		return uuid.Nil, errorutils.ErrDuplicateResource
+	}
+
+	var newId uuid.UUID
+
+	query = `
 	INSERT INTO build_skill_links(build_id, name, is_main)
 	VALUES($1, $2, $3)
 	RETURNING id
 	`
 
-	err := r.DB.QueryRowx(query, buildId, name, isMain).Scan(&newId)
+	err = r.DB.QueryRowx(query, buildId, name, isMain).Scan(&newId)
 
 	if err != nil {
 		fmt.Printf("Error when attempting to insert into build_skill_links: %s", err)
@@ -165,13 +181,11 @@ func (r *BuildRepository) AddSkillToLink(buildSkillLinkId uuid.UUID, skillId uui
 	WHERE build_skill_link_id = $1 AND skill_id = $2
 	`
 
-	fmt.Printf("Executing Query: %s\nParameters: buildSkillLinkId: %s, skillId: %s\n", query, buildSkillLinkId, skillId)
-
 	err := r.DB.Get(&existsId, query, buildSkillLinkId, skillId)
 
 	// if resource IS found, don't create duplicate skill-link to skill relation insert
 	if !errors.Is(err, sql.ErrNoRows) {
-		fmt.Println("WOW! Error was resource not found.")
+		return errorutils.ErrDuplicateResource
 	}
 
 	query = `
