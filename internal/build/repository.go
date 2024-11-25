@@ -89,41 +89,45 @@ func (r *BuildRepository) GetBuildForMemberById(memberId uuid.UUID, buildId uuid
 * join table build skills, builds, and skills.
 **/
 func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*BuildInfoResponse, error) {
-	var buildRowData []BuildInfoRows
+	var buildInfoRows []BuildInfoRows
 
 	query := `
 	SELECT 
-		builds.id AS id, 
-		builds.title AS title, 
-		builds.description AS description,
-		skills.id AS skill_id, 
-		skills.name AS skill_name, 
-		skills.type AS skill_type
+		builds.id as id,
+		builds.title as title,
+		builds.description as description,
+		build_skill_links.name as skill_link_name,
+		build_skill_links.is_main as skill_link_is_main
 	FROM builds
-	JOIN build_skills ON build_skills.build_id = builds.id
-	JOIN skills ON skills.id = build_skills.skill_id
+	JOIN build_skill_links ON build_skill_links.build_id = builds.id
 	WHERE builds.id = $1 AND builds.member_id = $2
 	`
 
-	err := r.DB.Select(&buildRowData, query, buildId, memberId)
+	err := r.DB.Select(&buildInfoRows, query, buildId, memberId)
 
 	if err != nil {
 		return nil, errorutils.AnalyzeDBErr(err)
 	}
 
+	fmt.Printf("\nbuildInfoRows: %+v\n\n", buildInfoRows)
+
+	if len(buildInfoRows) == 0 {
+		return nil, errorutils.ErrNotFound
+
+	}
+
 	// build up base of the response
 	result := BuildInfoResponse{
-		ID:          buildRowData[0].ID,
-		Title:       buildRowData[0].Title,
-		Description: buildRowData[0].Description,
+		ID:          buildInfoRows[0].ID,
+		Title:       buildInfoRows[0].Title,
+		Description: buildInfoRows[0].Description,
 	}
 
 	// group up all skill information
-	for _, row := range buildRowData {
-		result.Skills = append(result.Skills, models.Skill{
-			ID:   row.ID,
-			Name: row.SkillName,
-			Type: row.SkillType,
+	for _, row := range buildInfoRows {
+		result.Skills = append(result.Skills, TempSkillLink{
+			Name:   row.SkillLinkName,
+			IsMain: row.IsMain,
 		})
 	}
 

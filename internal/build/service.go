@@ -100,6 +100,7 @@ func (s *BuildService) AddSkillLinksToBuildService(memberId uuid.UUID, buildId u
 			panic(p)
 		}
 
+		// Rollback in the case of any errors.
 		if err != nil {
 			fmt.Println("Error on DEFER, rolling back:", err)
 			tx.Rollback()

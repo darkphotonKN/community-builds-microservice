@@ -1,7 +1,6 @@
 package build
 
 import (
-	"github.com/darkphotonKN/community-builds/internal/models"
 	"github.com/google/uuid"
 )
 
@@ -29,17 +28,21 @@ type AddSkillsToBuildRequest struct {
 
 // To TEMP hold rows of builds JOIN build_skills JOIN skills data
 type BuildInfoRows struct {
-	ID          uuid.UUID `db:"id"`
-	Title       string    `db:"title"`
-	Description string    `db:"description"`
-	SkillID     uuid.UUID `db:"skill_id"`
-	SkillName   string    `db:"skill_name"`
-	SkillType   string    `db:"skill_type"`
+	ID            uuid.UUID `db:"id"`
+	Title         string    `db:"title"`
+	Description   string    `db:"description"`
+	SkillLinkName string    `db:"skill_link_name"`
+	IsMain        bool      `db:"skill_link_is_main"`
+}
+
+type TempSkillLink struct {
+	Name   string `json:"name"`
+	IsMain bool   `json:"isMain"`
 }
 
 type BuildInfoResponse struct {
-	ID          uuid.UUID      `json:"id"`
-	Title       string         `json:"title"`
-	Description string         `json:"description"`
-	Skills      []models.Skill `json:"skills"`
+	ID          uuid.UUID       `json:"id"`
+	Title       string          `json:"title"`
+	Description string          `json:"description"`
+	Skills      []TempSkillLink `json:"skills"`
 }
