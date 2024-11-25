@@ -146,7 +146,6 @@ func (r *BuildRepository) CreateBuildSkillLinkTx(tx *sqlx.Tx, buildId uuid.UUID,
 	err := tx.Get(&existsId, query, buildId, name)
 
 	if !errors.Is(err, sql.ErrNoRows) {
-		fmt.Println("SkillLink with the same name already exists for this build.")
 		return uuid.Nil, errorutils.ErrDuplicateResource
 	}
 
@@ -188,6 +187,7 @@ func (r *BuildRepository) AddSkillToLinkTx(tx *sqlx.Tx, buildSkillLinkId uuid.UU
 		fmt.Println("Rows found, duplicate.")
 		return errorutils.ErrDuplicateResource
 	}
+
 	query = `
 	INSERT INTO build_skill_link_skills(build_skill_link_id, skill_id)
 	VALUES(:build_skill_link_id, :skill_id)
@@ -201,7 +201,6 @@ func (r *BuildRepository) AddSkillToLinkTx(tx *sqlx.Tx, buildSkillLinkId uuid.UU
 	_, err = tx.NamedExec(query, params)
 
 	if err != nil {
-		fmt.Println("ERROR ONE:", err)
 		fmt.Printf("DEBUG AddSkillToLinkTx: Error when attempting to insert into join table build_skill_link_skills: %s\n", err)
 		return errorutils.AnalyzeDBErr(err)
 	}
