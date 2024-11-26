@@ -64,7 +64,7 @@ func (s *BuildService) GetBuildForMemberByIdService(memberId uuid.UUID, buildId 
 /**
 * Get a single build with all information by ID for a member.
 **/
-func (s *BuildService) GetBuildInfoForMemberService(memberId uuid.UUID, buildId uuid.UUID) (*BuildInfoResponse, error) {
+func (s *BuildService) GetBuildInfoByIdService(memberId uuid.UUID, buildId uuid.UUID) (*BuildInfoResponse, error) {
 	return s.Repo.GetBuildInfo(memberId, buildId)
 }
 

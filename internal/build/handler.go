@@ -59,7 +59,7 @@ func (h *BuildHandler) GetBuildsForMemberHandler(c *gin.Context) {
 /**
 * Get all information for a build by ID for a particular member.
 **/
-func (h *BuildHandler) GetBuildInfoForMemberHandler(c *gin.Context) {
+func (h *BuildHandler) GetBuildInfoByIdHandler(c *gin.Context) {
 	memberId, _ := c.Get("userId")
 
 	idParam := c.Param("id")
@@ -71,7 +71,9 @@ func (h *BuildHandler) GetBuildInfoForMemberHandler(c *gin.Context) {
 		return
 	}
 
-	build, err := h.Service.GetBuildInfoForMemberService(memberId.(uuid.UUID), id)
+	fmt.Printf("memberId: %s, id: %s\n", memberId, id)
+
+	build, err := h.Service.GetBuildInfoByIdService(memberId.(uuid.UUID), id)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all build information for memberId %s: %s", memberId, err.Error())})

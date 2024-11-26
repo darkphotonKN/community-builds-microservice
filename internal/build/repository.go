@@ -7,6 +7,7 @@ import (
 
 	"github.com/darkphotonKN/community-builds/internal/errorutils"
 	"github.com/darkphotonKN/community-builds/internal/models"
+	"github.com/darkphotonKN/community-builds/internal/types"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
@@ -96,40 +97,107 @@ func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*
 		builds.id as id,
 		builds.title as title,
 		builds.description as description,
+		build_skill_links.id as skill_link_id,
 		build_skill_links.name as skill_link_name,
-		build_skill_links.is_main as skill_link_is_main
+		build_skill_links.is_main as skill_link_is_main,
+		skills.id as skill_id,
+		skills.name as skill_name,
+		skills.type as skill_type
 	FROM builds
 	JOIN build_skill_links ON build_skill_links.build_id = builds.id
+	JOIN build_skill_link_skills ON build_skill_link_skills.build_skill_link_id = build_skill_links.id
+	JOIN skills ON skills.id = build_skill_link_skills.skill_id
 	WHERE builds.id = $1 AND builds.member_id = $2
+	ORDER BY build_skill_links.id
 	`
 
 	err := r.DB.Select(&buildInfoRows, query, buildId, memberId)
 
 	if err != nil {
+		fmt.Printf("Error when querying for build info: %s\n", err)
 		return nil, errorutils.AnalyzeDBErr(err)
 	}
 
-	fmt.Printf("\nbuildInfoRows: %+v\n\n", buildInfoRows)
-
 	if len(buildInfoRows) == 0 {
+		fmt.Printf("No builds queried: %s\n", err)
 		return nil, errorutils.ErrNotFound
-
 	}
 
-	// build up base of the response
+	// TODO: One skill in additional skills still has issues.
+
+	// create the base of the response
 	result := BuildInfoResponse{
 		ID:          buildInfoRows[0].ID,
 		Title:       buildInfoRows[0].Title,
 		Description: buildInfoRows[0].Description,
 	}
 
+	var mainSkillLink SkillLinkResponse          // store primary skills
+	var additionalSkillLinks []SkillLinkResponse // stores additional skills
+
 	// group up all skill information
 	for _, row := range buildInfoRows {
-		result.Skills = append(result.Skills, TempSkillLink{
-			Name:   row.SkillLinkName,
-			IsMain: row.IsMain,
-		})
+
+		// --- grouping primary skills ---
+
+		mainSkillLink.SkillLinkName = row.SkillLinkName
+
+		// identify the "main skill link" with "skill_link_is_main"
+		if row.SkillLinkIsMain {
+
+			// match start of skill by active skill - match after casting
+			if types.SkillType(row.SkillType) == types.Active {
+				mainSkillLink.Skill = models.Skill{
+					ID:   row.SkillID,
+					Name: row.SkillName,
+					Type: row.SkillType,
+				}
+			} else {
+				// else its a support skill link
+				mainSkillLink.Links = append(mainSkillLink.Links, models.Skill{
+					ID:   row.SkillID,
+					Name: row.SkillName,
+					Type: row.SkillType,
+				})
+			}
+		} else {
+
+			// --- grouping secondary skills ---
+
+			// else we construct the secondary skills
+			var newAdditionalSkillLink SkillLinkResponse
+
+			newAdditionalSkillLink.SkillLinkName = row.SkillLinkName
+
+			// match start of skill by active skill - match after casting
+			if types.SkillType(row.SkillType) == types.Active {
+				newAdditionalSkillLink.Skill = models.Skill{
+					ID:   row.SkillID,
+					Name: row.SkillName,
+					Type: row.SkillType,
+				}
+			} else {
+				// else its a support skill link
+				newAdditionalSkillLink.Links = append(newAdditionalSkillLink.Links, models.Skill{
+					ID:   row.SkillID,
+					Name: row.SkillName,
+					Type: row.SkillType,
+				})
+			}
+
+			// add it to slice of additionalSkillLinks
+			additionalSkillLinks = append(additionalSkillLinks, newAdditionalSkillLink)
+		}
+
 	}
+
+	// wrap them for response
+	skills := SkillGroupResponse{
+		MainSkillLinks:   mainSkillLink,
+		AdditionalSkills: additionalSkillLinks,
+	}
+
+	result.Skills = skills
 
 	return &result, nil
 }
