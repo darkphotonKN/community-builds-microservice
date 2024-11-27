@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/darkphotonKN/community-builds/internal/errorutils"
 	"github.com/darkphotonKN/community-builds/internal/models"
 	"github.com/darkphotonKN/community-builds/internal/rating"
+	"github.com/darkphotonKN/community-builds/internal/utils/errorutils"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )

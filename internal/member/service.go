@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/darkphotonKN/community-builds/internal/auth"
-	"github.com/darkphotonKN/community-builds/internal/errorutils"
 	"github.com/darkphotonKN/community-builds/internal/models"
+	"github.com/darkphotonKN/community-builds/internal/utils/errorutils"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )

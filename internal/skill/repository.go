@@ -1,8 +1,8 @@
 package skill
 
 import (
-	"github.com/darkphotonKN/community-builds/internal/errorutils"
 	"github.com/darkphotonKN/community-builds/internal/models"
+	"github.com/darkphotonKN/community-builds/internal/utils/errorutils"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
