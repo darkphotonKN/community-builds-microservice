@@ -14,8 +14,8 @@ import (
 * Accepts a function that expects a transaction argument and helps wrap the function call
 * with the initiation, passing, and error checking of that transaction.
 **/
-func execTx(db *sqlx.DB, fn func(tx *sqlx.Tx) error) (err error) {
-	tx, txBeginErr := db.Beginx() // NOTE: use "beginx" for the **sqlx** version
+func ExecTx(db *sqlx.DB, fn func(tx *sqlx.Tx) error) (err error) {
+	tx, txBeginErr := db.Beginx() // NOTE: use "beginx" for the **sqlx* version
 
 	if txBeginErr != nil {
 		fmt.Printf("Error when attempting to start transaction: %v\n", txBeginErr)

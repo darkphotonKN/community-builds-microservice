@@ -5,7 +5,9 @@ import (
 
 	"github.com/darkphotonKN/community-builds/internal/models"
 	"github.com/darkphotonKN/community-builds/internal/skill"
+	"github.com/darkphotonKN/community-builds/internal/utils/dbutils"
 	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
 )
 
 type BuildService struct {
@@ -73,92 +75,64 @@ func (s *BuildService) GetBuildInfoByIdService(memberId uuid.UUID, buildId uuid.
 * rolling back on error with any portion of the creation.
 **/
 func (s *BuildService) AddSkillLinksToBuildService(memberId uuid.UUID, buildId uuid.UUID, request AddSkillsToBuildRequest) error {
-	// get build and check if it exists
-	_, err := s.GetBuildForMemberByIdService(memberId, buildId)
 
-	if err != nil {
-		return err
-	}
+	return dbutils.ExecTx(s.Repo.DB, func(tx *sqlx.Tx) error {
+		// get build and check if it exists
+		_, err := s.GetBuildForMemberByIdService(memberId, buildId)
 
-	// -- CREATE SKILL LINKS FOR BUILD --
-
-	// --- transaction start ---
-	tx, err := s.Repo.DB.Beginx() // NOTE: use "beginx" for the *sqlx* version
-
-	if err != nil {
-		return fmt.Errorf("failed to initiate transaction: %w", err)
-	}
-
-	// --- transaction commit or rollback ---
-	defer func() {
-		// roll back during crashes or unexpected events
-		if p := recover(); p != nil {
-			fmt.Println("Rolling back due to a crash or unexpected event.")
-			tx.Rollback()
-
-			// re-throw panic after rollback
-			panic(p)
-		}
-
-		// Rollback in the case of any errors.
-		if err != nil {
-			fmt.Println("Error on DEFER, rolling back:", err)
-			tx.Rollback()
-		}
-	}()
-
-	// --- primary links ---
-
-	// add main skill group
-	mainSkillLinkId, err := s.Repo.CreateBuildSkillLinkTx(tx, buildId, request.MainSkillLinks.SkillLinkName, true)
-
-	// add main skill relation to main skill link
-	err = s.Repo.AddSkillToLinkTx(tx, mainSkillLinkId, request.MainSkillLinks.Skill)
-
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("mainSkillLink created, id: %s\n", mainSkillLinkId)
-
-	// create skill relations under this main skill link, one skill at a time
-	for _, skillId := range request.MainSkillLinks.Links {
-		err := s.Repo.AddSkillToLinkTx(tx, mainSkillLinkId, skillId)
-		if err != nil {
-			return err
-		}
-	}
-
-	// --- other links --
-	for _, skillLinks := range request.AdditionalSkills {
-
-		// add secondary skill group
-		secondarySkillLinkId, err := s.Repo.CreateBuildSkillLinkTx(tx, buildId, skillLinks.SkillLinkName, false)
-
-		// add main skill relation to secondary link
-		err = s.Repo.AddSkillToLinkTx(tx, secondarySkillLinkId, skillLinks.Skill)
 		if err != nil {
 			return err
 		}
 
-		fmt.Printf("secondarySkillLinkId created, id: %s\n", secondarySkillLinkId)
+		// -- CREATE SKILL LINKS FOR BUILD --
 
-		// create skill relations under this secondary skill link, one skill at a time
-		for _, skillId := range skillLinks.Links {
-			err := s.Repo.AddSkillToLinkTx(tx, secondarySkillLinkId, skillId)
+		// --- primary links ---
 
+		// add main skill group
+		mainSkillLinkId, err := s.Repo.CreateBuildSkillLinkTx(tx, buildId, request.MainSkillLinks.SkillLinkName, true)
+
+		// add main skill relation to main skill link
+		err = s.Repo.AddSkillToLinkTx(tx, mainSkillLinkId, request.MainSkillLinks.Skill)
+
+		if err != nil {
+			return err
+		}
+
+		fmt.Printf("mainSkillLink created, id: %s\n", mainSkillLinkId)
+
+		// create skill relations under this main skill link, one skill at a time
+		for _, skillId := range request.MainSkillLinks.Links {
+			err := s.Repo.AddSkillToLinkTx(tx, mainSkillLinkId, skillId)
 			if err != nil {
 				return err
 			}
 		}
-	}
 
-	// commit but check for errors
-	if err := tx.Commit(); err != nil {
-		fmt.Printf("Failed to commit transaction: %v\n", err)
-		tx.Rollback()
-		return err
-	}
+		// --- other links --
+		for _, skillLinks := range request.AdditionalSkills {
 
-	return nil
+			// add secondary skill group
+			secondarySkillLinkId, err := s.Repo.CreateBuildSkillLinkTx(tx, buildId, skillLinks.SkillLinkName, false)
+
+			// add main skill relation to secondary link
+			err = s.Repo.AddSkillToLinkTx(tx, secondarySkillLinkId, skillLinks.Skill)
+			if err != nil {
+				return err
+			}
+
+			fmt.Printf("secondarySkillLinkId created, id: %s\n", secondarySkillLinkId)
+
+			// create skill relations under this secondary skill link, one skill at a time
+			for _, skillId := range skillLinks.Links {
+				err := s.Repo.AddSkillToLinkTx(tx, secondarySkillLinkId, skillId)
+
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		return nil
+
+	})
 }

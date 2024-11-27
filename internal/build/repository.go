@@ -119,8 +119,10 @@ func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*
 	}
 
 	if len(buildInfoRows) == 0 {
-		fmt.Printf("No builds queried: %s\n", err)
-		return nil, errorutils.ErrNotFound
+		fmt.Printf("No builds queried.")
+
+		// no builds queried with skills or item joins
+		return nil, fmt.Errorf("The build in relation with skills or items returned no data.")
 	}
 
 	// TODO: One skill in additional skills still has issues.
