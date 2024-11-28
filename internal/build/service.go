@@ -133,6 +133,5 @@ func (s *BuildService) AddSkillLinksToBuildService(memberId uuid.UUID, buildId u
 		}
 
 		return nil
-
 	})
 }

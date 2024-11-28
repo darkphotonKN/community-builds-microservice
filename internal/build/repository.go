@@ -125,8 +125,6 @@ func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*
 		return nil, fmt.Errorf("The build in relation with skills or items returned no data.")
 	}
 
-	// TODO: One skill in additional skills still has issues.
-
 	// create the base of the response
 	result := BuildInfoResponse{
 		ID:          buildInfoRows[0].ID,
@@ -142,18 +140,19 @@ func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*
 
 		// --- grouping primary skills ---
 
-		mainSkillLink.SkillLinkName = row.SkillLinkName
-
-		// identify the "main skill link" with "skill_link_is_main"
+		// identify the "main skilllink" with the "skill_link_is_main" field
 		if row.SkillLinkIsMain {
+			mainSkillLink.SkillLinkName = row.SkillLinkName
 
 			// match start of skill by active skill - match after casting
 			if types.SkillType(row.SkillType) == types.Active {
+
 				mainSkillLink.Skill = models.Skill{
 					ID:   row.SkillID,
 					Name: row.SkillName,
 					Type: row.SkillType,
 				}
+
 			} else {
 				// else its a support skill link
 				mainSkillLink.Links = append(mainSkillLink.Links, models.Skill{
@@ -163,32 +162,78 @@ func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*
 				})
 			}
 		} else {
+			// else we construct the secondary skills
 
 			// --- grouping secondary skills ---
 
-			// else we construct the secondary skills
-			var newAdditionalSkillLink SkillLinkResponse
+			// find existing skillLink via SkillLinkName
+			skillLinkExists := false
+			var existingSkillLink *SkillLinkResponse
 
-			newAdditionalSkillLink.SkillLinkName = row.SkillLinkName
-
-			// match start of skill by active skill - match after casting
-			if types.SkillType(row.SkillType) == types.Active {
-				newAdditionalSkillLink.Skill = models.Skill{
-					ID:   row.SkillID,
-					Name: row.SkillName,
-					Type: row.SkillType,
+			for index := range additionalSkillLinks {
+				if additionalSkillLinks[index].SkillLinkName == row.SkillLinkName {
+					skillLinkExists = true
+					// save reference to original skill link slice
+					existingSkillLink = &additionalSkillLinks[index]
+					break
 				}
-			} else {
-				// else its a support skill link
-				newAdditionalSkillLink.Links = append(newAdditionalSkillLink.Links, models.Skill{
-					ID:   row.SkillID,
-					Name: row.SkillName,
-					Type: row.SkillType,
-				})
 			}
 
-			// add it to slice of additionalSkillLinks
-			additionalSkillLinks = append(additionalSkillLinks, newAdditionalSkillLink)
+			// update existing link
+			if skillLinkExists {
+				fmt.Printf("\n UPDATE -----> Updating Skill Link with info: \n%v\n\n", map[string]interface{}{"skillLinkName": row.SkillLinkName, "name": row.SkillName})
+				// starting link skill
+				if types.SkillType(row.SkillType) == types.Active {
+
+					existingSkillLink.Skill = models.Skill{
+						ID:   row.SkillID,
+						Name: row.SkillName,
+						Type: row.SkillType,
+					}
+
+				} else {
+					fmt.Printf("\n\nExisting Links update BEFORE: %+v\n\n", existingSkillLink.Links)
+					// support link skill
+					existingSkillLink.Links = append(existingSkillLink.Links, models.Skill{
+						ID:   row.SkillID,
+						Name: row.SkillName,
+						Type: row.SkillType,
+					})
+				}
+
+				fmt.Printf("\n\nExisting Links update AFTER: %+v\n\n", existingSkillLink.Links)
+			} else {
+				// creating new link
+
+				var newAdditionalSkillLink SkillLinkResponse
+
+				fmt.Printf("\n CREATE -----> Creating New Skill Link with info: \n%v\n\n", map[string]interface{}{"skillLinkName": row.SkillLinkName, "name": row.SkillName})
+
+				// create new skill link name and the first skill
+				newAdditionalSkillLink.SkillLinkName = row.SkillLinkName
+
+				// starting link skill
+				if types.SkillType(row.SkillType) == types.Active {
+					newAdditionalSkillLink.Skill = models.Skill{
+						ID:   row.SkillID,
+						Name: row.SkillName,
+						Type: row.SkillType,
+					}
+
+				} else {
+					// supporting skill link
+					newAdditionalSkillLink.Links = append(newAdditionalSkillLink.Links, models.Skill{
+						ID:   row.SkillID,
+						Name: row.SkillName,
+						Type: row.SkillType,
+					})
+				}
+
+				// add it to slice of additionalSkillLinks
+				additionalSkillLinks = append(additionalSkillLinks, newAdditionalSkillLink)
+			}
+
+			fmt.Printf("\n END FN -----> Final additionalSkillLinks: %+v\n\n", additionalSkillLinks)
 		}
 
 	}
