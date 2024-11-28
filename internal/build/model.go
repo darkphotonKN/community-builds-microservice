@@ -25,9 +25,14 @@ type AddSkillsToBuildRequest struct {
 	AdditionalSkills []SkillLinks `json:"additionalSkills" binding:"required"`
 }
 
+type UpdateSkillsToBuildRequest struct {
+	MainSkillLinks   SkillLinks   `json:"mainSkillLinks" binding:"required"`
+	AdditionalSkills []SkillLinks `json:"additionalSkills" binding:"required"`
+}
+
 // --- Response ---
 
-// To TEMP hold rows of builds JOIN build_skill_links JOIN skills data
+// TEMP CONTAINER for builds JOIN build_skill_links JOIN skills data
 type BuildInfoRows struct {
 	ID              uuid.UUID `db:"id"`
 	Title           string    `db:"title"`
@@ -57,6 +62,7 @@ type SkillGroupResponse struct {
 	AdditionalSkills []SkillLinkResponse `json:"additionalSkills"`
 }
 
+// All Build Information
 type BuildInfoResponse struct {
 	ID          uuid.UUID          `json:"id"`
 	Title       string             `json:"title"`

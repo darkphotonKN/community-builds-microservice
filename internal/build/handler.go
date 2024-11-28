@@ -101,7 +101,6 @@ func (h *BuildHandler) AddSkillLinksToBuildHandler(c *gin.Context) {
 	var request AddSkillsToBuildRequest
 
 	if err := c.ShouldBindJSON(&request); err != nil {
-
 		fmt.Printf("Failed to bind JSON payload: %+v, Error: %s", request, err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON: %s", err)})
 		return
@@ -115,6 +114,39 @@ func (h *BuildHandler) AddSkillLinksToBuildHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully added skills to build for member."})
+}
+
+/**
+* Updates a specific build's skill links.
+**/
+func (h *BuildHandler) UpdateBuildSkillLinksHandler(c *gin.Context) {
+	memberId, _ := c.Get("userId")
+
+	idParam := c.Param("id")
+
+	id, err := uuid.Parse(idParam)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.", id)})
+		return
+	}
+
+	var request UpdateSkillsToBuildRequest
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		fmt.Printf("Failed to bind JSON payload: %+v, Error: %s", request, err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON: %s", err)})
+		return
+	}
+
+	err = h.Service.UpdateBuildSkillLinksService(memberId.(uuid.UUID), id, request)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all builds for memberId %s: %s", memberId, err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all builds for member."})
 }
 
 /**

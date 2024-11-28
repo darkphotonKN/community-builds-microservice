@@ -42,9 +42,13 @@ func ExecTx(db *sqlx.DB, fn func(tx *sqlx.Tx) error) (err error) {
 	// call the function passed in and provide the transaction to it
 	err = fn(tx)
 
+	if err != nil {
+		return err
+	}
+
 	// no error, safe to commit
 	if commitErr := tx.Commit(); commitErr != nil {
-		fmt.Printf("failed to commit transaction, rolling back. Error: %s\n", commitErr)
+		fmt.Printf("Failed to commit transaction, rolling back. Error: %s\n", commitErr)
 		tx.Rollback() // rollback if commit fails
 
 		return commitErr

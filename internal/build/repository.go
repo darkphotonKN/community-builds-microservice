@@ -181,7 +181,6 @@ func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*
 
 			// update existing link
 			if skillLinkExists {
-				fmt.Printf("\n UPDATE -----> Updating Skill Link with info: \n%v\n\n", map[string]interface{}{"skillLinkName": row.SkillLinkName, "name": row.SkillName})
 				// starting link skill
 				if types.SkillType(row.SkillType) == types.Active {
 
@@ -192,8 +191,6 @@ func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*
 					}
 
 				} else {
-					fmt.Printf("\n\nExisting Links update BEFORE: %+v\n\n", existingSkillLink.Links)
-					// support link skill
 					existingSkillLink.Links = append(existingSkillLink.Links, models.Skill{
 						ID:   row.SkillID,
 						Name: row.SkillName,
@@ -201,13 +198,10 @@ func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*
 					})
 				}
 
-				fmt.Printf("\n\nExisting Links update AFTER: %+v\n\n", existingSkillLink.Links)
 			} else {
 				// creating new link
 
 				var newAdditionalSkillLink SkillLinkResponse
-
-				fmt.Printf("\n CREATE -----> Creating New Skill Link with info: \n%v\n\n", map[string]interface{}{"skillLinkName": row.SkillLinkName, "name": row.SkillName})
 
 				// create new skill link name and the first skill
 				newAdditionalSkillLink.SkillLinkName = row.SkillLinkName
@@ -233,7 +227,6 @@ func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*
 				additionalSkillLinks = append(additionalSkillLinks, newAdditionalSkillLink)
 			}
 
-			fmt.Printf("\n END FN -----> Final additionalSkillLinks: %+v\n\n", additionalSkillLinks)
 		}
 
 	}

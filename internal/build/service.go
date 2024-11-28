@@ -72,7 +72,7 @@ func (s *BuildService) GetBuildInfoByIdService(memberId uuid.UUID, buildId uuid.
 
 /**
 * Adds primary and secondary skills and links to an existing build via a transanction,
-* rolling back on error with any portion of the creation.
+* rolling back on error.
 **/
 func (s *BuildService) AddSkillLinksToBuildService(memberId uuid.UUID, buildId uuid.UUID, request AddSkillsToBuildRequest) error {
 
@@ -133,5 +133,15 @@ func (s *BuildService) AddSkillLinksToBuildService(memberId uuid.UUID, buildId u
 		}
 
 		return nil
+	})
+}
+
+/**
+* Updates a specific member's build's skills and linksvia a transaction, rolling back on error.
+**/
+func (s *BuildService) UpdateBuildSkillLinksService(memberId uuid.UUID, buildId uuid.UUID, request UpdateSkillsToBuildRequest) error {
+	return dbutils.ExecTx(s.Repo.DB, func(tx *sqlx.Tx) error {
+
+		return fmt.Errorf("")
 	})
 }
