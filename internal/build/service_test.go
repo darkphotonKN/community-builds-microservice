@@ -26,7 +26,7 @@ func TestAddSkillLinksToBuildService_Success(t *testing.T) {
 	memberId, memberIdOk := metadata["memberId"].(uuid.UUID)
 
 	if !metadataOk || !skillIdOk || !memberIdOk {
-		panic("mainSkillId assertion failed.")
+		t.Fatalf("Failed to retrieve metadata: metadataOk=%v, skillIdOk=%v, memberIdOk=%v", metadataOk, skillIdOk, memberIdOk)
 	}
 
 	fmt.Printf("\n@TEST: assert mainSkillId: %s and memberId: %s\n\n", memberId, mainSkillId)
@@ -55,13 +55,12 @@ func TestAddSkillLinksToBuildService_Success(t *testing.T) {
 	// --- tests ---
 
 	// mock payload
-	// payload := build.AddSkillsToBuildRequest{
-	// MainSkillLinks: build.SkillLinks{
-	// 	SkillLinkName: "Earthquake",
-	// 	Skill:         "",
-	// 	Links,
-	// },
-	// }
+	payload := build.AddSkillsToBuildRequest{
+		MainSkillLinks: build.SkillLinks{
+			SkillLinkName: "Earthquake",
+			Skill:         mainSkillId,
+		},
+	}
 
-	// buildsService.AddSkillLinksToBuildService(memberId, buildId, payload)
+	buildsService.AddSkillLinksToBuildService(memberId, buildId, payload)
 }
