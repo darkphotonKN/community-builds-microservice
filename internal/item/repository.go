@@ -160,7 +160,7 @@ func getCategoryItem(category string, itemsCh chan WikiItem, wg *sync.WaitGroup)
 		log.Fatal(err)
 	}
 
-	doc.Find(".item-table").First().Each(func(tableIndex int, table *goquery.Selection) {
+	doc.Find(".item-table").Each(func(tableIndex int, table *goquery.Selection) {
 
 		var currentItemThs []string
 
