@@ -12,6 +12,9 @@ import (
 	_ "github.com/lib/pq"
 )
 
+/**
+* Establishes the initial connection to the test database
+**/
 func (t *TestSuite) ConnectTestDB() *sqlx.DB {
 	dsn := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
