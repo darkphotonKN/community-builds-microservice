@@ -19,6 +19,22 @@ func NewBuildHandler(service *BuildService) *BuildHandler {
 }
 
 /**
+* Get all builds for community viewing.
+**/
+
+func (h *BuildHandler) GetCommunityBuildsHandler(c *gin.Context) {
+	builds, err := h.Service.GetCommunityBuildsService()
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all community builds: %s", err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all builds for member.", "result": builds})
+
+}
+
+/**
 * Create build for a signed-in member.
 **/
 func (h *BuildHandler) CreateBuildHandler(c *gin.Context) {

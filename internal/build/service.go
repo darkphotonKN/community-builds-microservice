@@ -26,6 +26,13 @@ const (
 	maxBuildCount = 10
 )
 
+func (s *BuildService) GetCommunityBuildsService() ([]models.Build, error) {
+	return s.Repo.GetAllBuilds()
+}
+
+/**
+* Create build for a signed-in member.
+**/
 func (s *BuildService) CreateBuildService(memberId uuid.UUID, createBuildRequest CreateBuildRequest) error {
 	// confirm skill exists
 	_, err := s.SkillService.GetSkillByIdService(createBuildRequest.SkillID)
@@ -37,12 +44,12 @@ func (s *BuildService) CreateBuildService(memberId uuid.UUID, createBuildRequest
 	// check how many builds a user has, prevent creation if over the limit
 	builds, err := s.GetBuildsForMemberService(memberId)
 
-	if len(*builds) > maxBuildCount {
-		return fmt.Errorf("Number of builds allowed have reached maximum capacity.")
-	}
-
 	if err != nil {
 		return err
+	}
+
+	if len(*builds) > maxBuildCount {
+		return fmt.Errorf("Number of builds allowed have reached maximum capacity.")
 	}
 
 	// create build with this skill and for this member

@@ -63,6 +63,8 @@ type Build struct {
 	MainSkillID uuid.UUID `db:"main_skill_id" json:"mainSkill"`
 	Title       string    `db:"title" json:"title"`
 	Description string    `db:"description" json:"description"`
+	AvgRating   *float32  `db:"avg_rating" json:"avgRating,omitempty"`
+	Views       int       `db:"views" json:"views"`
 }
 
 type BuildItem struct {
