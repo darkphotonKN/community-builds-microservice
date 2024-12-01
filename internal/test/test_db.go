@@ -1,4 +1,4 @@
-package test
+package testsuite
 
 import (
 	"fmt"
@@ -11,17 +11,6 @@ import (
 	// This IS being used!
 	_ "github.com/lib/pq"
 )
-
-type TestSuite struct {
-	// stores useful global data for tests
-	Metadata map[string]interface{}
-}
-
-func NewTestSuite() *TestSuite {
-	return &TestSuite{
-		Metadata: make(map[string]interface{}),
-	}
-}
 
 func (t *TestSuite) SetupTestDB() *sqlx.DB {
 	dsn := fmt.Sprintf(

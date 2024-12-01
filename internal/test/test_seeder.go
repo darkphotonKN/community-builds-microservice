@@ -1,4 +1,4 @@
-package test
+package testsuite
 
 import (
 	"fmt"
@@ -45,14 +45,6 @@ func (t *TestSuite) seedTestData(db *sqlx.DB) {
 
 	// NOTE: transferring meta data for tests
 	// ["name of test"] -> map of data needed
-
-	// TestAddSkillLinksToBuildService_Success METADATA
-	t.Metadata["TestAddSkillLinksToBuildService_Success"] = map[string]interface{}{
-		"memberId":    memberID,
-		"mainSkillId": earthquakeId,
-	}
-
-	// store ids in meta data for later usage
 
 	// create test skills
 	skills := []struct {
@@ -117,4 +109,14 @@ func (t *TestSuite) seedTestData(db *sqlx.DB) {
 	}
 
 	fmt.Printf("Seeded build with ID: %s\n", buildID)
+
+	// --- META DATA ---
+
+	// -- TestAddSkillLinksToBuildService_Success METADATA --
+	t.setMetaData("TestAddSkillLinksToBuildService_Success", MetaData{
+		"memberId":    memberID,
+		"mainSkillId": earthquakeId,
+		"buildId":     buildID,
+	})
+
 }
