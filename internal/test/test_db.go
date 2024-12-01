@@ -12,7 +12,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func (t *TestSuite) SetupTestDB() *sqlx.DB {
+func (t *TestSuite) ConnectTestDB() *sqlx.DB {
 	dsn := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		os.Getenv("TEST_DB_USER"),
@@ -31,20 +31,24 @@ func (t *TestSuite) SetupTestDB() *sqlx.DB {
 	}
 
 	fmt.Println("Connected to the database successfully.")
-
-	// perform test migrations
-	t.applyTestMigrations(db)
-
-	// seed the database with test data
-	t.seedTestData(db)
-
 	return db
+}
+
+/**
+* Resets database.
+**/
+func (t *TestSuite) ResetTestDB(db *sqlx.DB) {
+	// Drop all tables and reset the schema
+	_, err := db.Exec(`DROP SCHEMA public CASCADE; CREATE SCHEMA public;`)
+	if err != nil {
+		log.Fatalf("Failed to reset test database: %v", err)
+	}
 }
 
 /**
 * Creates test tables for Test DB.
 **/
-func (t *TestSuite) applyTestMigrations(db *sqlx.DB) {
+func (t *TestSuite) applyTestMigrations() {
 	migrations := []string{
 		// uuid-ossp extension for uuid v4 generation
 		`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`,
@@ -108,7 +112,7 @@ func (t *TestSuite) applyTestMigrations(db *sqlx.DB) {
 	}
 
 	for _, migration := range migrations {
-		_, err := db.Exec(migration)
+		_, err := t.DB.Exec(migration)
 		if err != nil {
 			log.Fatalf("Failed to apply test migration: %v", err)
 		}
