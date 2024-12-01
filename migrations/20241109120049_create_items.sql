@@ -5,11 +5,42 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS items (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    category TEXT NOT NULL CHECK (category <> ''), -- E.g., "Two Handed Weapon", "Gems"
-    class TEXT NOT NULL CHECK (class <> ''), -- Class of Item, below category. E.g., "Body Armours", "Two Hand Swords"
+    -- category TEXT NOT NULL CHECK (category <> ''), -- E.g., "Two Handed Weapon", "Gems"
+    -- class TEXT NOT NULL CHECK (class <> ''), -- Class of Item, below category. E.g., "Body Armours", "Two Hand Swords"
+    category TEXT  NOT NULL,
+    class TEXT  NOT NULL,
     type TEXT NOT NULL CHECK (type <> ''), -- Type of Item, below class. E.g., "Glourious Plate"
-    name TEXT NOT NULL UNIQUE CHECK (name <> ''), -- Name of the item (e.g., "Kaom's Heart")
+    name TEXT NOT NULL CHECK (name <> ''), -- Name of the item (e.g., "Kaom's Heart")
+
+    description TEXT, -- equip's story or description
     image_url TEXT, -- Path or URL for the item's image
+    
+    required_level TEXT,
+    required_strength TEXT,
+    required_dexterity TEXT,
+    required_intelligence TEXT,
+    armour TEXT,
+    block TEXT,
+    energy_shield TEXT,
+    evasion TEXT,
+    ward TEXT,
+
+    damage TEXT,
+    aps TEXT,
+    crit TEXT,
+    pdps TEXT,
+    edps TEXT,
+    dps TEXT,
+
+    life TEXT,
+    mana TEXT,
+    duration TEXT,
+    usage TEXT,
+    capacity TEXT,
+
+    additional TEXT,
+    stats TEXT[],
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -19,5 +50,3 @@ CREATE TABLE IF NOT EXISTS items (
 -- +goose StatementBegin
 DROP TABLE IF EXISTS items;
 -- +goose StatementEnd
-
-

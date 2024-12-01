@@ -4,7 +4,7 @@ package item
 
 // -- Item Categories --
 var validCategories = map[string]bool{
-	"Flasks":            true,
+	"Flask":             true,
 	"Other":             true,
 	"Jewellery":         true,
 	"One Handed Weapon": true,
@@ -16,9 +16,10 @@ var validCategories = map[string]bool{
 // -- Item Classes --
 var validClasses = map[string]bool{
 	// Flasks
-	"Life Flasks":   true,
-	"Mana Flasks":   true,
-	"Hybrid Flasks": true,
+	"Life Flasks":    true,
+	"Mana Flasks":    true,
+	"Hybrid Flasks":  true,
+	"Utility Flasks": true,
 
 	// Jewellery
 	"Amulets": true,

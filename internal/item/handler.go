@@ -97,3 +97,14 @@ func (h *ItemHandler) AddItemToBuildHandler(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusCreated, "message": "Successfully created item."})
 }
+
+func (h *ItemHandler) GetWikiItemsHandler(c *gin.Context) {
+	items, err := h.Service.GetWikiItemsService()
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to retrieve all items: %s\n", err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all items.", "result": items})
+}

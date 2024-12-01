@@ -30,3 +30,7 @@ func (s *ItemService) GetItemsService() (*[]models.Item, error) {
 func (s *ItemService) UpdateItemsService(id uuid.UUID, updateItemReq UpdateItemReq) (*models.Item, error) {
 	return s.Repo.UpdateItemById(id, updateItemReq)
 }
+
+func (s *ItemService) GetWikiItemsService() (*[]WikiItem, error) {
+	return s.Repo.GetWikiItems()
+}
