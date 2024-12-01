@@ -1,6 +1,8 @@
 package testsuite
 
-import "fmt"
+import (
+	"log"
+)
 
 /**
 * Helper functions for testing.
@@ -9,13 +11,13 @@ import "fmt"
 /**
 * Helps extracting metadata for your specific test.
 **/
-func (t *TestSuite) getMetaData(testName string) MetaData {
+func (t *TestSuite) GetMetaData(testName string) MetaData {
 
 	// assert meta data
 	metaData, metaDataOk := t.MetaData[testName].(MetaData)
 
 	if !metaDataOk {
-		fmt.Printf("Failed to retrieve metaData: metaDataOk=%v", metaDataOk)
+		log.Fatalf("Failed to retrieve metaData: metaDataOk=%v", metaDataOk)
 	}
 
 	return metaData
@@ -25,7 +27,5 @@ func (t *TestSuite) getMetaData(testName string) MetaData {
 * Helps set metadata for a specific test.
 **/
 func (t *TestSuite) setMetaData(testName string, data interface{}) {
-
-	// -- TestAddSkillLinksToBuildService_Success METADATA --
 	t.MetaData[testName] = data
 }
