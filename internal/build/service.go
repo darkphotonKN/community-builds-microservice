@@ -26,8 +26,8 @@ const (
 	maxBuildCount = 10
 )
 
-func (s *BuildService) GetCommunityBuildsService(pageNo int, pageSize int, sortOrder string, sortBy string, skillType string, search string) ([]models.Build, error) {
-	return s.Repo.GetAllBuilds(pageNo, pageSize, sortOrder, sortBy, skillType, search)
+func (s *BuildService) GetCommunityBuildsService(pageNo int, pageSize int, sortOrder string, sortBy string, search string, skillId uuid.UUID) ([]models.Build, error) {
+	return s.Repo.GetAllBuilds(pageNo, pageSize, sortOrder, sortBy, search, skillId)
 }
 
 /**
