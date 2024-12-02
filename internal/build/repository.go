@@ -23,10 +23,33 @@ func NewBuildRepository(db *sqlx.DB) *BuildRepository {
 	}
 }
 
-func (r *BuildRepository) GetAllBuilds() ([]models.Build, error) {
+func (r *BuildRepository) GetAllBuilds(pageNo int, pageSize int, sortOrder string, sortBy string, skillType string, search string) ([]models.Build, error) {
 	var builds []models.Build
 
-	query := `
+	fmt.Printf("Params - PageNo: %d, PageSize: %d, SortOrder: %s, SortBy: %s, SkillType: %s, Search: %s",
+		pageNo, pageSize, sortOrder, sortBy, skillType, search)
+
+	// allowed columns and sort directions
+	validSortColumns := map[string]bool{
+		"created_at":    true,
+		"avg_rating":    true,
+		"main_skill_id": true,
+		"views":         true,
+	}
+	validSortDirections := map[string]bool{
+		"ASC":  true,
+		"DESC": true,
+	}
+
+	// validate 'sortBy' and 'sortOrder' and set defaults
+	if !validSortColumns[sortBy] {
+		sortBy = "created_at"
+	}
+	if !validSortDirections[sortOrder] {
+		sortOrder = "ASC"
+	}
+
+	query := fmt.Sprintf(`
 	SELECT 
 		id,
 		member_id,
@@ -37,9 +60,12 @@ func (r *BuildRepository) GetAllBuilds() ([]models.Build, error) {
 		views,
 		created_at
 	FROM builds
-	`
+	ORDER BY %s %s
+	LIMIT $1
+	OFFSET $2
+	`, sortBy, sortOrder)
 
-	err := r.DB.Select(&builds, query)
+	err := r.DB.Select(&builds, query, pageSize, (pageNo-1)*pageSize)
 
 	if err != nil {
 		return nil, errorutils.AnalyzeDBErr(err)
