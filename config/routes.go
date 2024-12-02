@@ -92,12 +92,17 @@ func SetupRouter() *gin.Engine {
 
 	// --- Build Routes ---
 	buildRoutes := api.Group("/build")
+
+	// Public Routes
+	buildRoutes.GET("/community", buildHandler.GetCommunityBuildsHandler)
+
 	// Protected Routes
-	buildRoutes.Use(auth.AuthMiddleware())
-	buildRoutes.GET("/", buildHandler.GetBuildsForMemberHandler)
-	buildRoutes.GET("/:id/info", buildHandler.GetBuildInfoByIdHandler)
-	buildRoutes.POST("/", buildHandler.CreateBuildHandler)
-	buildRoutes.POST("/:id/addSkills", buildHandler.AddSkillLinksToBuildHandler)
+	protectedBuildRoutes := buildRoutes.Group("/")
+	protectedBuildRoutes.Use(auth.AuthMiddleware())
+	protectedBuildRoutes.GET("/", buildHandler.GetBuildsForMemberHandler)
+	protectedBuildRoutes.GET("/:id/info", buildHandler.GetBuildInfoByIdHandler)
+	protectedBuildRoutes.POST("/", buildHandler.CreateBuildHandler)
+	protectedBuildRoutes.POST("/:id/addSkills", buildHandler.AddSkillLinksToBuildHandler)
 
 	// -- TAG --
 

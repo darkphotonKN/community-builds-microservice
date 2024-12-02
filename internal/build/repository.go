@@ -23,6 +23,31 @@ func NewBuildRepository(db *sqlx.DB) *BuildRepository {
 	}
 }
 
+func (r *BuildRepository) GetAllBuilds() ([]models.Build, error) {
+	var builds []models.Build
+
+	query := `
+	SELECT 
+		id,
+		member_id,
+		main_skill_id,
+		title,
+		description,
+		avg_rating,
+		views,
+		created_at
+	FROM builds
+	`
+
+	err := r.DB.Select(&builds, query)
+
+	if err != nil {
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return builds, nil
+}
+
 func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest CreateBuildRequest) error {
 	query := `
 	INSERT INTO builds(member_id, main_skill_id, title, description)

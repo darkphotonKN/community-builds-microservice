@@ -17,5 +17,5 @@ CREATE TABLE build_skill_links (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP IF EXISTS build_skill_links
+DROP TABLE IF EXISTS build_skill_links
 -- +goose StatementEnd
