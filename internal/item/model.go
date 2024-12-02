@@ -50,3 +50,28 @@ type WikiItem struct {
 	Additional string   `json:"additional" db:"additional"`
 	Stats      []string `json:"stats" db:"stats"`
 }
+
+type BaseItem struct {
+	ImageUrl string `json:"imageUrl" db:"image_url"`
+	Category string `json:"category" db:"category"`
+	Class    string `json:"class" db:"class"`
+	Name     string `json:"name" db:"name"`
+	Type     string `json:"type" db:"type"`
+
+	RequiredLevel        string `json:"requiredLevel" db:"required_level"`
+	RequiredStrength     string `json:"requiredStrength" db:"required_strength"`
+	RequiredDexterity    string `json:"requiredDexterity" db:"required_dexterity"`
+	RequiredIntelligence string `json:"requiredIntelligence" db:"required_intelligence"`
+
+	Damage string `json:"damage" db:"damage"`
+	APS    string `json:"aps" db:"aps"`
+	Crit   string `json:"crit" db:"crit"`
+	DPS    string `json:"dps" db:"dps"`
+
+	Armour       string `json:"armour" db:"armour"`
+	Evasion      string `json:"evasion" db:"evasion"`
+	EnergyShield string `json:"energyShield" db:"energy_shield"`
+	Ward         string `json:"ward" db:"ward"`
+
+	Stats []string `json:"stats" db:"stats"`
+}

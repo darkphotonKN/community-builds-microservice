@@ -1,14 +1,17 @@
 package item
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/chromedp/chromedp"
 	"github.com/darkphotonKN/community-builds/internal/models"
 	"github.com/darkphotonKN/community-builds/internal/utils/errorutils"
 	"github.com/google/uuid"
@@ -149,13 +152,10 @@ func getCategoryItem(category string, itemsCh chan WikiItem, wg *sync.WaitGroup)
 		wg.Done()
 	}()
 
-	fmt.Println("Response status:", resp.Status)
+	// fmt.Println("Response status:", resp.Status)
 
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
-	// body, err := io.ReadAll(resp.Body)
-	// if err != nil {
-	// 	panic(err)
-	// }
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -320,7 +320,7 @@ func getItem(currentItemThs []string, index int, tr *goquery.Selection, itemsCh 
 			itemBox = doc.Find("div.item-box.-unique .tc.-value").Last()
 			// value = itemBox.Find(".tc.-value").Last()
 			html, _ = itemBox.Html()
-			fmt.Println("html", html)
+			// fmt.Println("html", html)
 			myItem.Class = html
 			// if value == "" {
 			// 	fmt.Println("itemBox", itemBox)
@@ -569,6 +569,244 @@ func (r *ItemRepository) GetWikiItems() (*[]WikiItem, error) {
 			// common
 			pq.Array(item.Stats),
 			item.Additional,
+		)
+		if err != nil {
+			stmt.Close()
+			tx.Rollback()
+			return nil, err
+		}
+	}
+
+	_, err = stmt.Exec()
+	if err != nil {
+		stmt.Close()
+		tx.Rollback()
+		return nil, err
+	}
+
+	err = stmt.Close()
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	tx.Commit()
+
+	return &items, nil
+}
+
+// get base items
+
+func getBaseItemEquipType(equipType string, itemsCh chan BaseItem, wg *sync.WaitGroup) {
+
+	// 建立上下文
+	ctx, cancelChromedp := chromedp.NewContext(context.Background())
+	defer cancelChromedp() // 釋放資源
+
+	// 設定超時
+	ctxWithTimeout, cancelTimeout := context.WithTimeout(ctx, 30*time.Second)
+	defer cancelTimeout()
+	defer wg.Done()
+
+	var pageHTML string
+
+	// 模擬瀏覽器進入網站並抓取內容
+	err := chromedp.Run(ctxWithTimeout,
+		// 打開指定 URL
+		chromedp.Navigate("https://www.pathofexile.com/item-data/"+equipType),
+		// 等待網頁載入完成
+		chromedp.WaitReady("body"),
+		// 抓取完整 HTML
+		chromedp.OuterHTML("html", &pageHTML),
+	)
+
+	// 處理錯誤
+	if err != nil {
+		log.Fatalf("Failed to get HTML: %v", err)
+	}
+
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(pageHTML)))
+	if err != nil {
+		panic(err)
+	}
+
+	doc.Find(".layoutBox1.layoutBoxStretch").Each(func(index int, box *goquery.Selection) {
+		// boxHtml, _ := box.Html()
+		// fmt.Println("boxHtml", boxHtml)
+		wg.Add(1)
+		go getBaseItemTable(box, itemsCh, wg)
+	})
+
+}
+
+func getBaseItemTable(table *goquery.Selection, itemsCh chan BaseItem, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	category := table.Find("h1").First()
+	// fmt.Println("category", category.Text())
+
+	table.Find("table.itemDataTable").Each(func(index int, table *goquery.Selection) {
+
+		// tableHtml, _ := table.Html()
+		// fmt.Println("tableHtml", tableHtml)
+		thList := []string{}
+		table.Find("thead tr th").Each(func(index int, th *goquery.Selection) {
+			// thHtml, _ := th.Html()
+			// fmt.Println("thHtml", thHtml)
+			if index == 0 {
+				thList = append(thList, "ImageUrl")
+			} else {
+				thList = append(thList, th.Text())
+			}
+		})
+		// for _, th := range thList {
+		// 	fmt.Println("th", th)
+		// }
+		var baseItem BaseItem
+		table.Find("tbody tr").Each(func(trIndex int, tr *goquery.Selection) {
+			if trIndex%2 == 0 {
+				baseItem = BaseItem{
+					Category: category.Text(),
+					Type:     category.Text(),
+					Class:    category.Text(),
+				}
+			}
+			if trIndex%2 == 0 {
+				tr.Find("td").Each(func(tdIndex int, td *goquery.Selection) {
+					// fmt.Println("td text", td.Text())
+					if columnIndex := checkStr(thList, "ImageUrl"); columnIndex == tdIndex {
+						img := td.Find("img").First()
+						imgPath, _ := img.Attr("src")
+						baseItem.ImageUrl = imgPath
+					}
+					if columnIndex := checkStr(thList, "Name"); columnIndex == tdIndex {
+						baseItem.Name = td.Text()
+					}
+					if columnIndex := checkStr(thList, "Level"); columnIndex == tdIndex {
+						baseItem.RequiredLevel = td.Text()
+					}
+					if columnIndex := checkStr(thList, "Str"); columnIndex == tdIndex {
+						baseItem.RequiredStrength = td.Text()
+					}
+					if columnIndex := checkStr(thList, "Dex"); columnIndex == tdIndex {
+						baseItem.RequiredDexterity = td.Text()
+					}
+					if columnIndex := checkStr(thList, "Int"); columnIndex == tdIndex {
+						baseItem.RequiredIntelligence = td.Text()
+					}
+					if columnIndex := checkStr(thList, "Damage"); columnIndex == tdIndex {
+						baseItem.Damage = td.Text()
+					}
+					if columnIndex := checkStr(thList, "Critical Chance"); columnIndex == tdIndex {
+						baseItem.Crit = td.Text()
+					}
+					if columnIndex := checkStr(thList, "APS"); columnIndex == tdIndex {
+						baseItem.APS = td.Text()
+					}
+					if columnIndex := checkStr(thList, "DPS"); columnIndex == tdIndex {
+						baseItem.DPS = td.Text()
+					}
+
+					if columnIndex := checkStr(thList, "Armour"); columnIndex == tdIndex {
+						baseItem.Armour = td.Text()
+					}
+					if columnIndex := checkStr(thList, "Evasion Rating"); columnIndex == tdIndex {
+						baseItem.Evasion = td.Text()
+					}
+					if columnIndex := checkStr(thList, "Energy Shield"); columnIndex == tdIndex {
+						baseItem.EnergyShield = td.Text()
+					}
+					if columnIndex := checkStr(thList, "Ward"); columnIndex == tdIndex {
+						baseItem.Ward = td.Text()
+					}
+
+				})
+			} else {
+				td := tr.Find("td").First()
+				baseItem.Stats = append(baseItem.Stats, strings.TrimSpace(td.Text()))
+				itemsCh <- baseItem
+			}
+		})
+	})
+
+}
+
+func (r *ItemRepository) GetBaseItems() (*[]BaseItem, error) {
+
+	var wg sync.WaitGroup
+	itemsCh := make(chan BaseItem)
+	items := []BaseItem{}
+
+	wg.Add(2)
+	go getBaseItemEquipType("weapon", itemsCh, &wg)
+	go getBaseItemEquipType("armour", itemsCh, &wg)
+
+	go func() {
+		wg.Wait()
+		close(itemsCh) // 所有 goroutine 完成後才關閉 Channel
+	}()
+
+	for itemCh := range itemsCh {
+		items = append(items, itemCh)
+	}
+
+	// store items to db
+
+	tx, err := r.DB.Begin()
+	if err != nil {
+		return nil, err
+	}
+	stmt, err := tx.Prepare(pq.CopyIn(
+		"base_items",
+
+		"image_url",
+		"category",
+		"class",
+		"name",
+		"type",
+		"required_level",
+		"required_strength",
+		"required_dexterity",
+		"required_intelligence",
+		// armor
+		"armour",
+		"energy_shield",
+		"evasion",
+		"ward",
+		// weapon
+		"damage",
+		"aps",
+		"crit",
+		"dps",
+		// common
+		"stats",
+	))
+	if err != nil {
+		return nil, err
+	}
+
+	for _, item := range items {
+		_, err := stmt.Exec(
+			item.ImageUrl,
+			item.Category,
+			item.Class,
+			item.Name,
+			item.Type,
+			item.RequiredLevel,
+			item.RequiredStrength,
+			item.RequiredDexterity,
+			item.RequiredIntelligence,
+			// armor
+			item.Armour,
+			item.EnergyShield,
+			item.Evasion,
+			item.Ward,
+			// weapon
+			item.Damage,
+			item.APS,
+			item.Crit,
+			item.DPS,
+			// common
+			pq.Array(item.Stats),
 		)
 		if err != nil {
 			stmt.Close()

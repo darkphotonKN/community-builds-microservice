@@ -34,3 +34,7 @@ func (s *ItemService) UpdateItemsService(id uuid.UUID, updateItemReq UpdateItemR
 func (s *ItemService) GetWikiItemsService() (*[]WikiItem, error) {
 	return s.Repo.GetWikiItems()
 }
+
+func (s *ItemService) GetBaseItemsService() (*[]BaseItem, error) {
+	return s.Repo.GetBaseItems()
+}

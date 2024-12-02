@@ -160,6 +160,41 @@ CREATE TABLE public.items (
 
 
 --
+-- Name: base_items; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.base_items (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    category text NOT NULL,
+    class text NOT NULL,
+    type text NOT NULL,
+    name text NOT NULL,
+    image_url text,
+    required_level text,
+    required_strength text,
+    required_dexterity text,
+    required_intelligence text,
+    armour text,
+    energy_shield text,
+    evasion text,
+    ward text,
+
+    damage text,
+    aps text,
+    crit text,
+    dps text,
+
+    stats text[],
+    
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT items_category_check CHECK ((category <> ''::text)),
+    CONSTRAINT items_class_check CHECK ((class <> ''::text)),
+    CONSTRAINT items_name_check CHECK ((name <> ''::text)),
+    CONSTRAINT items_type_check CHECK ((type <> ''::text))
+);
+
+--
 -- Name: members; Type: TABLE; Schema: public; Owner: -
 --
 
