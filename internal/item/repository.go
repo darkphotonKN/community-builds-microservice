@@ -633,12 +633,12 @@ func getBaseItemEquipType(equipType string, itemsCh chan BaseItem, wg *sync.Wait
 		// boxHtml, _ := box.Html()
 		// fmt.Println("boxHtml", boxHtml)
 		wg.Add(1)
-		go getBaseItemTable(box, itemsCh, wg)
+		go getBaseItemTable(equipType, box, itemsCh, wg)
 	})
 
 }
 
-func getBaseItemTable(table *goquery.Selection, itemsCh chan BaseItem, wg *sync.WaitGroup) {
+func getBaseItemTable(equipType string, table *goquery.Selection, itemsCh chan BaseItem, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	category := table.Find("h1").First()
@@ -665,9 +665,11 @@ func getBaseItemTable(table *goquery.Selection, itemsCh chan BaseItem, wg *sync.
 		table.Find("tbody tr").Each(func(trIndex int, tr *goquery.Selection) {
 			if trIndex%2 == 0 {
 				baseItem = BaseItem{
-					Category: category.Text(),
-					Type:     category.Text(),
-					Class:    category.Text(),
+					Category:   category.Text(),
+					Type:       category.Text(),
+					Class:      category.Text(),
+					EquipType:  equipType,
+					IsTwoHands: strings.Contains(category.Text(), "Two Hand"),
 				}
 			}
 			if trIndex%2 == 0 {
@@ -722,7 +724,7 @@ func getBaseItemTable(table *goquery.Selection, itemsCh chan BaseItem, wg *sync.
 				})
 			} else {
 				td := tr.Find("td").First()
-				baseItem.Stats = append(baseItem.Stats, strings.TrimSpace(td.Text()))
+				baseItem.Implicit = append(baseItem.Implicit, strings.TrimSpace(td.Text()))
 				itemsCh <- baseItem
 			}
 		})
@@ -763,6 +765,8 @@ func (r *ItemRepository) GetBaseItems() (*[]BaseItem, error) {
 		"class",
 		"name",
 		"type",
+		"equip_type",
+		"is_two_hands",
 		"required_level",
 		"required_strength",
 		"required_dexterity",
@@ -778,7 +782,7 @@ func (r *ItemRepository) GetBaseItems() (*[]BaseItem, error) {
 		"crit",
 		"dps",
 		// common
-		"stats",
+		"implicit",
 	))
 	if err != nil {
 		return nil, err
@@ -791,6 +795,8 @@ func (r *ItemRepository) GetBaseItems() (*[]BaseItem, error) {
 			item.Class,
 			item.Name,
 			item.Type,
+			item.EquipType,
+			item.IsTwoHands,
 			item.RequiredLevel,
 			item.RequiredStrength,
 			item.RequiredDexterity,
@@ -806,8 +812,150 @@ func (r *ItemRepository) GetBaseItems() (*[]BaseItem, error) {
 			item.Crit,
 			item.DPS,
 			// common
-			pq.Array(item.Stats),
+			pq.Array(item.Implicit),
 		)
+		if err != nil {
+			stmt.Close()
+			tx.Rollback()
+			return nil, err
+		}
+	}
+
+	_, err = stmt.Exec()
+	if err != nil {
+		stmt.Close()
+		tx.Rollback()
+		return nil, err
+	}
+
+	err = stmt.Close()
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	tx.Commit()
+
+	return &items, nil
+}
+
+func getModHtml(itemsCh chan ItemMod, wg *sync.WaitGroup) {
+
+	// 建立上下文
+	ctx, cancelChromedp := chromedp.NewContext(context.Background())
+	defer cancelChromedp() // 釋放資源
+
+	// 設定超時
+	ctxWithTimeout, cancelTimeout := context.WithTimeout(ctx, 30*time.Second)
+	defer cancelTimeout()
+	defer wg.Done()
+
+	var pageHTML string
+
+	// 模擬瀏覽器進入網站並抓取內容
+	err := chromedp.Run(ctxWithTimeout,
+		// 打開指定 URL
+		chromedp.Navigate("https://www.pathofexile.com/item-data/mods"),
+		// 等待網頁載入完成
+		chromedp.WaitReady("body"),
+		// 抓取完整 HTML
+		chromedp.OuterHTML("html", &pageHTML),
+	)
+
+	// 處理錯誤
+	if err != nil {
+		log.Fatalf("Failed to get HTML: %v", err)
+	}
+
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(pageHTML)))
+	if err != nil {
+		panic(err)
+	}
+
+	table := doc.Find(".layoutBox1.layoutBoxStretch").First()
+
+	table.Find("table.itemDataTable tbody tr").Each(func(index int, tr *goquery.Selection) {
+		// boxHtml, _ := box.Html()
+		// fmt.Println("boxHtml", boxHtml)
+		wg.Add(1)
+		go getItemMod(tr, itemsCh, wg)
+	})
+}
+
+func getItemMod(tr *goquery.Selection, itemsCh chan ItemMod, wg *sync.WaitGroup) {
+	defer wg.Done()
+	itemMod := ItemMod{}
+	thList := []string{"Affix", "Name", "Level", "Stat", "Tags"}
+
+	tr.Find("td").Each(func(tdIndex int, td *goquery.Selection) {
+		if columnIndex := checkStr(thList, "Affix"); columnIndex == tdIndex {
+			itemMod.Affix = td.Text()
+		}
+		if columnIndex := checkStr(thList, "Name"); columnIndex == tdIndex {
+			text := td.Text()
+			text = strings.Replace(text, "of", "", 1)
+			text = strings.TrimSpace(text)
+			itemMod.Name = text
+		}
+		if columnIndex := checkStr(thList, "Level"); columnIndex == tdIndex {
+			itemMod.Level = td.Text()
+		}
+		if columnIndex := checkStr(thList, "Stat"); columnIndex == tdIndex {
+			itemMod.Stat = td.Text()
+		}
+		if columnIndex := checkStr(thList, "Tags"); columnIndex == tdIndex {
+			itemMod.Tags = td.Text()
+		}
+	})
+
+	itemsCh <- itemMod
+}
+
+func (r *ItemRepository) GetItemMods() (*[]ItemMod, error) {
+
+	var wg sync.WaitGroup
+	itemsCh := make(chan ItemMod)
+	items := []ItemMod{}
+
+	wg.Add(1)
+	go getModHtml(itemsCh, &wg)
+
+	go func() {
+		wg.Wait()
+		close(itemsCh) // 所有 goroutine 完成後才關閉 Channel
+	}()
+
+	for item := range itemsCh {
+		items = append(items, item)
+	}
+
+	// store items to db
+
+	tx, err := r.DB.Begin()
+	if err != nil {
+		return nil, err
+	}
+	stmt, err := tx.Prepare(pq.CopyIn(
+		"item_mods",
+
+		"affix",
+		"name",
+		"level",
+		"stat",
+		"tags",
+	))
+	if err != nil {
+		return nil, err
+	}
+
+	for _, item := range items {
+		_, err := stmt.Exec(
+			item.Affix,
+			item.Name,
+			item.Level,
+			item.Stat,
+			item.Tags,
+		)
+
 		if err != nil {
 			stmt.Close()
 			tx.Rollback()

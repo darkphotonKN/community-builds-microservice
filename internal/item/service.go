@@ -38,3 +38,7 @@ func (s *ItemService) GetWikiItemsService() (*[]WikiItem, error) {
 func (s *ItemService) GetBaseItemsService() (*[]BaseItem, error) {
 	return s.Repo.GetBaseItems()
 }
+
+func (s *ItemService) GetItemModsService() (*[]ItemMod, error) {
+	return s.Repo.GetItemMods()
+}
