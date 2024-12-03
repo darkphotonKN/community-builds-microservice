@@ -63,6 +63,11 @@ func (r *BuildRepository) GetAllBuilds(pageNo int, pageSize int, sortOrder strin
 	var queryArgs []interface{}
 
 	// construct filter query
+	joinClause := "AND"
+	if len(queryArgs) == 0 {
+		// use WHERE if first query
+		joinClause = "WHERE"
+	}
 
 	if search != "" {
 		searchQuery := "%" + search + "%"
@@ -71,24 +76,21 @@ func (r *BuildRepository) GetAllBuilds(pageNo int, pageSize int, sortOrder strin
 	}
 
 	if skillId != uuid.Nil {
-		joinClause := "AND"
-
-		if len(queryArgs) == 0 {
-			// use WHERE if first query
-			joinClause = "WHERE"
-		}
-
 		queryArgs = append(queryArgs, skillId)
 		query += fmt.Sprintf("\n%s main_skill_id = $%d", joinClause, len(queryArgs))
 	}
 
 	// construct pagination and sorting
 	queryArgs = append(queryArgs, pageSize, (pageNo-1)*pageSize)
-	fmt.Println("queryArgs:", queryArgs)
 
-	query += fmt.Sprintf("\nORDER BY %s %s", sortBy, sortOrder)
-	query += fmt.Sprintf("\nLIMIT $%d", len(queryArgs)-1) // second last args is LIMIT
-	query += fmt.Sprintf("\nOFFSET $%d", len(queryArgs))  // last args is OFFSET
+	query += fmt.Sprintf(`
+		ORDER BY %s %s
+		LIMIT $%d
+		OFFSET $%d
+	`, sortBy, sortOrder,
+		len(queryArgs)-1, // second last args is LIMIT
+		len(queryArgs),   // last args is OFFSET
+	)
 
 	fmt.Printf("\n\nFinal Query: %s\n\n", query)
 

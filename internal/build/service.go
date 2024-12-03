@@ -100,6 +100,7 @@ func (s *BuildService) AddSkillLinksToBuildService(memberId uuid.UUID, buildId u
 
 		// add main skill relation to main skill link
 		err = s.Repo.AddSkillToLinkTx(tx, mainSkillLinkId, request.MainSkillLinks.Skill)
+		// create item mod
 
 		if err != nil {
 			return err
