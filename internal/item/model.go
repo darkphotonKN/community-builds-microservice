@@ -75,3 +75,11 @@ type BaseItem struct {
 
 	Stats []string `json:"stats" db:"stats"`
 }
+
+type ModItem struct {
+	Affix string `json:"affix" db:"affix"`
+	Name  string `json:"name" db:"name"`
+	Level string `json:"level" db:"level"`
+	Stat  string `json:"stat" db:"stat"`
+	Tags  string `json:"tags" db:"tags"`
+}

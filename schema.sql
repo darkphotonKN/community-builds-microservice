@@ -195,6 +195,22 @@ CREATE TABLE public.base_items (
 );
 
 --
+-- Name: base_items; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.mod_items (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    affix text NOT NULL,
+    name text NOT NULL,
+	level text NOT NULL,
+	stat text NOT NULL,
+	tags text,
+    
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+);
+
+--
 -- Name: members; Type: TABLE; Schema: public; Owner: -
 --
 

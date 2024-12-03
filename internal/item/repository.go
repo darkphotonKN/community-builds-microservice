@@ -831,3 +831,145 @@ func (r *ItemRepository) GetBaseItems() (*[]BaseItem, error) {
 
 	return &items, nil
 }
+
+func getModHtml(itemsCh chan ModItem, wg *sync.WaitGroup) {
+
+	// 建立上下文
+	ctx, cancelChromedp := chromedp.NewContext(context.Background())
+	defer cancelChromedp() // 釋放資源
+
+	// 設定超時
+	ctxWithTimeout, cancelTimeout := context.WithTimeout(ctx, 30*time.Second)
+	defer cancelTimeout()
+	defer wg.Done()
+
+	var pageHTML string
+
+	// 模擬瀏覽器進入網站並抓取內容
+	err := chromedp.Run(ctxWithTimeout,
+		// 打開指定 URL
+		chromedp.Navigate("https://www.pathofexile.com/item-data/mods"),
+		// 等待網頁載入完成
+		chromedp.WaitReady("body"),
+		// 抓取完整 HTML
+		chromedp.OuterHTML("html", &pageHTML),
+	)
+
+	// 處理錯誤
+	if err != nil {
+		log.Fatalf("Failed to get HTML: %v", err)
+	}
+
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(pageHTML)))
+	if err != nil {
+		panic(err)
+	}
+
+	table := doc.Find(".layoutBox1.layoutBoxStretch").First()
+
+	table.Find("table.itemDataTable tbody tr").Each(func(index int, tr *goquery.Selection) {
+		// boxHtml, _ := box.Html()
+		// fmt.Println("boxHtml", boxHtml)
+		wg.Add(1)
+		go getModItem(tr, itemsCh, wg)
+	})
+}
+
+func getModItem(tr *goquery.Selection, itemsCh chan ModItem, wg *sync.WaitGroup) {
+	defer wg.Done()
+	modItem := ModItem{}
+	thList := []string{"Affix", "Name", "Level", "Stat", "Tags"}
+
+	tr.Find("td").Each(func(tdIndex int, td *goquery.Selection) {
+		if columnIndex := checkStr(thList, "Affix"); columnIndex == tdIndex {
+			modItem.Affix = td.Text()
+		}
+		if columnIndex := checkStr(thList, "Name"); columnIndex == tdIndex {
+			text := td.Text()
+			text = strings.Replace(text, "of", "", 1)
+			text = strings.TrimSpace(text)
+			modItem.Name = text
+		}
+		if columnIndex := checkStr(thList, "Level"); columnIndex == tdIndex {
+			modItem.Level = td.Text()
+		}
+		if columnIndex := checkStr(thList, "Stat"); columnIndex == tdIndex {
+			modItem.Stat = td.Text()
+		}
+		if columnIndex := checkStr(thList, "Tags"); columnIndex == tdIndex {
+			modItem.Tags = td.Text()
+		}
+	})
+
+	itemsCh <- modItem
+}
+
+func (r *ItemRepository) GetModItems() (*[]ModItem, error) {
+
+	var wg sync.WaitGroup
+	itemsCh := make(chan ModItem)
+	items := []ModItem{}
+
+	wg.Add(1)
+	go getModHtml(itemsCh, &wg)
+
+	go func() {
+		wg.Wait()
+		close(itemsCh) // 所有 goroutine 完成後才關閉 Channel
+	}()
+
+	for item := range itemsCh {
+		items = append(items, item)
+	}
+
+	// store items to db
+
+	tx, err := r.DB.Begin()
+	if err != nil {
+		return nil, err
+	}
+	stmt, err := tx.Prepare(pq.CopyIn(
+		"mod_items",
+
+		"affix",
+		"name",
+		"level",
+		"stat",
+		"tags",
+	))
+	if err != nil {
+		return nil, err
+	}
+
+	for _, item := range items {
+		_, err := stmt.Exec(
+			item.Affix,
+			item.Name,
+			item.Level,
+			item.Stat,
+			item.Tags,
+		)
+
+		if err != nil {
+			stmt.Close()
+			tx.Rollback()
+			return nil, err
+		}
+	}
+
+	_, err = stmt.Exec()
+	if err != nil {
+		stmt.Close()
+		tx.Rollback()
+		return nil, err
+	}
+
+	err = stmt.Close()
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	tx.Commit()
+
+	return &items, nil
+}
