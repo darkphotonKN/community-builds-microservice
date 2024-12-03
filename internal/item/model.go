@@ -52,11 +52,13 @@ type WikiItem struct {
 }
 
 type BaseItem struct {
-	ImageUrl string `json:"imageUrl" db:"image_url"`
-	Category string `json:"category" db:"category"`
-	Class    string `json:"class" db:"class"`
-	Name     string `json:"name" db:"name"`
-	Type     string `json:"type" db:"type"`
+	ImageUrl   string `json:"imageUrl" db:"image_url"`
+	Category   string `json:"category" db:"category"`
+	Class      string `json:"class" db:"class"`
+	Name       string `json:"name" db:"name"`
+	Type       string `json:"type" db:"type"`
+	EquipType  string `json:"equipType" db:"equip_type"`
+	IsTwoHands bool   `json:"isTwoHands" db:"is_two_hands"`
 
 	RequiredLevel        string `json:"requiredLevel" db:"required_level"`
 	RequiredStrength     string `json:"requiredStrength" db:"required_strength"`
@@ -73,7 +75,7 @@ type BaseItem struct {
 	EnergyShield string `json:"energyShield" db:"energy_shield"`
 	Ward         string `json:"ward" db:"ward"`
 
-	Stats []string `json:"stats" db:"stats"`
+	Implicit []string `json:"implicit" db:"implicit"`
 }
 
 type ItemMod struct {

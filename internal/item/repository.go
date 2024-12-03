@@ -633,12 +633,12 @@ func getBaseItemEquipType(equipType string, itemsCh chan BaseItem, wg *sync.Wait
 		// boxHtml, _ := box.Html()
 		// fmt.Println("boxHtml", boxHtml)
 		wg.Add(1)
-		go getBaseItemTable(box, itemsCh, wg)
+		go getBaseItemTable(equipType, box, itemsCh, wg)
 	})
 
 }
 
-func getBaseItemTable(table *goquery.Selection, itemsCh chan BaseItem, wg *sync.WaitGroup) {
+func getBaseItemTable(equipType string, table *goquery.Selection, itemsCh chan BaseItem, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	category := table.Find("h1").First()
@@ -665,9 +665,11 @@ func getBaseItemTable(table *goquery.Selection, itemsCh chan BaseItem, wg *sync.
 		table.Find("tbody tr").Each(func(trIndex int, tr *goquery.Selection) {
 			if trIndex%2 == 0 {
 				baseItem = BaseItem{
-					Category: category.Text(),
-					Type:     category.Text(),
-					Class:    category.Text(),
+					Category:   category.Text(),
+					Type:       category.Text(),
+					Class:      category.Text(),
+					EquipType:  equipType,
+					IsTwoHands: strings.Contains(category.Text(), "Two Hand"),
 				}
 			}
 			if trIndex%2 == 0 {
@@ -722,7 +724,7 @@ func getBaseItemTable(table *goquery.Selection, itemsCh chan BaseItem, wg *sync.
 				})
 			} else {
 				td := tr.Find("td").First()
-				baseItem.Stats = append(baseItem.Stats, strings.TrimSpace(td.Text()))
+				baseItem.Implicit = append(baseItem.Implicit, strings.TrimSpace(td.Text()))
 				itemsCh <- baseItem
 			}
 		})
@@ -763,6 +765,8 @@ func (r *ItemRepository) GetBaseItems() (*[]BaseItem, error) {
 		"class",
 		"name",
 		"type",
+		"equip_type",
+		"is_two_hands",
 		"required_level",
 		"required_strength",
 		"required_dexterity",
@@ -778,7 +782,7 @@ func (r *ItemRepository) GetBaseItems() (*[]BaseItem, error) {
 		"crit",
 		"dps",
 		// common
-		"stats",
+		"implicit",
 	))
 	if err != nil {
 		return nil, err
@@ -791,6 +795,8 @@ func (r *ItemRepository) GetBaseItems() (*[]BaseItem, error) {
 			item.Class,
 			item.Name,
 			item.Type,
+			item.EquipType,
+			item.IsTwoHands,
 			item.RequiredLevel,
 			item.RequiredStrength,
 			item.RequiredDexterity,
@@ -806,7 +812,7 @@ func (r *ItemRepository) GetBaseItems() (*[]BaseItem, error) {
 			item.Crit,
 			item.DPS,
 			// common
-			pq.Array(item.Stats),
+			pq.Array(item.Implicit),
 		)
 		if err != nil {
 			stmt.Close()

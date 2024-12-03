@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS base_items (
     class TEXT  NOT NULL,
     type TEXT NOT NULL,
     name TEXT NOT NULL,
+    equip_type TEXT NOT NULL,
+    is_two_hands BOOLEAN NOT NULL,
 
     image_url TEXT, -- Path or URL for the item's image
     
@@ -30,7 +32,7 @@ CREATE TABLE IF NOT EXISTS base_items (
     crit TEXT,
     dps TEXT,
 
-    stats TEXT[],
+    implicit TEXT[],
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
