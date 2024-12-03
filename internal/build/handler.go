@@ -3,6 +3,7 @@ package build
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -23,7 +24,24 @@ func NewBuildHandler(service *BuildService) *BuildHandler {
 **/
 
 func (h *BuildHandler) GetCommunityBuildsHandler(c *gin.Context) {
-	builds, err := h.Service.GetCommunityBuildsService()
+	// defaults
+	pageNo := 1
+	pageSize := 20
+	sortBy := c.Query("sort_by")
+	sortOrder := c.Query("sort_order")
+	skillType := c.Query("skill_type")
+	search := c.Query("search")
+
+	// parse query strings
+	if pageNoQuery := c.Query("page_no"); pageNoQuery != "" {
+		pageNo, _ = strconv.Atoi(pageNoQuery)
+	}
+
+	if pageSizeQuery := c.Query("page_size"); pageSizeQuery != "" {
+		pageSize, _ = strconv.Atoi(pageSizeQuery)
+	}
+
+	builds, err := h.Service.GetCommunityBuildsService(pageNo, pageSize, sortOrder, sortBy, skillType, search)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all community builds: %s", err.Error())})
