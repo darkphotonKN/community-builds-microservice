@@ -3,7 +3,7 @@
 
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS mod_items (
+CREATE TABLE IF NOT EXISTS item_mods (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     affix TEXT NOT NULL,
     name TEXT NOT NULL,
@@ -18,5 +18,5 @@ CREATE TABLE IF NOT EXISTS mod_items (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS mod_items;
+DROP TABLE IF EXISTS item_mods;
 -- +goose StatementEnd

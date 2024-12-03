@@ -76,7 +76,7 @@ type BaseItem struct {
 	Stats []string `json:"stats" db:"stats"`
 }
 
-type ModItem struct {
+type ItemMod struct {
 	Affix string `json:"affix" db:"affix"`
 	Name  string `json:"name" db:"name"`
 	Level string `json:"level" db:"level"`

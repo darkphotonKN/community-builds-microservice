@@ -198,7 +198,7 @@ CREATE TABLE public.base_items (
 -- Name: base_items; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.mod_items (
+CREATE TABLE public.item_mods (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     affix text NOT NULL,
     name text NOT NULL,

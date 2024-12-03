@@ -39,6 +39,6 @@ func (s *ItemService) GetBaseItemsService() (*[]BaseItem, error) {
 	return s.Repo.GetBaseItems()
 }
 
-func (s *ItemService) GetModItemsService() (*[]ModItem, error) {
-	return s.Repo.GetModItems()
+func (s *ItemService) GetItemModsService() (*[]ItemMod, error) {
+	return s.Repo.GetItemMods()
 }

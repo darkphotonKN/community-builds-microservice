@@ -832,7 +832,7 @@ func (r *ItemRepository) GetBaseItems() (*[]BaseItem, error) {
 	return &items, nil
 }
 
-func getModHtml(itemsCh chan ModItem, wg *sync.WaitGroup) {
+func getModHtml(itemsCh chan ItemMod, wg *sync.WaitGroup) {
 
 	// 建立上下文
 	ctx, cancelChromedp := chromedp.NewContext(context.Background())
@@ -871,44 +871,44 @@ func getModHtml(itemsCh chan ModItem, wg *sync.WaitGroup) {
 		// boxHtml, _ := box.Html()
 		// fmt.Println("boxHtml", boxHtml)
 		wg.Add(1)
-		go getModItem(tr, itemsCh, wg)
+		go getItemMod(tr, itemsCh, wg)
 	})
 }
 
-func getModItem(tr *goquery.Selection, itemsCh chan ModItem, wg *sync.WaitGroup) {
+func getItemMod(tr *goquery.Selection, itemsCh chan ItemMod, wg *sync.WaitGroup) {
 	defer wg.Done()
-	modItem := ModItem{}
+	itemMod := ItemMod{}
 	thList := []string{"Affix", "Name", "Level", "Stat", "Tags"}
 
 	tr.Find("td").Each(func(tdIndex int, td *goquery.Selection) {
 		if columnIndex := checkStr(thList, "Affix"); columnIndex == tdIndex {
-			modItem.Affix = td.Text()
+			itemMod.Affix = td.Text()
 		}
 		if columnIndex := checkStr(thList, "Name"); columnIndex == tdIndex {
 			text := td.Text()
 			text = strings.Replace(text, "of", "", 1)
 			text = strings.TrimSpace(text)
-			modItem.Name = text
+			itemMod.Name = text
 		}
 		if columnIndex := checkStr(thList, "Level"); columnIndex == tdIndex {
-			modItem.Level = td.Text()
+			itemMod.Level = td.Text()
 		}
 		if columnIndex := checkStr(thList, "Stat"); columnIndex == tdIndex {
-			modItem.Stat = td.Text()
+			itemMod.Stat = td.Text()
 		}
 		if columnIndex := checkStr(thList, "Tags"); columnIndex == tdIndex {
-			modItem.Tags = td.Text()
+			itemMod.Tags = td.Text()
 		}
 	})
 
-	itemsCh <- modItem
+	itemsCh <- itemMod
 }
 
-func (r *ItemRepository) GetModItems() (*[]ModItem, error) {
+func (r *ItemRepository) GetItemMods() (*[]ItemMod, error) {
 
 	var wg sync.WaitGroup
-	itemsCh := make(chan ModItem)
-	items := []ModItem{}
+	itemsCh := make(chan ItemMod)
+	items := []ItemMod{}
 
 	wg.Add(1)
 	go getModHtml(itemsCh, &wg)
@@ -929,7 +929,7 @@ func (r *ItemRepository) GetModItems() (*[]ModItem, error) {
 		return nil, err
 	}
 	stmt, err := tx.Prepare(pq.CopyIn(
-		"mod_items",
+		"item_mods",
 
 		"affix",
 		"name",
