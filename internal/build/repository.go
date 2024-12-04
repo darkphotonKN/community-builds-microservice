@@ -23,11 +23,8 @@ func NewBuildRepository(db *sqlx.DB) *BuildRepository {
 	}
 }
 
-func (r *BuildRepository) GetAllBuilds(pageNo int, pageSize int, sortOrder string, sortBy string, skillType string, search string) ([]models.Build, error) {
+func (r *BuildRepository) GetAllBuilds(pageNo int, pageSize int, sortOrder string, sortBy string, search string, skillId uuid.UUID) ([]models.Build, error) {
 	var builds []models.Build
-
-	fmt.Printf("Params - PageNo: %d, PageSize: %d, SortOrder: %s, SortBy: %s, SkillType: %s, Search: %s",
-		pageNo, pageSize, sortOrder, sortBy, skillType, search)
 
 	// allowed columns and sort directions
 	validSortColumns := map[string]bool{
@@ -49,7 +46,7 @@ func (r *BuildRepository) GetAllBuilds(pageNo int, pageSize int, sortOrder strin
 		sortOrder = "ASC"
 	}
 
-	query := fmt.Sprintf(`
+	query := `
 	SELECT 
 		id,
 		member_id,
@@ -60,12 +57,44 @@ func (r *BuildRepository) GetAllBuilds(pageNo int, pageSize int, sortOrder strin
 		views,
 		created_at
 	FROM builds
-	ORDER BY %s %s
-	LIMIT $1
-	OFFSET $2
-	`, sortBy, sortOrder)
+	`
 
-	err := r.DB.Select(&builds, query, pageSize, (pageNo-1)*pageSize)
+	// arguments for final query execution
+	var queryArgs []interface{}
+
+	// construct filter query
+	joinClause := "AND"
+	if len(queryArgs) == 0 {
+		// use WHERE if first query
+		joinClause = "WHERE"
+	}
+
+	if search != "" {
+		searchQuery := "%" + search + "%"
+		queryArgs = append(queryArgs, searchQuery)
+		query += fmt.Sprintf("\nWHERE title LIKE $1")
+	}
+
+	if skillId != uuid.Nil {
+		queryArgs = append(queryArgs, skillId)
+		query += fmt.Sprintf("\n%s main_skill_id = $%d", joinClause, len(queryArgs))
+	}
+
+	// construct pagination and sorting
+	queryArgs = append(queryArgs, pageSize, (pageNo-1)*pageSize)
+
+	query += fmt.Sprintf(`
+		ORDER BY %s %s
+		LIMIT $%d
+		OFFSET $%d
+	`, sortBy, sortOrder,
+		len(queryArgs)-1, // second last args is LIMIT
+		len(queryArgs),   // last args is OFFSET
+	)
+
+	fmt.Printf("\n\nFinal Query: %s\n\n", query)
+
+	err := r.DB.Select(&builds, query, queryArgs...)
 
 	if err != nil {
 		return nil, errorutils.AnalyzeDBErr(err)

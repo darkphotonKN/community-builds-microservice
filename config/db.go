@@ -3,9 +3,11 @@ package config
 import (
 	"fmt"
 
-	"github.com/jmoiron/sqlx"
 	"log"
 	"os"
+
+	"github.com/darkphotonKN/community-builds/internal/class"
+	"github.com/jmoiron/sqlx"
 
 	// Importing for side effects - Dont Remove
 	// This IS being used!
@@ -40,7 +42,30 @@ func InitDB() *sqlx.DB {
 
 	fmt.Println("Connected to the database successfully.")
 
+	// seed default
+	SeedDefaults(db)
+
 	// set global instance for the database
 	DB = db
 	return DB
+}
+
+func SeedDefaults(db *sqlx.DB) {
+	// default classes
+	classes := []class.CreateClass{
+		class.CreateClass{Name: "Warrior", Description: "Brutal monster wielding melee weapns.", ImageURL: "Placeholder."},
+		class.CreateClass{Name: "Sorceror", Description: "Brutal monster wielding melee weapns.", ImageURL: "Placeholder."},
+		class.CreateClass{Name: "Witch", Description: "Brutal monster wielding melee weapns.", ImageURL: "Placeholder."},
+		class.CreateClass{Name: "Monk", Description: "Brutal monster wielding melee weapns.", ImageURL: "Placeholder."},
+		class.CreateClass{Name: "Ranger", Description: "Brutal monster wielding melee weapns.", ImageURL: "Placeholder."},
+		class.CreateClass{Name: "Mercenary", Description: "Brutal monster wielding melee weapns.", ImageURL: "Placeholder."},
+	}
+	classRepo := class.NewClassRepository(db)
+	classService := class.NewClassService(classRepo)
+
+	err := classService.CreateClassesAndAscendanciesService(classes)
+
+	if err != nil {
+		log.Fatalf("Error when attempting to create default classes and ascendancies:", err)
+	}
 }

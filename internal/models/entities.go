@@ -23,6 +23,16 @@ type Member struct {
 }
 
 /**
+* Class
+**/
+type Class struct {
+	BaseDBDateModel
+	Name        string `db:"name" json:"name"`
+	Description string `db:"description" json:"description"`
+	ImageURL    string `db:"image_url" json:"imageUrl"`
+}
+
+/**
 * Items
 **/
 type Item struct {

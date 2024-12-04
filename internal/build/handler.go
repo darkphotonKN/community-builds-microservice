@@ -27,12 +27,8 @@ func (h *BuildHandler) GetCommunityBuildsHandler(c *gin.Context) {
 	// defaults
 	pageNo := 1
 	pageSize := 20
-	sortBy := c.Query("sort_by")
-	sortOrder := c.Query("sort_order")
-	skillType := c.Query("skill_type")
-	search := c.Query("search")
 
-	// parse query strings
+	// parse query pagination querystrings to ints
 	if pageNoQuery := c.Query("page_no"); pageNoQuery != "" {
 		pageNo, _ = strconv.Atoi(pageNoQuery)
 	}
@@ -41,7 +37,21 @@ func (h *BuildHandler) GetCommunityBuildsHandler(c *gin.Context) {
 		pageSize, _ = strconv.Atoi(pageSizeQuery)
 	}
 
-	builds, err := h.Service.GetCommunityBuildsService(pageNo, pageSize, sortOrder, sortBy, skillType, search)
+	// query strings
+	sortBy := c.Query("sort_by")
+	sortOrder := c.Query("sort_order")
+	search := c.Query("search")
+
+	skillQuery := c.Query("skill")
+
+	// validate querystrings
+	skillId, err := uuid.Parse(skillQuery)
+	if skillQuery != "" && err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Skill in querystring was not a valid uuid, error: %s", err.Error())})
+		return
+	}
+
+	builds, err := h.Service.GetCommunityBuildsService(pageNo, pageSize, sortOrder, sortBy, search, skillId)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all community builds: %s", err.Error())})

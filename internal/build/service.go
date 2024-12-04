@@ -26,8 +26,8 @@ const (
 	maxBuildCount = 10
 )
 
-func (s *BuildService) GetCommunityBuildsService(pageNo int, pageSize int, sortOrder string, sortBy string, skillType string, search string) ([]models.Build, error) {
-	return s.Repo.GetAllBuilds(pageNo, pageSize, sortOrder, sortBy, skillType, search)
+func (s *BuildService) GetCommunityBuildsService(pageNo int, pageSize int, sortOrder string, sortBy string, search string, skillId uuid.UUID) ([]models.Build, error) {
+	return s.Repo.GetAllBuilds(pageNo, pageSize, sortOrder, sortBy, search, skillId)
 }
 
 /**
@@ -100,6 +100,7 @@ func (s *BuildService) AddSkillLinksToBuildService(memberId uuid.UUID, buildId u
 
 		// add main skill relation to main skill link
 		err = s.Repo.AddSkillToLinkTx(tx, mainSkillLinkId, request.MainSkillLinks.Skill)
+		// create item mod
 
 		if err != nil {
 			return err
