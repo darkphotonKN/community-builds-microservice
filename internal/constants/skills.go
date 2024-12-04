@@ -38,7 +38,7 @@ var ActiveSkills []skill.SeedSkill = []skill.SeedSkill{
 	{ID: uuid.MustParse("00000000-0000-0000-0000-00000000001B"), Name: "Earthquake", Type: "active"},
 	{ID: uuid.MustParse("00000000-0000-0000-0000-00000000001C"), Name: "Elemental Hit", Type: "active"},
 	{ID: uuid.MustParse("00000000-0000-0000-0000-00000000001D"), Name: "Ethereal Knives", Type: "active"},
-	{ID: uuid.MustParse("00000000-0000-0000-0000-00000000001D"), Name: "Leap Slam", Type: "active"},
+	{ID: uuid.MustParse("00000000-0000-0000-0000-00000000001E"), Name: "Leap Slam", Type: "active"},
 }
 
 // -- Support Skills --
@@ -64,6 +64,6 @@ var SupportSkills []skill.SeedSkill = []skill.SeedSkill{
 	{ID: uuid.MustParse("00000000-0000-0000-0000-000000000113"), Name: "Close Combat", Type: "support"},
 	{ID: uuid.MustParse("00000000-0000-0000-0000-000000000114"), Name: "Cold to Fire", Type: "support"},
 	{ID: uuid.MustParse("00000000-0000-0000-0000-000000000115"), Name: "Concentrated Effect", Type: "support"},
-	{ID: uuid.MustParse("00000000-0000-0000-0000-000000000115"), Name: "Multistrike", Type: "support"},
-	{ID: uuid.MustParse("00000000-0000-0000-0000-000000000115"), Name: "Faster Attacks", Type: "support"},
+	{ID: uuid.MustParse("00000000-0000-0000-0000-000000000116"), Name: "Multistrike", Type: "support"},
+	{ID: uuid.MustParse("00000000-0000-0000-0000-000000000117"), Name: "Faster Attacks", Type: "support"},
 }
