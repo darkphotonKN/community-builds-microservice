@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS base_items (
     name TEXT NOT NULL,
     equip_type TEXT NOT NULL,
     is_two_hands BOOLEAN NOT NULL,
+    slot TEXT NOT NULL,
 
     image_url TEXT, -- Path or URL for the item's image
     

@@ -412,7 +412,52 @@ func getItem(currentItemThs []string, index int, tr *goquery.Selection, itemsCh 
 		if columnIndex := checkStr(currentItemThs, "Additional"); columnIndex == tdIndex {
 			myItem.Additional = td.Text()
 		}
+		slot := "One Hand"
+		// "axes",
+		// "bows",
+		// "quivers",
+		// "claws",
+		// "daggers",
+		// "fishing_rods",
+		// "maces",
+		// "sceptres",
+		// "staves",
+		// "swords",
+		// "wands",
+		// // Armor
+		// "body_armors",
+		// "helmets",
+		// "shields",
+		// // Jewellery,
+		// "rings",
+		switch category {
+		case "boots":
+			slot = "Boots"
+		case "gloves":
+			slot = "Glove"
+		case "helmets":
+			slot = "Helmet"
+		case "amulets":
+			slot = "Amulet"
+		case "body_armors":
+			slot = "Body Armor"
+		case "belts":
+			slot = "Belt"
+		case "rings":
+			slot = "Rings"
+		case "life_flasks":
+		case "mana_flasks":
+		case "hybrid_flasks":
+		case "utility_flasks":
+			slot = "Flask"
+		default:
+			slot = "One Hand"
+		}
+
+		myItem.Slot = slot
 		myItem.Category = formatCategory(category)
+		myItem.UniqueItem = true
+
 	})
 
 	if myItem.Name != "" && myItem.ImageUrl != "" {
@@ -503,6 +548,8 @@ func (r *ItemRepository) GetWikiItems() (*[]WikiItem, error) {
 		"class",
 		"name",
 		"type",
+		"unique_item",
+		"slot",
 		"description",
 		"required_level",
 		"required_strength",
@@ -542,6 +589,8 @@ func (r *ItemRepository) GetWikiItems() (*[]WikiItem, error) {
 			item.Class,
 			item.Name,
 			item.Type,
+			item.UniqueItem,
+			item.Slot,
 			item.Description,
 			item.RequiredLevel,
 			item.RequiredStrength,
@@ -641,7 +690,31 @@ func getBaseItemEquipType(equipType string, itemsCh chan BaseItem, wg *sync.Wait
 func getBaseItemTable(equipType string, table *goquery.Selection, itemsCh chan BaseItem, wg *sync.WaitGroup) {
 	defer wg.Done()
 
+	slot := ""
 	category := table.Find("h1").First()
+	if equipType == "weapon" {
+		slot = "One Hand"
+		if strings.Contains(category.Text(), "Two Hand") {
+			slot = "Two Hand"
+		}
+	}
+	if equipType == "armour" {
+		if strings.Contains(category.Text(), "Body Armour") {
+			slot = "Body Armour"
+		}
+		if strings.Contains(category.Text(), "Helmets") {
+			slot = "Helmet"
+		}
+		if strings.Contains(category.Text(), "Boots") {
+			slot = "Boots"
+		}
+		if strings.Contains(category.Text(), "Gloves") {
+			slot = "Glove"
+		}
+		if strings.Contains(category.Text(), "Shields") {
+			slot = "Shield"
+		}
+	}
 	// fmt.Println("category", category.Text())
 
 	table.Find("table.itemDataTable").Each(func(index int, table *goquery.Selection) {
@@ -670,6 +743,7 @@ func getBaseItemTable(equipType string, table *goquery.Selection, itemsCh chan B
 					Class:      category.Text(),
 					EquipType:  equipType,
 					IsTwoHands: strings.Contains(category.Text(), "Two Hand"),
+					Slot:       slot,
 				}
 			}
 			if trIndex%2 == 0 {
@@ -767,6 +841,7 @@ func (r *ItemRepository) GetBaseItems() (*[]BaseItem, error) {
 		"type",
 		"equip_type",
 		"is_two_hands",
+		"slot",
 		"required_level",
 		"required_strength",
 		"required_dexterity",
@@ -797,6 +872,7 @@ func (r *ItemRepository) GetBaseItems() (*[]BaseItem, error) {
 			item.Type,
 			item.EquipType,
 			item.IsTwoHands,
+			item.Slot,
 			item.RequiredLevel,
 			item.RequiredStrength,
 			item.RequiredDexterity,
