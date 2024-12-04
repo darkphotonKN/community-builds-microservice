@@ -17,8 +17,8 @@ func NewClassRepository(db *sqlx.DB) *ClassRepository {
 
 func (r *ClassRepository) BatchCreateDefaultClasses(classes []CreateDefaultClass) error {
 	query := `
-	INSERT INTO classes(name, description, image_url)
-	VALUES(:name, :description, :image_url)
+	INSERT INTO classes(id, name, description, image_url)
+	VALUES(:id, :name, :description, :image_url)
 	ON CONFLICT DO NOTHING
 	`
 

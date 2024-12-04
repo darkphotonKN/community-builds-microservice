@@ -34,8 +34,8 @@ func (s *SkillRepository) CreateSkill(createSkillRequest CreateSkillRequest) err
 
 func (s *SkillRepository) BatchCreateSkills(skills []SeedSkill) error {
 	query := `
-	INSERT INTO skills (name, type)
-  VALUES (:name, :type)
+	INSERT INTO skills (id, name, type)
+	VALUES (:id, :name, :type)
   ON CONFLICT (name) DO NOTHING
   `
 	// batch insert skills with a slice of structs via sqlx
