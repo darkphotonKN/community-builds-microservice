@@ -15,14 +15,14 @@ func NewClassRepository(db *sqlx.DB) *ClassRepository {
 	}
 }
 
-func (r *ClassRepository) CreateClass(class CreateClass) error {
+func (r *ClassRepository) BatchCreateDefaultClasses(classes []CreateDefaultClass) error {
 	query := `
 	INSERT INTO classes(name, description, image_url)
 	VALUES(:name, :description, :image_url)
 	ON CONFLICT DO NOTHING
 	`
 
-	_, err := r.DB.NamedExec(query, class)
+	_, err := r.DB.NamedExec(query, classes)
 
 	if err != nil {
 		return errorutils.AnalyzeDBErr(err)

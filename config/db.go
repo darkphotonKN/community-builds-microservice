@@ -7,6 +7,8 @@ import (
 	"os"
 
 	"github.com/darkphotonKN/community-builds/internal/class"
+	"github.com/darkphotonKN/community-builds/internal/constants"
+	"github.com/darkphotonKN/community-builds/internal/skill"
 	"github.com/jmoiron/sqlx"
 
 	// Importing for side effects - Dont Remove
@@ -32,15 +34,13 @@ func InitDB() *sqlx.DB {
 		os.Getenv("DB_NAME"),
 	)
 
-	fmt.Println("constructed dsn", dsn)
-
 	// pass the db connection string to connect to our database
 	db, err := sqlx.Connect("postgres", dsn)
 	if err != nil {
 		log.Fatalf("Failed to connect to the database: %v", err)
 	}
 
-	fmt.Println("Connected to the database successfully.")
+	fmt.Printf("\nConnected to the database successfully.\n\n")
 
 	// seed default
 	SeedDefaults(db)
@@ -51,21 +51,31 @@ func InitDB() *sqlx.DB {
 }
 
 func SeedDefaults(db *sqlx.DB) {
-	// default classes
-	classes := []class.CreateClass{
-		class.CreateClass{Name: "Warrior", Description: "Brutal monster wielding melee weapns.", ImageURL: "Placeholder."},
-		class.CreateClass{Name: "Sorceror", Description: "Brutal monster wielding melee weapns.", ImageURL: "Placeholder."},
-		class.CreateClass{Name: "Witch", Description: "Brutal monster wielding melee weapns.", ImageURL: "Placeholder."},
-		class.CreateClass{Name: "Monk", Description: "Brutal monster wielding melee weapns.", ImageURL: "Placeholder."},
-		class.CreateClass{Name: "Ranger", Description: "Brutal monster wielding melee weapns.", ImageURL: "Placeholder."},
-		class.CreateClass{Name: "Mercenary", Description: "Brutal monster wielding melee weapns.", ImageURL: "Placeholder."},
-	}
+	// --- default classes ---
 	classRepo := class.NewClassRepository(db)
 	classService := class.NewClassService(classRepo)
 
-	err := classService.CreateClassesAndAscendanciesService(classes)
+	err := classService.CreateDefaultClassesAndAscendanciesService(constants.DefaultClasses)
 
 	if err != nil {
-		log.Fatalf("Error when attempting to create default classes and ascendancies:", err)
+		log.Fatal("Error when attempting to create default classes and ascendancies:", err)
 	}
+
+	fmt.Printf("Successfully created all classes and ascendancies.\n\n")
+
+	// --- default skills ---
+	skillRepo := skill.NewSkillRepository(db)
+	skillService := skill.NewSkillService(skillRepo)
+
+	err = skillService.BatchCreateSkillsService(constants.ActiveSkills)
+	if err != nil {
+		log.Fatal("Error when attempting to create default active skills:", err)
+	}
+
+	err = skillService.BatchCreateSkillsService(constants.SupportSkills)
+	if err != nil {
+		log.Fatal("Error when attempting to create defaultsupport skills:", err)
+	}
+
+	fmt.Printf("Successfully created active and support skills.\n\n")
 }
