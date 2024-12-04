@@ -5,6 +5,7 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS items (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    member_id UUID,
     -- category TEXT NOT NULL CHECK (category <> ''), -- E.g., "Two Handed Weapon", "Gems"
     -- class TEXT NOT NULL CHECK (class <> ''), -- Class of Item, below category. E.g., "Body Armours", "Two Hand Swords"
     -- type TEXT NOT NULL CHECK (type <> ''), -- Type of Item, below class. E.g., "Glourious Plate"
@@ -13,8 +14,8 @@ CREATE TABLE IF NOT EXISTS items (
     class TEXT  NOT NULL,
     type TEXT NOT NULL,
     name TEXT NOT NULL,
-
-
+    unique_item BOOLEAN NOT NULL,
+    slot TEXT NOT NULL,
     description TEXT, -- equip's story or description
     image_url TEXT, -- Path or URL for the item's image
     

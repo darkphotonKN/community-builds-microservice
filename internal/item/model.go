@@ -23,6 +23,8 @@ type WikiItem struct {
 	Name        string `json:"name" db:"name"`
 	Type        string `json:"type" db:"type"`
 	Description string `json:"description" db:"description"`
+	UniqueItem  bool   `json:"uniqueItem" db:"unique_item"`
+	Slot        string `json:"slot" db:"slot"`
 	// armor
 	RequiredLevel        string `json:"requiredLevel" db:"required_level"`
 	RequiredStrength     string `json:"requiredStrength" db:"required_strength"`
@@ -59,6 +61,7 @@ type BaseItem struct {
 	Type       string `json:"type" db:"type"`
 	EquipType  string `json:"equipType" db:"equip_type"`
 	IsTwoHands bool   `json:"isTwoHands" db:"is_two_hands"`
+	Slot       string `json:"slot" db:"slot"`
 
 	RequiredLevel        string `json:"requiredLevel" db:"required_level"`
 	RequiredStrength     string `json:"requiredStrength" db:"required_strength"`
