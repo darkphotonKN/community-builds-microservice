@@ -15,16 +15,17 @@ func NewClassService(repo *ClassRepository) *ClassService {
 /**
 * Creates all base classes and ascendancies
 **/
-func (s *ClassService) CreateClassesAndAscendanciesService(classes []CreateClass) error {
+func (s *ClassService) CreateDefaultClassesAndAscendanciesService(classes []CreateDefaultClass, ascendancies []CreateDefaultAscendancy) error {
 
-	for _, class := range classes {
-		err := s.Repo.CreateClass(class)
+	if err := s.Repo.BatchCreateDefaultClasses(classes); err != nil {
 		fmt.Println("Error when creating class:", err)
-		if err != nil {
-			return err
-		}
+		return err
 	}
 
-	fmt.Println("Successfully created all classes!")
+	if err := s.Repo.BatchCreateDefaultAscendancies(ascendancies); err != nil {
+		fmt.Println("Error when creating ascendancy:", err)
+		return err
+	}
+
 	return nil
 }

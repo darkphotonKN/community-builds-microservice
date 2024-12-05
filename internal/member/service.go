@@ -132,3 +132,26 @@ func (s *MemberService) ComparePasswords(storedPassword string, inputPassword st
 	// If err is nil, the passwords match
 	return true, nil
 }
+
+/**
+* Create Default Members.
+**/
+
+func (s *MemberService) CreateDefaultMembers(members []CreateDefaultMember) error {
+
+	var hashedPwMembers []CreateDefaultMember
+
+	// update members passwords with hash
+	for _, member := range members {
+		hashedPw, err := s.HashPassword(member.Password)
+
+		if err != nil {
+			return err
+		}
+
+		member.Password = hashedPw
+		hashedPwMembers = append(hashedPwMembers, member)
+	}
+
+	return s.Repo.CreateDefaultMembers(hashedPwMembers)
+}

@@ -32,6 +32,22 @@ func (s *SkillRepository) CreateSkill(createSkillRequest CreateSkillRequest) err
 	return nil
 }
 
+func (s *SkillRepository) BatchCreateSkills(skills []SeedSkill) error {
+	query := `
+	INSERT INTO skills (id, name, type)
+	VALUES (:id, :name, :type)
+  ON CONFLICT (name) DO NOTHING
+  `
+	// batch insert skills with a slice of structs via sqlx
+	_, err := s.DB.NamedExec(query, skills)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *SkillRepository) GetSkill(id uuid.UUID) (*models.Skill, error) {
 	var skill models.Skill
 

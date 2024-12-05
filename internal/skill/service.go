@@ -35,3 +35,15 @@ func (s *SkillService) GetSkillByIdService(id uuid.UUID) (*models.Skill, error) 
 func (s *SkillService) GetSkillsService() (*[]models.Skill, error) {
 	return s.Repo.GetSkills()
 }
+
+/**
+* Creates a list of skills.
+**/
+func (s *SkillService) BatchCreateSkillsService(createSkills []SeedSkill) error {
+
+	if err := s.Repo.BatchCreateSkills(createSkills); err != nil {
+		return err
+	}
+
+	return nil
+}
