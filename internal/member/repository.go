@@ -121,3 +121,18 @@ func (r *MemberRepository) GetMemberByEmail(email string) (*models.Member, error
 
 	return &member, nil
 }
+
+func (r *MemberRepository) CreateDefaultMembers(members []CreateDefaultMember) error {
+	query := `
+	INSERT INTO members(id, email, name, password, status)
+	VALUES(:id, :email, :name, :password, :status)
+	ON CONFLICT (id) DO NOTHING
+	`
+	_, err := r.DB.NamedExec(query, members)
+
+	if err != nil {
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	return nil
+}

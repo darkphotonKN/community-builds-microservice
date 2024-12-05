@@ -8,6 +8,7 @@ import (
 
 	"github.com/darkphotonKN/community-builds/internal/class"
 	"github.com/darkphotonKN/community-builds/internal/constants"
+	"github.com/darkphotonKN/community-builds/internal/member"
 	"github.com/darkphotonKN/community-builds/internal/skill"
 	"github.com/jmoiron/sqlx"
 
@@ -16,7 +17,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// NOTE: for global db access, do not remove or move inside a function
+// NOTE: for global db access, do not remove
 var DB *sqlx.DB
 
 /**
@@ -51,17 +52,29 @@ func InitDB() *sqlx.DB {
 }
 
 func SeedDefaults(db *sqlx.DB) {
+
+	// --- default members ---
+	memberRepo := member.NewMemberRepository(db)
+	memberService := member.NewMemberService(memberRepo)
+
+	err := memberService.Repo.CreateDefaultMembers(constants.DefaultMembers)
+
+	if err != nil {
+		log.Fatal("Error when attempting to create default members:", err)
+	}
+
+	fmt.Printf("Successfully created all default members.\n\n")
 	// --- default classes ---
 	classRepo := class.NewClassRepository(db)
 	classService := class.NewClassService(classRepo)
 
-	err := classService.CreateDefaultClassesAndAscendanciesService(constants.DefaultClasses)
+	err = classService.CreateDefaultClassesAndAscendanciesService(constants.DefaultClasses, constants.DefaultAscendancies)
 
 	if err != nil {
 		log.Fatal("Error when attempting to create default classes and ascendancies:", err)
 	}
 
-	fmt.Printf("Successfully created all classes and ascendancies.\n\n")
+	fmt.Printf("Successfully created all default classes and ascendancies.\n\n")
 
 	// --- default skills ---
 	skillRepo := skill.NewSkillRepository(db)
@@ -74,8 +87,8 @@ func SeedDefaults(db *sqlx.DB) {
 
 	err = skillService.BatchCreateSkillsService(constants.SupportSkills)
 	if err != nil {
-		log.Fatal("Error when attempting to create defaultsupport skills:", err)
+		log.Fatal("Error when attempting to create default support skills:", err)
 	}
 
-	fmt.Printf("Successfully created active and support skills.\n\n")
+	fmt.Printf("Successfully created all default active and support skills.\n\n")
 }

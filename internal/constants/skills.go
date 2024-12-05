@@ -5,6 +5,10 @@ import (
 	"github.com/google/uuid"
 )
 
+/**
+* Seed Constants for skills.
+**/
+
 // --- Skills ---
 
 // -- Active Skills --
