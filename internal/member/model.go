@@ -50,3 +50,11 @@ type MemberUpdateInfoParams struct {
 type RefreshTokenRequest struct {
 	RefreshToken string `json:"refreshToken"`
 }
+
+type CreateDefaultMember struct {
+	ID       uuid.UUID `db:"id"`
+	Email    string    `db:"email" `
+	Name     string    `db:"name" `
+	Password string    `db:"password" `
+	Status   int       `db:"status"`
+}
