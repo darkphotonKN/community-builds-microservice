@@ -31,14 +31,21 @@ func (s *ItemService) UpdateItemsService(id uuid.UUID, updateItemReq UpdateItemR
 	return s.Repo.UpdateItemById(id, updateItemReq)
 }
 
-func (s *ItemService) GetWikiItemsService() (*[]WikiItem, error) {
-	return s.Repo.GetWikiItems()
+func (s *ItemService) GetUniqueItemsService() (*[]models.Item, error) {
+	return s.Repo.GetUniqueItems()
 }
 
-func (s *ItemService) GetBaseItemsService() (*[]BaseItem, error) {
+func (s *ItemService) GetBaseItemsService() (*[]models.BaseItem, error) {
 	return s.Repo.GetBaseItems()
 }
 
-func (s *ItemService) GetItemModsService() (*[]ItemMod, error) {
+func (s *ItemService) GetBaseItemByIdService(id uuid.UUID) (*models.BaseItem, error) {
+	return s.Repo.GetBaseItemById(id)
+}
+
+func (s *ItemService) GetItemModsService() (*[]models.ItemMod, error) {
 	return s.Repo.GetItemMods()
+}
+func (s *ItemService) CreateRareItemService(id uuid.UUID, createRareItemReq CreateRareItemReq) error {
+	return s.Repo.CreateRareItem(id, createRareItemReq)
 }

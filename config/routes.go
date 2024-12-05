@@ -66,9 +66,11 @@ func SetupRouter() *gin.Engine {
 	itemRoutes.GET("/", itemHandler.GetItemsHandler)
 	itemRoutes.POST("/", itemHandler.CreateItemHandler)
 	itemRoutes.PATCH("/:id", itemHandler.UpdateItemsHandler)
-	itemRoutes.GET("/wiki", itemHandler.GetWikiItemsHandler)
+	itemRoutes.GET("/wiki", itemHandler.GetUniqueItemsHandler)
 	itemRoutes.GET("/base", itemHandler.GetBaseItemsHandler)
+	itemRoutes.GET("/base/:id", itemHandler.GetBaseItemByIdHandler)
 	itemRoutes.GET("/mod", itemHandler.GetItemModsHandler)
+	itemRoutes.POST("/rare-item", itemHandler.CreateRareItemHandler)
 
 	// -- SKILL --
 
