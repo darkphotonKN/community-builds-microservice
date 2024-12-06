@@ -32,6 +32,7 @@ func (r *BuildRepository) GetAllBuilds(
 	skillId uuid.UUID,
 	minRating *int,
 	ratingCategory types.RatingCategory) ([]models.Build, error) {
+
 	var builds []models.Build
 
 	// allowed columns and sort directions

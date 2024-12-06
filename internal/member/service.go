@@ -137,7 +137,7 @@ func (s *MemberService) ComparePasswords(storedPassword string, inputPassword st
 * Create Default Members.
 **/
 
-func (s *MemberService) CreateDefaultMembers(members []CreateDefaultMember) error {
+func (s *MemberService) CreateDefaultMembersService(members []CreateDefaultMember) error {
 
 	var hashedPwMembers []CreateDefaultMember
 
@@ -149,10 +149,9 @@ func (s *MemberService) CreateDefaultMembers(members []CreateDefaultMember) erro
 			return err
 		}
 		member.Password = hashedPw
+
 		hashedPwMembers = append(hashedPwMembers, member)
 	}
-
-	fmt.Printf("hashed password members: %+v", hashedPwMembers)
 
 	return s.Repo.CreateDefaultMembers(hashedPwMembers)
 }

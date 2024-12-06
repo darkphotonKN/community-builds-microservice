@@ -53,10 +53,21 @@ func (h *BuildHandler) GetCommunityBuildsHandler(c *gin.Context) {
 		return
 	}
 
-	minRating, err := strconv.Atoi(minRatingQuery)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Skill in querystring was not a valid uuid, error: %s", err.Error())})
-		return
+	var minRating int
+	if minRatingQuery != "" {
+		minRating, err = strconv.Atoi(minRatingQuery)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("minRating in querystring was not a valid integer, error: %s", err.Error())})
+			return
+		}
+
+		fmt.Println("minRating:", minRating)
+
+		if minRating < 1 || minRating > 10 {
+			c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": "min_rating needs to be in the range 1-10."})
+			return
+		}
 	}
 
 	builds, err := h.Service.GetCommunityBuildsService(pageNo, pageSize, sortOrder, sortBy, search, skillId, &minRating, types.RatingCategory(ratingCategory))

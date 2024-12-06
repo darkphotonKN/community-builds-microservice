@@ -56,13 +56,14 @@ func SeedDefaults(db *sqlx.DB) {
 	memberRepo := member.NewMemberRepository(db)
 	memberService := member.NewMemberService(memberRepo)
 
-	err := memberService.Repo.CreateDefaultMembers(constants.DefaultMembers)
+	err := memberService.CreateDefaultMembersService(constants.DefaultMembers)
 
 	if err != nil {
 		log.Fatal("Error when attempting to create default members:", err)
 	}
 
 	fmt.Printf("Successfully created all default members.\n\n")
+
 	// --- default classes ---
 	classRepo := class.NewClassRepository(db)
 	classService := class.NewClassService(classRepo)

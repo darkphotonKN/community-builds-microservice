@@ -110,8 +110,6 @@ func (r *MemberRepository) GetMemberByEmail(email string) (*models.Member, error
 	var member models.Member
 	query := `SELECT * FROM members WHERE members.email = $1`
 
-	fmt.Println("Querying member with email:", email)
-
 	err := r.DB.Get(&member, query, email)
 	fmt.Println("Error:", err)
 
