@@ -2,12 +2,14 @@ package validation
 
 import (
 	"github.com/darkphotonKN/community-builds/internal/item"
+	"github.com/darkphotonKN/community-builds/internal/rating"
 	"github.com/darkphotonKN/community-builds/internal/skill"
 	"github.com/go-playground/validator/v10"
 )
 
 // RegisterValidators registers custom validators for categories, classes, and types
 func RegisterValidators(v *validator.Validate) {
+	// --- Item ---
 	v.RegisterValidation("category", func(fl validator.FieldLevel) bool {
 		return item.IsValidCategory(fl.Field().String())
 	})
@@ -20,9 +22,18 @@ func RegisterValidators(v *validator.Validate) {
 		return item.IsValidType(fl.Field().String())
 	})
 
+	// --- Skill ---
 	v.RegisterValidation("skillType",
 		func(fl validator.FieldLevel) bool {
 			return skill.IsValidType(fl.Field().String())
 		},
 	)
-}
+
+
+	// --- Rating ---
+	v.RegisterValidation("ratingCategory",
+		func(fl validator.FieldLevel) bool {
+			return rating.IsValidType(fl.Field().String())
+		},
+	)
+}}

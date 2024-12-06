@@ -148,10 +148,11 @@ func (s *MemberService) CreateDefaultMembers(members []CreateDefaultMember) erro
 		if err != nil {
 			return err
 		}
-
 		member.Password = hashedPw
 		hashedPwMembers = append(hashedPwMembers, member)
 	}
+
+	fmt.Printf("hashed password members: %+v", hashedPwMembers)
 
 	return s.Repo.CreateDefaultMembers(hashedPwMembers)
 }

@@ -9,3 +9,7 @@ func NewRatingHandler(service *RatingService) *RatingHandler {
 		Service: service,
 	}
 }
+
+func (h *RatingHandler) CreateRatingByBuildIdHandler(rating CreateRatingRequest) error {
+	return h.Service.CreateRatingByBuildIdService(rating)
+}

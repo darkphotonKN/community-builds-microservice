@@ -60,8 +60,10 @@ type Skill struct {
 **/
 type Rating struct {
 	BaseIDModel
-	BuildID uuid.UUID `db:"build_id" json:"memberId"`
-	Rating  int       `db:"rating" json:"rating"`
+	BuildID  uuid.UUID `db:"build_id" json:"buildId"`
+	MemberID uuid.UUID `db:"member_id" json:"memberId"`
+	Category string    `db:"category" json:"category"`
+	Value    int       `db:"value" json:"value"`
 }
 
 /**

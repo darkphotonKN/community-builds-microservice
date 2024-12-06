@@ -52,7 +52,6 @@ func InitDB() *sqlx.DB {
 }
 
 func SeedDefaults(db *sqlx.DB) {
-
 	// --- default members ---
 	memberRepo := member.NewMemberRepository(db)
 	memberService := member.NewMemberService(memberRepo)
