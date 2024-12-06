@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/darkphotonKN/community-builds/internal/models"
+	"github.com/darkphotonKN/community-builds/internal/utils/errorutils"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -18,24 +19,25 @@ func NewRatingRepository(db *sqlx.DB) *RatingRepository {
 	}
 }
 
-func (r *RatingRepository) CreateRating(memberId uuid.UUID, ratingReq RatingRequest) error {
+func (r *RatingRepository) CreateRatingForBuildById(memberId uuid.UUID, request CreateRatingRequest) error {
 
-	// add a new rating under this product's id
+	// add a new rating under this member id and build id
 	query := `
-	INSERT INTO ratings (member_id, rating)
-	VALUES (:member_id, :rating)
+	INSERT INTO ratings (build_id, member_id, value, category)
+	VALUES (:build_id, :member_id, :value, :category)
 	`
 
-	// temporary struct to hold values
 	params := map[string]interface{}{
+		"build_id":  request.BuildId,
 		"member_id": memberId,
-		"rating":    ratingReq.Rating,
+		"value":     request.Value,
+		"category":  request.Category,
 	}
 
-	_, err := r.DB.NamedQuery(query, params)
+	_, err := r.DB.NamedExec(query, params)
 
 	if err != nil {
-		return err
+		return errorutils.AnalyzeDBErr(err)
 	}
 
 	return nil

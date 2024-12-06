@@ -1,6 +1,7 @@
 package rating
 
-type RatingRequest struct {
+type CreateRatingRequest struct {
+	BuildId  string `db:"build_id" binding:"required,uuid" json:"buildId"`
+	Category string `db:"category" binding:"required,ratingCategory" json:"category"`
 	Value    int    `db:"value" binding:"required" json:"value"`
-	Category string `db:"category" binding:"required,category" json:"category"`
 }

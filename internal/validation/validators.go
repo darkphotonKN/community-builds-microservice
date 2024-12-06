@@ -29,11 +29,11 @@ func RegisterValidators(v *validator.Validate) {
 		},
 	)
 
-
 	// --- Rating ---
 	v.RegisterValidation("ratingCategory",
 		func(fl validator.FieldLevel) bool {
-			return rating.IsValidType(fl.Field().String())
+			return rating.IsValidCategoryType(fl.Field().String())
 		},
 	)
-}}
+
+}

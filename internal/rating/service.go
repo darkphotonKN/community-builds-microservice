@@ -18,8 +18,8 @@ func NewRatingService(repo *RatingRepository) *RatingService {
 /**
 * Posts single rating for a single product.
 **/
-func (s *RatingService) PostRatingService(productId uuid.UUID, ratingReq RatingRequest) error {
-	return s.Repo.CreateRating(productId, ratingReq)
+func (s *RatingService) CreateRatingForBuildByIdService(memberId uuid.UUID, request CreateRatingRequest) error {
+	return s.Repo.CreateRatingForBuildById(memberId, request)
 }
 
 /**

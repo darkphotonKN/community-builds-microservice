@@ -6,11 +6,11 @@ CREATE TABLE IF NOT EXISTS ratings (
 	member_id UUID NOT NULL REFERENCES members (id) ON DELETE CASCADE,
 	category TEXT NOT NULL CHECK (
 		category IN (
-			'End Game',
-			'Fun',
-			'Creative',
-			'Speed Farm',
-			'Bossing'
+			'endgame',
+			'fun',
+			'creative',
+			'speedfarm',
+			'bossing'
 		)
 	),
 	value SMALLINT CHECK (value BETWEEN 1 AND 10) NOT NULL,

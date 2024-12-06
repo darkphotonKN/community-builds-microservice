@@ -34,33 +34,44 @@ func SetupRouter() *gin.Engine {
 	// --- Rating Setup ---
 	ratingRepo := rating.NewRatingRepository(DB)
 	ratingService := rating.NewRatingService(ratingRepo)
+	ratingHandler := rating.NewRatingHandler(ratingService)
 
-	// -- MEMBER --
+	ratingRoutes := api.Group("/rating")
 
-	// --- Member Setup ---
+	ratingRoutes.Use(auth.AuthMiddleware())
+	ratingRoutes.POST("/", ratingHandler.CreateRatingByBuildIdHandler)
+
+	// --- MEMBER ---
+
+	// -- Member Setup --
 	memberRepo := member.NewMemberRepository(DB)
 	memberService := member.NewMemberService(memberRepo)
 	memberHandler := member.NewMemberHandler(memberService, ratingService)
 
-	// --- Member Routes ---
+	// -- Member Routes --
 	memberRoutes := api.Group("/member")
 
+	// Public Routes
 	memberRoutes.GET("/:id", memberHandler.GetMemberByIdHandler)
 	memberRoutes.POST("/signup", memberHandler.CreateMemberHandler)
 	memberRoutes.POST("/signin", memberHandler.LoginMemberHandler)
-	memberRoutes.Use(auth.AuthMiddleware())
-	memberRoutes.POST("/update-password", memberHandler.UpdatePasswordMemberHandler)
-	memberRoutes.POST("/update-info", memberHandler.UpdateInfoMemberHandler)
 
-	// -- ITEM --
+	// Protected Routes
+	protectedMemberRoutes := memberRoutes.Group("/")
+	protectedMemberRoutes.Use(auth.AuthMiddleware())
+	protectedMemberRoutes.POST("/update-password", memberHandler.UpdatePasswordMemberHandler)
+	protectedMemberRoutes.POST("/update-info", memberHandler.UpdateInfoMemberHandler)
 
-	// --- Item Setup ---
+	// --- ITEM ---
+
+	// -- Item Setup --
 	itemRepo := item.NewItemRepository(DB)
 	itemService := item.NewItemService(itemRepo)
 	itemHandler := item.NewItemHandler(itemService)
 
-	// --- Item Routes ---
+	// -- Item Routes --
 	itemRoutes := api.Group("/item")
+
 	// Protected Routes
 	itemRoutes.Use(auth.AuthMiddleware())
 	itemRoutes.GET("/", itemHandler.GetItemsHandler)
@@ -70,28 +81,29 @@ func SetupRouter() *gin.Engine {
 	itemRoutes.GET("/base", itemHandler.GetBaseItemsHandler)
 	itemRoutes.GET("/mod", itemHandler.GetItemModsHandler)
 
-	// -- SKILL --
+	// --- SKILL ---
 
-	// --- Skill Setup ---
+	// -- Skill Setup --
 	skillRepo := skill.NewSkillRepository(DB)
 	skillService := skill.NewSkillService(skillRepo)
 	skillHandler := skill.NewSkillHandler(skillService)
 
-	// --- Skill Routes ---
+	// -- Skill Routes --
 	skillRoutes := api.Group("/skill")
+
 	// Protected Routes
 	skillRoutes.Use(auth.AuthMiddleware())
 	skillRoutes.GET("/", skillHandler.GetSkillsHandler)
 	skillRoutes.POST("/", skillHandler.CreateSkillHandler)
 
-	// -- BUILD --
+	// --- BUILD ---
 
-	// --- Build Setup ---
+	// -- Build Setup --
 	buildRepo := build.NewBuildRepository(DB)
 	buildService := build.NewBuildService(buildRepo, skillService)
 	buildHandler := build.NewBuildHandler(buildService)
 
-	// --- Build Routes ---
+	// -- Build Routes --
 	buildRoutes := api.Group("/build")
 
 	// Public Routes
@@ -105,14 +117,16 @@ func SetupRouter() *gin.Engine {
 	protectedBuildRoutes.POST("/", buildHandler.CreateBuildHandler)
 	protectedBuildRoutes.POST("/:id/addSkills", buildHandler.AddSkillLinksToBuildHandler)
 
-	// -- TAG --
+	// --- TAG ---
 
-	// --- Tag Setup ---
+	// -- Tag Setup --
 	tagRepo := tag.NewTagRepository(DB)
 	tagService := tag.NewTagService(tagRepo)
 	tagHandler := tag.NewTagHandler(tagService)
-	// --- Tag Routes ---
+
+	// -- Tag Routes --
 	tagRoutes := api.Group("/tag")
+
 	// Protected Routes
 	tagRoutes.Use(auth.AuthMiddleware())
 	tagRoutes.GET("/", tagHandler.GetTagsHandler)
