@@ -148,12 +148,17 @@ type Rating struct {
 **/
 type Build struct {
 	BaseDBDateModel
-	MemberID    uuid.UUID `db:"member_id" json:"memberId"`
-	MainSkillID uuid.UUID `db:"main_skill_id" json:"mainSkill"`
-	Title       string    `db:"title" json:"title"`
-	Description string    `db:"description" json:"description"`
-	AvgRating   *float32  `db:"avg_rating" json:"avgRating,omitempty"`
-	Views       int       `db:"views" json:"views"`
+	MemberID           uuid.UUID `db:"member_id" json:"memberId"`
+	MainSkillID        uuid.UUID `db:"main_skill_id" json:"mainSkill"`
+	Title              string    `db:"title" json:"title"`
+	Description        string    `db:"description" json:"description"`
+	AvgEndGameRating   *float32  `db:"avg_end_game_rating" json:"avgEndGameRating,omitempty"`
+	AvgFunRating       *float32  `db:"avg_fun_rating" json:"avgFunRating,omitempty"`
+	AvgCreativeRating  *float32  `db:"avg_creative_rating" json:"avgCreativeRating,omitempty"`
+	AvgSpeedFarmRating *float32  `db:"avg_speed_farm_rating" json:"avgSpeedFarmRating,omitempty"`
+	AvgBossingRating   *float32  `db:"avg_bossing_rating" json:"avgBossingRating,omitempty"`
+	Views              int       `db:"views" json:"views"`
+	Status             int       `db:"status" json:"status"` // 0: Edit, 1: Published, 2: Archived
 }
 
 type BuildItem struct {

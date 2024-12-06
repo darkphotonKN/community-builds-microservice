@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/darkphotonKN/community-builds/internal/types"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -41,8 +42,9 @@ func (h *BuildHandler) GetCommunityBuildsHandler(c *gin.Context) {
 	sortBy := c.Query("sort_by")
 	sortOrder := c.Query("sort_order")
 	search := c.Query("search")
-
 	skillQuery := c.Query("skill")
+	minRatingQuery := c.Query("min_rating")
+	ratingCategory := c.Query("rating_category")
 
 	// validate querystrings
 	skillId, err := uuid.Parse(skillQuery)
@@ -51,7 +53,13 @@ func (h *BuildHandler) GetCommunityBuildsHandler(c *gin.Context) {
 		return
 	}
 
-	builds, err := h.Service.GetCommunityBuildsService(pageNo, pageSize, sortOrder, sortBy, search, skillId)
+	minRating, err := strconv.Atoi(minRatingQuery)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Skill in querystring was not a valid uuid, error: %s", err.Error())})
+		return
+	}
+
+	builds, err := h.Service.GetCommunityBuildsService(pageNo, pageSize, sortOrder, sortBy, search, skillId, &minRating, types.RatingCategory(ratingCategory))
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all community builds: %s", err.Error())})

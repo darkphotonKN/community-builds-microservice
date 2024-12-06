@@ -23,16 +23,28 @@ func NewBuildRepository(db *sqlx.DB) *BuildRepository {
 	}
 }
 
-func (r *BuildRepository) GetAllBuilds(pageNo int, pageSize int, sortOrder string, sortBy string, search string, skillId uuid.UUID) ([]models.Build, error) {
+func (r *BuildRepository) GetAllBuilds(
+	pageNo int,
+	pageSize int,
+	sortOrder string,
+	sortBy string,
+	search string,
+	skillId uuid.UUID,
+	minRating *int,
+	ratingCategory types.RatingCategory) ([]models.Build, error) {
 	var builds []models.Build
 
 	// allowed columns and sort directions
 	validSortColumns := map[string]bool{
-		"created_at":    true,
-		"avg_rating":    true,
-		"main_skill_id": true,
-		"views":         true,
+		"created_at":           true,
+		"avg_bossing_rating":   true,
+		"avg_endgame_rating":   true,
+		"avg_fun_rating":       true,
+		"avg_creative_rating":  true,
+		"avg_speedfarm_rating": true,
+		"main_skill_id":        true,
 	}
+
 	validSortDirections := map[string]bool{
 		"ASC":  true,
 		"DESC": true,
@@ -47,16 +59,20 @@ func (r *BuildRepository) GetAllBuilds(pageNo int, pageSize int, sortOrder strin
 	}
 
 	query := `
-	SELECT 
-		id,
-		member_id,
-		main_skill_id,
-		title,
-		description,
-		avg_rating,
-		views,
-		created_at
-	FROM builds
+		SELECT
+			id,
+			member_id,
+			main_skill_id,
+			title,
+			description,
+			avg_end_game_rating,
+			avg_fun_rating,
+			avg_creative_rating,
+			avg_speed_farm_rating,
+			avg_bossing_rating,
+			views,
+			created_at
+		FROM builds
 	`
 
 	// arguments for final query execution
@@ -69,16 +85,24 @@ func (r *BuildRepository) GetAllBuilds(pageNo int, pageSize int, sortOrder strin
 		joinClause = "WHERE"
 	}
 
+	// keyword search filter
 	if search != "" {
 		searchQuery := "%" + search + "%"
 		queryArgs = append(queryArgs, searchQuery)
 		query += fmt.Sprintf("\nWHERE title LIKE $1")
 	}
 
+	// skill filter
 	if skillId != uuid.Nil {
 		queryArgs = append(queryArgs, skillId)
 		query += fmt.Sprintf("\n%s main_skill_id = $%d", joinClause, len(queryArgs))
 	}
+
+	// WIP - rating filter
+	// if minRating != nil {
+	// 	queryArgs = append(queryArgs, minRating)
+	// 	query += fmt.Sprintf("\n%s main_skill_id = $%d", joinClause, len(queryArgs))
+	// }
 
 	// construct pagination and sorting
 	queryArgs = append(queryArgs, pageSize, (pageNo-1)*pageSize)
@@ -173,7 +197,7 @@ func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*
 	var buildInfoRows []BuildInfoRows
 
 	query := `
-	SELECT 
+	SELECT
 		builds.id as id,
 		builds.title as title,
 		builds.description as description,
@@ -368,7 +392,7 @@ func (r *BuildRepository) AddSkillToLinkTx(tx *sqlx.Tx, buildSkillLinkId uuid.UU
 	var existsId uuid.UUID
 
 	query := `
-	SELECT id FROM build_skill_link_skills 
+	SELECT id FROM build_skill_link_skills
 	WHERE build_skill_link_id = $1 AND skill_id = $2
 	`
 

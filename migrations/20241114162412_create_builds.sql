@@ -11,25 +11,25 @@ CREATE TABLE IF NOT EXISTS builds (
 	title TEXT NOT NULL,
 	description TEXT NOT NULL,
 	main_skill_id UUID NOT NULL REFERENCES skills (id) ON DELETE RESTRICT,
-	end_game_avg_rating DECIMAL(3, 1) DEFAULT 0 CHECK (
-		end_game_avg_rating >= 0
-		AND end_game_avg_rating <= 10
+	avg_end_game_rating DECIMAL(3, 1) DEFAULT 0 CHECK (
+		avg_end_game_rating >= 0
+		AND avg_end_game_rating <= 10
 	),
-	fun_avg_rating DECIMAL(3, 1) DEFAULT 0 CHECK (
-		fun_avg_rating >= 0
-		AND fun_avg_rating <= 10
+	avg_fun_rating DECIMAL(3, 1) DEFAULT 0 CHECK (
+		avg_fun_rating >= 0
+		AND avg_fun_rating <= 10
 	),
-	creative_avg_rating DECIMAL(3, 1) DEFAULT 0 CHECK (
-		creative_avg_rating >= 0
-		AND creative_avg_rating <= 10
+	avg_creative_rating DECIMAL(3, 1) DEFAULT 0 CHECK (
+		avg_creative_rating >= 0
+		AND avg_creative_rating <= 10
 	),
-	speed_farm_avg_rating DECIMAL(3, 1) DEFAULT 0 CHECK (
-		speed_farm_avg_rating >= 0
-		AND speed_farm_avg_rating <= 10
+	avg_speed_farm_rating DECIMAL(3, 1) DEFAULT 0 CHECK (
+		avg_speed_farm_rating >= 0
+		AND avg_speed_farm_rating <= 10
 	),
-	bossing_avg_rating DECIMAL(3, 1) DEFAULT 0 CHECK (
-		bossing_avg_rating >= 0
-		AND bossing_avg_rating <= 10
+	avg_bossing_rating DECIMAL(3, 1) DEFAULT 0 CHECK (
+		avg_bossing_rating >= 0
+		AND avg_bossing_rating <= 10
 	),
 	views INT DEFAULT 0 CHECK (views >= 0),
 	status SMALLINT NOT NULL DEFAULT 0 CHECK (status IN (0, 1, 2)), -- 0: Edit, 1: Published, 2: Archived

@@ -5,6 +5,7 @@ import (
 
 	"github.com/darkphotonKN/community-builds/internal/models"
 	"github.com/darkphotonKN/community-builds/internal/skill"
+	"github.com/darkphotonKN/community-builds/internal/types"
 	"github.com/darkphotonKN/community-builds/internal/utils/dbutils"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -26,8 +27,8 @@ const (
 	maxBuildCount = 10
 )
 
-func (s *BuildService) GetCommunityBuildsService(pageNo int, pageSize int, sortOrder string, sortBy string, search string, skillId uuid.UUID) ([]models.Build, error) {
-	return s.Repo.GetAllBuilds(pageNo, pageSize, sortOrder, sortBy, search, skillId)
+func (s *BuildService) GetCommunityBuildsService(pageNo int, pageSize int, sortOrder string, sortBy string, search string, skillId uuid.UUID, minRating *int, ratingCategory types.RatingCategory) ([]models.Build, error) {
+	return s.Repo.GetAllBuilds(pageNo, pageSize, sortOrder, sortBy, search, skillId, minRating, ratingCategory)
 }
 
 /**
