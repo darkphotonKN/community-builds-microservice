@@ -29,39 +29,6 @@ func SetupRouter() *gin.Engine {
 	// base route
 	api := router.Group("/api")
 
-	// -- RATING --
-
-	// --- Rating Setup ---
-	ratingRepo := rating.NewRatingRepository(DB)
-	ratingService := rating.NewRatingService(ratingRepo)
-	ratingHandler := rating.NewRatingHandler(ratingService)
-
-	ratingRoutes := api.Group("/rating")
-
-	ratingRoutes.Use(auth.AuthMiddleware())
-	ratingRoutes.POST("/", ratingHandler.CreateRatingByBuildIdHandler)
-
-	// --- MEMBER ---
-
-	// -- Member Setup --
-	memberRepo := member.NewMemberRepository(DB)
-	memberService := member.NewMemberService(memberRepo)
-	memberHandler := member.NewMemberHandler(memberService, ratingService)
-
-	// -- Member Routes --
-	memberRoutes := api.Group("/member")
-
-	// Public Routes
-	memberRoutes.GET("/:id", memberHandler.GetMemberByIdHandler)
-	memberRoutes.POST("/signup", memberHandler.CreateMemberHandler)
-	memberRoutes.POST("/signin", memberHandler.LoginMemberHandler)
-
-	// Protected Routes
-	protectedMemberRoutes := memberRoutes.Group("/")
-	protectedMemberRoutes.Use(auth.AuthMiddleware())
-	protectedMemberRoutes.POST("/update-password", memberHandler.UpdatePasswordMemberHandler)
-	protectedMemberRoutes.POST("/update-info", memberHandler.UpdateInfoMemberHandler)
-
 	// --- ITEM ---
 
 	// -- Item Setup --
@@ -134,6 +101,39 @@ func SetupRouter() *gin.Engine {
 	tagRoutes.GET("/", tagHandler.GetTagsHandler)
 	tagRoutes.POST("/", tagHandler.CreateTagHandler)
 	tagRoutes.PATCH("/:id", tagHandler.UpdateTagsHandler)
+
+	// -- RATING --
+
+	// --- Rating Setup ---
+	ratingRepo := rating.NewRatingRepository(DB)
+	ratingService := rating.NewRatingService(ratingRepo, buildService)
+	ratingHandler := rating.NewRatingHandler(ratingService)
+
+	ratingRoutes := api.Group("/rating")
+
+	ratingRoutes.Use(auth.AuthMiddleware())
+	ratingRoutes.POST("/", ratingHandler.CreateRatingByBuildIdHandler)
+
+	// --- MEMBER ---
+
+	// -- Member Setup --
+	memberRepo := member.NewMemberRepository(DB)
+	memberService := member.NewMemberService(memberRepo)
+	memberHandler := member.NewMemberHandler(memberService, ratingService)
+
+	// -- Member Routes --
+	memberRoutes := api.Group("/member")
+
+	// Public Routes
+	memberRoutes.GET("/:id", memberHandler.GetMemberByIdHandler)
+	memberRoutes.POST("/signup", memberHandler.CreateMemberHandler)
+	memberRoutes.POST("/signin", memberHandler.LoginMemberHandler)
+
+	// Protected Routes
+	protectedMemberRoutes := memberRoutes.Group("/")
+	protectedMemberRoutes.Use(auth.AuthMiddleware())
+	protectedMemberRoutes.POST("/update-password", memberHandler.UpdatePasswordMemberHandler)
+	protectedMemberRoutes.POST("/update-info", memberHandler.UpdateInfoMemberHandler)
 
 	return router
 }

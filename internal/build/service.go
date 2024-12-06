@@ -154,3 +154,10 @@ func (s *BuildService) UpdateBuildSkillLinksService(memberId uuid.UUID, buildId 
 		return fmt.Errorf("")
 	})
 }
+
+/**
+* Updates an average rating of a specific category for a build.
+**/
+func (s *BuildService) UpdateAvgRatingForBuildService(buildId string, category types.RatingCategory, avgRating float32) error {
+	return s.Repo.UpdateAvgRatingForBuild(buildId, category, avgRating)
+}

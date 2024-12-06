@@ -79,30 +79,28 @@ func (r *BuildRepository) GetAllBuilds(
 	// arguments for final query execution
 	var queryArgs []interface{}
 
-	// construct filter query
-	joinClause := "AND"
-	if len(queryArgs) == 0 {
-		// use WHERE if first query
-		joinClause = "WHERE"
-	}
+	// set default where status is published
+	query += fmt.Sprintf("\nWHERE status = $1")
+
+	queryArgs = append(queryArgs, types.IsPublished)
 
 	// keyword search filter
 	if search != "" {
 		searchQuery := "%" + search + "%"
 		queryArgs = append(queryArgs, searchQuery)
-		query += fmt.Sprintf("\nWHERE title LIKE $1")
+		query += fmt.Sprintf("\nAND title LIKE $1")
 	}
 
 	// skill filter
 	if skillId != uuid.Nil {
 		queryArgs = append(queryArgs, skillId)
-		query += fmt.Sprintf("\n%s main_skill_id = $%d", joinClause, len(queryArgs))
+		query += fmt.Sprintf("\nAND main_skill_id = $%d", len(queryArgs))
 	}
 
 	// WIP - rating filter
 	// if minRating != nil {
 	// 	queryArgs = append(queryArgs, minRating)
-	// 	query += fmt.Sprintf("\n%s main_skill_id = $%d", joinClause, len(queryArgs))
+	// 	query += fmt.Sprintf("\nAND main_skill_id = $%d", len(queryArgs))
 	// }
 
 	// construct pagination and sorting
@@ -419,6 +417,42 @@ func (r *BuildRepository) AddSkillToLinkTx(tx *sqlx.Tx, buildSkillLinkId uuid.UU
 
 	if err != nil {
 		fmt.Printf("DEBUG AddSkillToLinkTx: Error when attempting to insert into join table build_skill_link_skills: %s\n", err)
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	return nil
+}
+
+/**
+* Updates the average rating of a specific category for a build.
+**/
+func (r *BuildRepository) UpdateAvgRatingForBuild(buildId string, category types.RatingCategory, avgRating float32) error {
+
+	// mapping rating category to build category column name
+	categoryColumn := map[types.RatingCategory]string{
+		types.Endgame:   "avg_end_game_rating",
+		types.Fun:       "avg_fun_rating",
+		types.Creative:  "avg_creative_rating",
+		types.Speedfarm: "avg_speedfarm_rating",
+		types.Bossing:   "avg_bossing_rating",
+	}
+
+	// package parameters
+	params := map[string]interface{}{
+		"build_id":   buildId,
+		"avg_rating": avgRating,
+	}
+
+	// construct query with mapped category column name
+	query := fmt.Sprintf(`
+	UPDATE builds
+	SET %s = :avg_rating
+	WHERE id = :build_id
+	`, categoryColumn[category])
+
+	_, err := r.DB.NamedExec(query, params)
+
+	if err != nil {
 		return errorutils.AnalyzeDBErr(err)
 	}
 

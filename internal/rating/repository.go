@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/darkphotonKN/community-builds/internal/models"
+	"github.com/darkphotonKN/community-builds/internal/types"
 	"github.com/darkphotonKN/community-builds/internal/utils/errorutils"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -19,6 +20,9 @@ func NewRatingRepository(db *sqlx.DB) *RatingRepository {
 	}
 }
 
+/**
+* Creates a single rating of a single category type for a build by buildId.
+**/
 func (r *RatingRepository) CreateRatingForBuildById(memberId uuid.UUID, request CreateRatingRequest) error {
 
 	// add a new rating under this member id and build id
@@ -60,4 +64,25 @@ func (r *RatingRepository) GetAllRatingsByMemberId(memberId uuid.UUID) (*[]model
 	}
 
 	return &ratings, nil
+}
+
+/**
+* Retrieves all ratings of a specific rating category for a build.
+**/
+func (r *RatingRepository) GetAllRatingsByCategoryForBuild(buildId string, category types.RatingCategory) ([]int, error) {
+	var values []int
+
+	query := `
+	SELECT value
+	FROM ratings
+	WHERE build_id = $1 AND category = $2
+	`
+
+	err := r.DB.Select(&values, query, buildId, category)
+
+	if err != nil {
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return values, nil
 }
