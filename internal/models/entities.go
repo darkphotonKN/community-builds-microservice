@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 /**
@@ -35,13 +36,89 @@ type Class struct {
 /**
 * Items
 **/
+
 type Item struct {
 	BaseDBDateModel
-	Category string `db:"category" json:"category"`
-	Class    string `db:"class" json:"class"`
-	Type     string `db:"type" json:"type"`
-	Name     string `db:"name" json:"name"`
-	ImageURL string `db:"image_url" json:"imageUrl"`
+	BaseItemId  uuid.UUID `json:"baseItemId,omitempty" db:"base_item_id"`
+	ImageUrl    string    `json:"imageUrl" db:"image_url"`
+	Category    string    `json:"category" db:"category"`
+	Class       string    `json:"class" db:"class"`
+	Name        string    `json:"name" db:"name"`
+	Type        string    `json:"type" db:"type"`
+	Description string    `json:"description" db:"description"`
+	UniqueItem  bool      `json:"uniqueItem" db:"unique_item"`
+	Slot        string    `json:"slot" db:"slot"`
+	// armor
+	RequiredLevel        string `json:"requiredLevel,omitempty" db:"required_level"`
+	RequiredStrength     string `json:"requiredStrength,omitempty" db:"required_strength"`
+	RequiredDexterity    string `json:"requiredDexterity,omitempty" db:"required_dexterity"`
+	RequiredIntelligence string `json:"requiredIntelligence,omitempty" db:"required_intelligence"`
+	Armour               string `json:"armour,omitempty" db:"armour"`
+	EnergyShield         string `json:"energyShield,omitempty" db:"energy_shield"`
+	Evasion              string `json:"evasion,omitempty" db:"evasion"`
+	Block                string `json:"block,omitempty" db:"block"`
+	Ward                 string `json:"ward,omitempty" db:"ward"`
+	// weapon
+	Damage string `json:"damage,omitempty" db:"damage"`
+	APS    string `json:"aps,omitempty" db:"aps"`
+	Crit   string `json:"crit,omitempty" db:"crit"`
+	PDPS   string `json:"pdps,omitempty" db:"pdps"`
+	EDPS   string `json:"edps,omitempty" db:"edps"`
+	DPS    string `json:"dps,omitempty" db:"dps"`
+	// poison
+	Life     string `json:"life,omitempty" db:"life"`
+	Mana     string `json:"mana,omitempty" db:"mana"`
+	Duration string `json:"duration,omitempty" db:"duration"`
+	Usage    string `json:"usage,omitempty" db:"usage"`
+	Capacity string `json:"capacity,omitempty" db:"capacity"`
+	// common
+	Additional string         `json:"additional,omitempty" db:"additional"`
+	Stats      pq.StringArray `json:"stats" db:"stats"`
+	Implicit   pq.StringArray `json:"implicit" db:"implicit"`
+}
+
+/**
+* Base Items
+**/
+type BaseItem struct {
+	BaseDBDateModel
+	ImageUrl   string `json:"imageUrl" db:"image_url"`
+	Category   string `json:"category" db:"category"`
+	Class      string `json:"class" db:"class"`
+	Name       string `json:"name" db:"name"`
+	Type       string `json:"type" db:"type"`
+	EquipType  string `json:"equipType" db:"equip_type"`
+	IsTwoHands bool   `json:"isTwoHands" db:"is_two_hands"`
+	Slot       string `json:"slot" db:"slot"`
+
+	RequiredLevel        string `json:"requiredLevel,omitempty" db:"required_level"`
+	RequiredStrength     string `json:"requiredStrength,omitempty" db:"required_strength"`
+	RequiredDexterity    string `json:"requiredDexterity,omitempty" db:"required_dexterity"`
+	RequiredIntelligence string `json:"requiredIntelligence,omitempty" db:"required_intelligence"`
+
+	Damage string `json:"damage,omitempty" db:"damage"`
+	APS    string `json:"aps,omitempty" db:"aps"`
+	Crit   string `json:"crit,omitempty" db:"crit"`
+	DPS    string `json:"dps,omitempty" db:"dps"`
+
+	Armour       string `json:"armour,omitempty" db:"armour"`
+	Evasion      string `json:"evasion,omitempty" db:"evasion"`
+	EnergyShield string `json:"energyShield,omitempty" db:"energy_shield"`
+	Ward         string `json:"ward,omitempty" db:"ward"`
+
+	Implicit pq.StringArray `json:"implicit" db:"implicit"`
+}
+
+/**
+* Item Mods
+**/
+type ItemMod struct {
+	BaseDBDateModel
+	Affix string `json:"affix" db:"affix"`
+	Name  string `json:"name" db:"name"`
+	Level string `json:"level" db:"level"`
+	Stat  string `json:"stat" db:"stat"`
+	Tags  string `json:"tags" db:"tags"`
 }
 
 /**

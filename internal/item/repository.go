@@ -140,8 +140,8 @@ func checkStr(items []string, text string) int {
 	return strIndex
 }
 
-// , itemsCh chan WikiItem, wg *sync.WaitGroup
-func getCategoryItem(category string, itemsCh chan WikiItem, wg *sync.WaitGroup) {
+// , itemsCh chan Item, wg *sync.WaitGroup
+func getCategoryItem(category string, itemsCh chan models.Item, wg *sync.WaitGroup) {
 
 	resp, err := http.Get("https://www.poewiki.net/wiki/List_of_unique_" + category)
 	if err != nil {
@@ -279,10 +279,10 @@ func getCategoryItem(category string, itemsCh chan WikiItem, wg *sync.WaitGroup)
 
 }
 
-func getItem(currentItemThs []string, index int, tr *goquery.Selection, itemsCh chan WikiItem, wg *sync.WaitGroup, category string) {
+func getItem(currentItemThs []string, index int, tr *goquery.Selection, itemsCh chan models.Item, wg *sync.WaitGroup, category string) {
 	defer wg.Done()
 	// go getItem()
-	myItem := WikiItem{}
+	myItem := models.Item{}
 	tr.Find("td").Each(func(tdIndex int, td *goquery.Selection) {
 
 		if columnIndex := checkStr(currentItemThs, "Item"); columnIndex == tdIndex {
@@ -467,7 +467,7 @@ func getItem(currentItemThs []string, index int, tr *goquery.Selection, itemsCh 
 
 }
 
-func (r *ItemRepository) GetWikiItems() (*[]WikiItem, error) {
+func (r *ItemRepository) GetUniqueItems() (*[]models.Item, error) {
 	// var items []models.Item
 
 	// query := `
@@ -517,8 +517,8 @@ func (r *ItemRepository) GetWikiItems() (*[]WikiItem, error) {
 	// }
 
 	var wg sync.WaitGroup
-	itemsCh := make(chan WikiItem)
-	items := []WikiItem{}
+	itemsCh := make(chan models.Item)
+	items := []models.Item{}
 
 	// for _, category := range formattedCategories {
 	// 	wg.Add(1)
@@ -645,7 +645,7 @@ func (r *ItemRepository) GetWikiItems() (*[]WikiItem, error) {
 
 // get base items
 
-func getBaseItemEquipType(equipType string, itemsCh chan BaseItem, wg *sync.WaitGroup) {
+func getBaseItemEquipType(equipType string, itemsCh chan models.BaseItem, wg *sync.WaitGroup) {
 
 	// 建立上下文
 	ctx, cancelChromedp := chromedp.NewContext(context.Background())
@@ -687,7 +687,7 @@ func getBaseItemEquipType(equipType string, itemsCh chan BaseItem, wg *sync.Wait
 
 }
 
-func getBaseItemTable(equipType string, table *goquery.Selection, itemsCh chan BaseItem, wg *sync.WaitGroup) {
+func getBaseItemTable(equipType string, table *goquery.Selection, itemsCh chan models.BaseItem, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	slot := ""
@@ -734,10 +734,10 @@ func getBaseItemTable(equipType string, table *goquery.Selection, itemsCh chan B
 		// for _, th := range thList {
 		// 	fmt.Println("th", th)
 		// }
-		var baseItem BaseItem
+		var baseItem models.BaseItem
 		table.Find("tbody tr").Each(func(trIndex int, tr *goquery.Selection) {
 			if trIndex%2 == 0 {
-				baseItem = BaseItem{
+				baseItem = models.BaseItem{
 					Category:   category.Text(),
 					Type:       category.Text(),
 					Class:      category.Text(),
@@ -806,11 +806,11 @@ func getBaseItemTable(equipType string, table *goquery.Selection, itemsCh chan B
 
 }
 
-func (r *ItemRepository) GetBaseItems() (*[]BaseItem, error) {
+func (r *ItemRepository) GetBaseItems() (*[]models.BaseItem, error) {
 
 	var wg sync.WaitGroup
-	itemsCh := make(chan BaseItem)
-	items := []BaseItem{}
+	itemsCh := make(chan models.BaseItem)
+	items := []models.BaseItem{}
 
 	wg.Add(2)
 	go getBaseItemEquipType("weapon", itemsCh, &wg)
@@ -914,7 +914,28 @@ func (r *ItemRepository) GetBaseItems() (*[]BaseItem, error) {
 	return &items, nil
 }
 
-func getModHtml(itemsCh chan ItemMod, wg *sync.WaitGroup) {
+func (r *ItemRepository) GetBaseItemById(id uuid.UUID) (*models.BaseItem, error) {
+	fmt.Println("base id", id)
+	var baseItem models.BaseItem
+	query := `
+    SELECT *
+    FROM base_items 
+    WHERE id = $1
+    `
+	// var rawImplicits []byte
+	err := r.DB.Get(&baseItem, query, id)
+
+	if err != nil {
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	// if err := json.Unmarshal(rawImplicits, &baseItem.Implicit); err != nil {
+	// 	return nil, fmt.Errorf("failed to unmarshal implicit: %w", err)
+	// }
+	return &baseItem, nil
+}
+
+func getModHtml(itemsCh chan models.ItemMod, wg *sync.WaitGroup) {
 
 	// 建立上下文
 	ctx, cancelChromedp := chromedp.NewContext(context.Background())
@@ -957,9 +978,9 @@ func getModHtml(itemsCh chan ItemMod, wg *sync.WaitGroup) {
 	})
 }
 
-func getItemMod(tr *goquery.Selection, itemsCh chan ItemMod, wg *sync.WaitGroup) {
+func getItemMod(tr *goquery.Selection, itemsCh chan models.ItemMod, wg *sync.WaitGroup) {
 	defer wg.Done()
-	itemMod := ItemMod{}
+	itemMod := models.ItemMod{}
 	thList := []string{"Affix", "Name", "Level", "Stat", "Tags"}
 
 	tr.Find("td").Each(func(tdIndex int, td *goquery.Selection) {
@@ -986,11 +1007,11 @@ func getItemMod(tr *goquery.Selection, itemsCh chan ItemMod, wg *sync.WaitGroup)
 	itemsCh <- itemMod
 }
 
-func (r *ItemRepository) GetItemMods() (*[]ItemMod, error) {
+func (r *ItemRepository) GetItemMods() (*[]models.ItemMod, error) {
 
 	var wg sync.WaitGroup
-	itemsCh := make(chan ItemMod)
-	items := []ItemMod{}
+	itemsCh := make(chan models.ItemMod)
+	items := []models.ItemMod{}
 
 	wg.Add(1)
 	go getModHtml(itemsCh, &wg)
@@ -1054,4 +1075,101 @@ func (r *ItemRepository) GetItemMods() (*[]ItemMod, error) {
 	tx.Commit()
 
 	return &items, nil
+}
+
+func (r *ItemRepository) CreateRareItem(id uuid.UUID, createRareItemReq CreateRareItemReq) error {
+
+	baseItem, err := r.GetBaseItemById(createRareItemReq.BaseItemId)
+
+	if err != nil {
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	query := `
+		INSERT INTO items(
+		member_id, 
+		base_item_id,
+		image_url, 
+		name, 
+		category, 
+		type, 
+		slot, 
+		unique_item, 
+		class, 
+		stats,
+		required_level,
+		required_intelligence,
+		required_strength,
+		required_dexterity,
+		damage,
+		crit,
+		aps,
+		dps,
+		implicit,
+		armour,
+		evasion,
+		energy_shield,
+		ward
+		)
+		VALUES(
+		:member_id, 
+		:base_item_id,
+		:image_url, 
+		:name, 
+		:category, 
+		:type, 
+		:slot, 
+		:unique_item, 
+		:class, 
+		:stats,
+		:required_level,
+		:required_intelligence,
+		:required_strength,
+		:required_dexterity,
+		:damage,
+		:crit,
+		:aps,
+		:dps,
+		:implicit,
+		:armour,
+		:evasion,
+		:energy_shield,
+		:ward
+		)
+	`
+
+	payload := map[string]interface{}{
+		"member_id":             id,
+		"base_item_id":          createRareItemReq.BaseItemId,
+		"image_url":             baseItem.ImageUrl,
+		"name":                  createRareItemReq.Name,
+		"category":              baseItem.Category,
+		"type":                  baseItem.Type,
+		"slot":                  baseItem.Slot,
+		"unique_item":           false,
+		"class":                 baseItem.Class,
+		"stats":                 pq.StringArray(createRareItemReq.Stats),
+		"required_level":        baseItem.RequiredLevel,
+		"required_intelligence": baseItem.RequiredIntelligence,
+		"required_strength":     baseItem.RequiredStrength,
+		"required_dexterity":    baseItem.RequiredDexterity,
+		"damage":                baseItem.Damage,
+		"crit":                  baseItem.Crit,
+		"aps":                   baseItem.APS,
+		"dps":                   baseItem.DPS,
+		"implicit":              pq.StringArray(baseItem.Implicit),
+		"armour":                baseItem.Armour,
+		"evasion":               baseItem.Evasion,
+		"energy_shield":         baseItem.EnergyShield,
+		"ward":                  baseItem.Ward,
+	}
+	_, createErr := r.DB.NamedExec(query, payload)
+
+	fmt.Print("Error when creating item:", createErr)
+
+	if createErr != nil {
+		return errorutils.AnalyzeDBErr(createErr)
+	}
+
+	return nil
 }

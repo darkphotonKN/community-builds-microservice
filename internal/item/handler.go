@@ -98,8 +98,8 @@ func (h *ItemHandler) AddItemToBuildHandler(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusCreated, "message": "Successfully created item."})
 }
 
-func (h *ItemHandler) GetWikiItemsHandler(c *gin.Context) {
-	items, err := h.Service.GetWikiItemsService()
+func (h *ItemHandler) GetUniqueItemsHandler(c *gin.Context) {
+	items, err := h.Service.GetUniqueItemsService()
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to retrieve all items: %s\n", err.Error())})
@@ -120,6 +120,25 @@ func (h *ItemHandler) GetBaseItemsHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all items.", "result": items})
 }
 
+func (h *ItemHandler) GetBaseItemByIdHandler(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := uuid.Parse(idParam)
+	// fmt.Println("base item id", id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Invalid UUID format for id.")})
+		return
+	}
+
+	item, err := h.Service.GetBaseItemByIdService(id)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to retrieve all items: %s\n", err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved item.", "result": item})
+}
+
 func (h *ItemHandler) GetItemModsHandler(c *gin.Context) {
 	items, err := h.Service.GetItemModsService()
 
@@ -129,4 +148,24 @@ func (h *ItemHandler) GetItemModsHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all items.", "result": items})
+}
+
+func (h *ItemHandler) CreateRareItemHandler(c *gin.Context) {
+	userId, _ := c.Get("userId")
+	fmt.Println("userId", userId)
+	// update item payload
+	var createRareItemReq CreateRareItemReq
+	if err := c.ShouldBindJSON(&createRareItemReq); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON.")})
+		return
+	}
+
+	resErr := h.Service.CreateRareItemService(userId.(uuid.UUID), createRareItemReq)
+
+	if resErr != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to retrieve all items: %s\n", resErr.Error())})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all items."})
 }
