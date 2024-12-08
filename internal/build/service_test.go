@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/darkphotonKN/community-builds/internal/build"
+	"github.com/darkphotonKN/community-builds/internal/models"
 	"github.com/darkphotonKN/community-builds/internal/skill"
 	testsuite "github.com/darkphotonKN/community-builds/internal/test"
 	"github.com/google/uuid"
@@ -25,16 +26,14 @@ func TestAddSkillLinksToBuildService_Success(t *testing.T) {
 
 	// -- retrieve stored metaData --
 	metaData := ts.GetMetaData("TestAddSkillLinksToBuildService_Success") // global metadata
-	mainSkillId, skillIdOk := metaData["mainSkillId"].(uuid.UUID)         // get main skill id
 	memberId, memberIdOk := metaData["memberId"].(uuid.UUID)              // get a member's id
 	buildId, buildIdOk := metaData["buildId"].(uuid.UUID)                 // get buildId
-	skills, skillsOk := metaData["skills"].(testsuite.TestSkills)         // get skill information
 
-	if !skillIdOk || !memberIdOk || !buildIdOk || !skillsOk {
-		t.Fatalf("Failed to retrieve metadata: skillIdOk=%v, memberIdOk=%v, buildIdOk=%v, skillsOk=%v", skillIdOk, memberIdOk, buildIdOk, skillsOk)
+	if !memberIdOk || !buildIdOk {
+		t.Fatalf("Failed to retrieve metadata: memberIdOk=%v, buildIdOk=%v", memberIdOk, buildIdOk)
 	}
 
-	fmt.Printf("\n@TEST: mainSkillId: %s\nmemberId: %s\nbuildId: %s\nskills: %+v\n\n", mainSkillId, memberId, buildId, skills)
+	fmt.Printf("\n@TEST: memberId: %s\nbuildId: %s\n\n", memberId, buildId)
 
 	// --- test service methods ---
 
@@ -47,27 +46,57 @@ func TestAddSkillLinksToBuildService_Success(t *testing.T) {
 
 	// -- tests --
 
-	// find and insert all test skills
-	var testSkill1 testsuite.TestSkill
-	var testSkill2 testsuite.TestSkill
-	var testSkill3 testsuite.TestSkill
-	var testSkill4 testsuite.TestSkill
-	var testSkill5 testsuite.TestSkill
+	// query all the skills needed for test
+	var testSkill1 models.Skill
+	var testSkill2 models.Skill
+	var testSkill3 models.Skill
+	var testSkill4 models.Skill
+	var testSkill5 models.Skill
 
-	for _, skill := range skills {
-		switch skill.Name {
-		case "Earthquake":
-			testSkill1 = skill
-		case "Concentrated Effect":
-			testSkill2 = skill
-		case "Increased Area of Effect":
-			testSkill3 = skill
-		case "Lightning Strike":
-			testSkill4 = skill
-		case "Multistrike":
-			testSkill5 = skill
-		}
-	}
+	ts.DB.Get(&testSkill1, `
+		SELECT 
+			id, 
+			name, 
+			type
+		FROM skills
+		WHERE name = 'Earthquake'
+	`)
+
+	ts.DB.Get(&testSkill2, `
+		SELECT 
+			id, 
+			name, 
+			type
+		FROM skills
+		WHERE name = 'Concentrated Effect'
+	`)
+
+	ts.DB.Get(&testSkill3, `
+		SELECT 
+			id, 
+			name, 
+			type
+		FROM skills
+		WHERE name = 'Multistrike'
+	`)
+
+	ts.DB.Get(&testSkill4, `
+		SELECT 
+			id, 
+			name, 
+			type
+		FROM skills
+		WHERE name = 'Leap Slam'
+	`)
+
+	ts.DB.Get(&testSkill5, `
+		SELECT 
+			id, 
+			name, 
+			type
+		FROM skills
+		WHERE name = 'Faster Attacks'
+	`)
 
 	fmt.Println("testSkill1:", testSkill1)
 
@@ -75,12 +104,12 @@ func TestAddSkillLinksToBuildService_Success(t *testing.T) {
 	payload := build.AddSkillsToBuildRequest{
 		MainSkillLinks: build.SkillLinks{
 			SkillLinkName: "Earthquake",
-			Skill:         mainSkillId,
+			Skill:         testSkill1.ID,
 			Links:         []uuid.UUID{testSkill2.ID, testSkill3.ID},
 		},
 		AdditionalSkills: []build.SkillLinks{
 			{
-				SkillLinkName: "Lighting Strike Multistrike",
+				SkillLinkName: "Mobility Setup",
 				Skill:         testSkill4.ID,
 				Links:         []uuid.UUID{testSkill5.ID},
 			},
@@ -94,7 +123,7 @@ func TestAddSkillLinksToBuildService_Success(t *testing.T) {
 	var skillLinkRows []SkillLinkRow
 
 	err := ts.DB.Select(&skillLinkRows, `
-		SELECT 
+		SELECT
 			build_skill_links.name AS name,
 			build_skill_links.is_main AS is_main,
 			skills.id AS skill_id,

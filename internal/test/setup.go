@@ -15,12 +15,12 @@ func NewTestSuite() *TestSuite {
 	}
 
 	// reset database data, apply migrations and seed
-	newTestSuite.InitTestEnv()
+	newTestSuite.InitTestEnvironment()
 
 	return newTestSuite
 }
 
-func (t *TestSuite) InitTestEnv() {
+func (t *TestSuite) InitTestEnvironment() {
 	db := t.ConnectTestDB()
 
 	// reset database data
