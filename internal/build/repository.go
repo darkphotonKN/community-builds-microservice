@@ -128,8 +128,8 @@ func (r *BuildRepository) GetAllBuilds(
 
 func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest CreateBuildRequest) error {
 	query := `
-	INSERT INTO builds(member_id, main_skill_id, title, description)
-	VALUES($1, $2, $3, $4)
+	INSERT INTO builds(member_id, main_skill_id, class_id, ascendancy_id, title, description)
+	VALUES($1, $2, $3, $4, $5, $6)
 	RETURNING id
 	`
 	var buildId uuid.UUID
@@ -222,7 +222,7 @@ func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*
 	}
 
 	if len(buildInfoRows) == 0 {
-		fmt.Printf("No builds queried.")
+		fmt.Println("No builds queried.")
 
 		// no builds queried with skills or item joins
 		return nil, fmt.Errorf("The build in relation with skills or items returned no data.")

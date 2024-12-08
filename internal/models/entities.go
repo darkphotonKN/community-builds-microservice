@@ -34,6 +34,18 @@ type Class struct {
 }
 
 /**
+* Ascendancy
+**/
+
+type Ascendancy struct {
+	BaseDBDateModel
+	ClassID     uuid.UUID `db:"class_id" json:"classId"`
+	Name        string    `db:"name" json:"name"`
+	Description string    `db:"description" json:"description"`
+	ImageURL    string    `db:"image_url" json:"imageUrl"`
+}
+
+/**
 * Items
 **/
 
@@ -150,6 +162,8 @@ type Build struct {
 	BaseDBDateModel
 	MemberID           uuid.UUID `db:"member_id" json:"memberId"`
 	MainSkillID        uuid.UUID `db:"main_skill_id" json:"mainSkill"`
+	ClassID            uuid.UUID `db:"class_id" json:"classId"`
+	AscendancyID       uuid.UUID `db:"ascendancy_id" json:"ascendancyId"`
 	Title              string    `db:"title" json:"title"`
 	Description        string    `db:"description" json:"description"`
 	AvgEndGameRating   *float32  `db:"avg_end_game_rating" json:"avgEndGameRating,omitempty"`

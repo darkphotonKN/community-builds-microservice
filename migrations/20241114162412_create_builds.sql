@@ -1,6 +1,8 @@
 -- Builds Table
 -- Many to One in relation with Members
 -- Many to One relation with Skills
+-- Many to One relation with Classes
+-- Many to One relation with Ascendancies
 -- Many to Many in relation with Items (join table build_items)
 -- Many to Many in relation with Skills (join table build_skills)
 -- +goose Up
@@ -11,6 +13,8 @@ CREATE TABLE IF NOT EXISTS builds (
 	title TEXT NOT NULL,
 	description TEXT NOT NULL,
 	main_skill_id UUID NOT NULL REFERENCES skills (id) ON DELETE RESTRICT,
+	class_id UUID NOT NULL REFERENCES classes (id) ON DELETE RESTRICT,
+	ascendancy_id UUID REFERENCES ascendancies (id) ON DELETE RESTRICT,
 	avg_end_game_rating DECIMAL(3, 1) DEFAULT 0 CHECK (
 		avg_end_game_rating >= 0
 		AND avg_end_game_rating <= 10
