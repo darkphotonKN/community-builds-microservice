@@ -128,13 +128,13 @@ func (r *BuildRepository) GetAllBuilds(
 
 func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest CreateBuildRequest) error {
 	query := `
-	INSERT INTO builds(member_id, main_skill_id, class_id, ascendancy_id, title, description)
-	VALUES($1, $2, $3, $4, $5, $6)
+	INSERT INTO builds(member_id, main_skill_id, class_id, title, description)
+	VALUES($1, $2, $3, $4, $5)
 	RETURNING id
 	`
 	var buildId uuid.UUID
 
-	err := r.DB.QueryRowx(query, memberId, createBuildRequest.SkillID, createBuildRequest.Title, createBuildRequest.Description).Scan(&buildId)
+	err := r.DB.QueryRowx(query, memberId, createBuildRequest.SkillID, createBuildRequest.ClassID, createBuildRequest.Title, createBuildRequest.Description).Scan(&buildId)
 
 	if err != nil {
 		return errorutils.AnalyzeDBErr(err)
