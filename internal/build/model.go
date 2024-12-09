@@ -69,7 +69,43 @@ type BuildInfoResponse struct {
 	ID          uuid.UUID          `json:"id"`
 	Title       string             `json:"title"`
 	Description string             `json:"description"`
-	Skills      SkillGroupResponse `json:"skills"`
 	Class       models.Class       `json:"class"`
 	Ascendancy  models.Ascendancy  `json:"ascendancy"`
+	Skills      SkillGroupResponse `json:"skills"`
+}
+
+// Build List
+type BuildListQuery struct {
+	ID                 uuid.UUID `json:"id"`
+	Title              string    `db:"title" json:"title"`
+	Description        string    `db:"description" json:"description"`
+	Class              string    `db:"class_name" json:"class"`
+	Ascendancy         *string   `db:"ascendancy_name" json:"ascendancy"`
+	MainSkillName      string    `db:"main_skill_name" json:"mainSkill"`
+	AvgEndGameRating   *float32  `db:"avg_end_game_rating" json:"avgEndGameRating,omitempty"`
+	AvgFunRating       *float32  `db:"avg_fun_rating" json:"avgFunRating,omitempty"`
+	AvgCreativeRating  *float32  `db:"avg_creative_rating" json:"avgCreativeRating,omitempty"`
+	AvgSpeedFarmRating *float32  `db:"avg_speed_farm_rating" json:"avgSpeedFarmRating,omitempty"`
+	AvgBossingRating   *float32  `db:"avg_bossing_rating" json:"avgBossingRating,omitempty"`
+	Views              int       `db:"views" json:"views"`
+	Status             int       `db:"status" json:"status"`
+	CreatedAt          string    `db:"created_at" json:"createdAt"`
+}
+
+type BuildListResponse struct {
+	ID                 uuid.UUID    `json:"id"`
+	Title              string       `json:"title"`
+	Description        string       `json:"description"`
+	Class              string       `json:"class"`
+	Ascendancy         *string      `json:"ascendancy"`
+	MainSkillName      string       `json:"mainSkill"`
+	AvgEndGameRating   *float32     `json:"avgEndGameRating,omitempty"`
+	AvgFunRating       *float32     `json:"avgFunRating,omitempty"`
+	AvgCreativeRating  *float32     `json:"avgCreativeRating,omitempty"`
+	AvgSpeedFarmRating *float32     `json:"avgSpeedFarmRating,omitempty"`
+	AvgBossingRating   *float32     `json:"avgBossingRating,omitempty"`
+	Views              int          `json:"views"`
+	Tags               []models.Tag `json:"tags"`
+	Status             int          `json:"status"`
+	CreatedAt          string       `json:"createdAt"`
 }

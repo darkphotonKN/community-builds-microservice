@@ -60,8 +60,43 @@ func (s *BuildService) CreateBuildService(memberId uuid.UUID, createBuildRequest
 /**
 * Get list builds available to a member.
 **/
-func (s *BuildService) GetBuildsForMemberService(memberId uuid.UUID) (*[]models.Build, error) {
-	return s.Repo.GetBuildsByMemberId(memberId)
+func (s *BuildService) GetBuildsForMemberService(memberId uuid.UUID) (*[]BuildListResponse, error) {
+	baseBuilds, err := s.Repo.GetBuildsByMemberId(memberId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	buildListResponse := make([]BuildListResponse, len(*baseBuilds))
+
+	// query and add each builds tag's
+	for _, build := range *baseBuilds {
+		tags, err := s.Repo.GetBuildTagsForMemberById(memberId, build.ID)
+
+		// stop query pre-maturely if errored on query
+		if err != nil {
+			return nil, err
+		}
+
+		buildListResponse = append(buildListResponse, BuildListResponse{
+			ID:                 build.ID,
+			Title:              build.Title,
+			Description:        build.Description,
+			Ascendancy:         build.Ascendancy,
+			MainSkillName:      build.MainSkillName,
+			AvgEndGameRating:   build.AvgEndGameRating,
+			AvgBossingRating:   build.AvgBossingRating,
+			AvgCreativeRating:  build.AvgCreativeRating,
+			AvgFunRating:       build.AvgFunRating,
+			AvgSpeedFarmRating: build.AvgSpeedFarmRating,
+			Tags:               *tags,
+			Views:              build.Views,
+			Status:             build.Status,
+			CreatedAt:          build.CreatedAt,
+		})
+	}
+
+	return &buildListResponse, nil
 }
 
 /**

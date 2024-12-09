@@ -140,12 +140,23 @@ func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest Cre
 		return errorutils.AnalyzeDBErr(err)
 	}
 
+	// create build tags
+	err = r.CreateBuildTags(buildId, createBuildRequest.TagIDs)
+
+	if err != nil {
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	return nil
+}
+
+func (r *BuildRepository) CreateBuildTags(buildId uuid.UUID, tagIds []uuid.UUID) error {
+
 	buildTagQuery := `
 	INSERT INTO build_tags(build_id, tag_id)
 	VALUES($1, unnest($2::uuid[]))
 	`
-
-	_, buildTagsErr := r.DB.Exec(buildTagQuery, buildId, pq.Array(createBuildRequest.TagIDs))
+	_, buildTagsErr := r.DB.Exec(buildTagQuery, buildId, pq.Array(tagIds))
 	if buildTagsErr != nil {
 		return errorutils.AnalyzeDBErr(buildTagsErr)
 	}
@@ -153,11 +164,33 @@ func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest Cre
 	return nil
 }
 
-func (r *BuildRepository) GetBuildsByMemberId(memberId uuid.UUID) (*[]models.Build, error) {
-	var builds []models.Build
+/**
+* Multi build query By Id, for a specific member.
+**/
+func (r *BuildRepository) GetBuildsByMemberId(memberId uuid.UUID) (*[]BuildListQuery, error) {
+	var builds []BuildListQuery
 
 	query := `
-	SELECT * FROM builds
+	SELECT
+		builds.id as id,
+		title,
+		builds.description as description,
+		ascendancies.name as ascendancy_name,
+		classes.name as class_name,
+		skills.name as main_skill_name,
+		avg_end_game_rating,
+		avg_fun_rating,
+		avg_creative_rating,
+		avg_speed_farm_rating,
+		avg_bossing_rating,
+		views,
+		status,
+		builds.created_at as created_at
+ 	FROM builds
+  JOIN classes ON classes.id = builds.class_id
+  JOIN skills ON skills.id = builds.main_skill_id
+  LEFT JOIN ascendancies ON ascendancies.id = builds.ascendancy_id
+
 	WHERE member_id = $1
 	`
 
@@ -170,6 +203,9 @@ func (r *BuildRepository) GetBuildsByMemberId(memberId uuid.UUID) (*[]models.Bui
 	return &builds, nil
 }
 
+/**
+* Single build query By Id, for a specific member.
+**/
 func (r *BuildRepository) GetBuildForMemberById(memberId uuid.UUID, buildId uuid.UUID) (*models.Build, error) {
 	var build models.Build
 
@@ -186,6 +222,35 @@ func (r *BuildRepository) GetBuildForMemberById(memberId uuid.UUID, buildId uuid
 	}
 
 	return &build, nil
+}
+
+/**
+* Queries for a corresponding builds tags.
+**/
+
+func (r *BuildRepository) GetBuildTagsForMemberById(memberId uuid.UUID, buildId uuid.UUID) (*[]models.Tag, error) {
+
+	var tags []models.Tag
+
+	query := `
+	SELECT 
+		tags.id as id,
+		tags.created_at as created_at,
+		tags.name as name
+	FROM tags
+	JOIN build_tags ON build_tags.tag_id = tags.id
+	JOIN builds ON builds.id = build_tags.build_id
+	WHERE builds.member_id = $1 AND builds.id = $2
+	`
+
+	err := r.DB.Select(&tags, query, memberId, buildId)
+
+	if err != nil {
+		fmt.Println("Errored when querying tags.")
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return &tags, nil
 }
 
 /**
