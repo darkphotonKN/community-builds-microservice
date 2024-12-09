@@ -31,9 +31,8 @@ func (r *BuildRepository) GetAllBuilds(
 	search string,
 	skillId uuid.UUID,
 	minRating *int,
-	ratingCategory types.RatingCategory) ([]models.Build, error) {
-
-	var builds []models.Build
+	ratingCategory types.RatingCategory) ([]BuildListQuery, error) {
+	var builds []BuildListQuery
 
 	// allowed columns and sort directions
 	validSortColumns := map[string]bool{
@@ -61,19 +60,24 @@ func (r *BuildRepository) GetAllBuilds(
 
 	query := `
 		SELECT
-			id,
-			member_id,
-			main_skill_id,
+			builds.id as id,
 			title,
-			description,
+			builds.description as description,
+			ascendancies.name as ascendancy_name,
+			classes.name as class_name,
+			skills.name as main_skill_name,
 			avg_end_game_rating,
 			avg_fun_rating,
 			avg_creative_rating,
 			avg_speed_farm_rating,
 			avg_bossing_rating,
 			views,
-			created_at
+			status,
+			builds.created_at as created_at
 		FROM builds
+		JOIN classes ON classes.id = builds.class_id
+	  JOIN skills ON skills.id = builds.main_skill_id
+	  LEFT JOIN ascendancies ON ascendancies.id = builds.ascendancy_id
 	`
 
 	// arguments for final query execution
@@ -123,7 +127,28 @@ func (r *BuildRepository) GetAllBuilds(
 		return nil, errorutils.AnalyzeDBErr(err)
 	}
 
-	return builds, nil
+	buildList := make([]BuildListQuery, len(builds))
+
+	for index, build := range builds {
+		buildList[index] = BuildListQuery{
+			ID:                 build.ID,
+			Title:              build.Title,
+			Description:        build.Description,
+			Class:              build.Class,
+			Ascendancy:         build.Ascendancy,
+			MainSkillName:      build.MainSkillName,
+			AvgEndGameRating:   build.AvgEndGameRating,
+			AvgFunRating:       build.AvgFunRating,
+			AvgCreativeRating:  build.AvgCreativeRating,
+			AvgSpeedFarmRating: build.AvgSpeedFarmRating,
+			AvgBossingRating:   build.AvgBossingRating,
+			Views:              build.Views,
+			Status:             build.Status,
+			CreatedAt:          build.CreatedAt,
+		}
+	}
+
+	return buildList, nil
 }
 
 func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest CreateBuildRequest) error {
@@ -227,23 +252,22 @@ func (r *BuildRepository) GetBuildForMemberById(memberId uuid.UUID, buildId uuid
 /**
 * Queries for a corresponding builds tags.
 **/
-
-func (r *BuildRepository) GetBuildTagsForMemberById(memberId uuid.UUID, buildId uuid.UUID) (*[]models.Tag, error) {
+func (r *BuildRepository) GetBuildTagsForMemberById(buildId uuid.UUID) (*[]models.Tag, error) {
 
 	var tags []models.Tag
 
 	query := `
-	SELECT 
+	SELECT
 		tags.id as id,
 		tags.created_at as created_at,
 		tags.name as name
 	FROM tags
 	JOIN build_tags ON build_tags.tag_id = tags.id
 	JOIN builds ON builds.id = build_tags.build_id
-	WHERE builds.member_id = $1 AND builds.id = $2
+	WHERE builds.id = $1
 	`
 
-	err := r.DB.Select(&tags, query, memberId, buildId)
+	err := r.DB.Select(&tags, query, buildId)
 
 	if err != nil {
 		fmt.Println("Errored when querying tags.")
