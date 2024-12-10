@@ -122,7 +122,7 @@ func (h *BuildHandler) GetBuildsForMemberHandler(c *gin.Context) {
 /**
 * Get all information for a single build by ID for a particular member.
 **/
-func (h *BuildHandler) GetBuildInfoByIdHandler(c *gin.Context) {
+func (h *BuildHandler) GetBuildInfoForMemberHandler(c *gin.Context) {
 	memberId, _ := c.Get("userId")
 
 	idParam := c.Param("id")
@@ -136,10 +136,36 @@ func (h *BuildHandler) GetBuildInfoByIdHandler(c *gin.Context) {
 
 	fmt.Printf("memberId: %s, id: %s\n", memberId, id)
 
-	build, err := h.Service.GetBuildInfoByIdService(memberId.(uuid.UUID), id)
+	build, err := h.Service.GetBuildInfoForMemberService(memberId.(uuid.UUID), id)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all build information for memberId %s: %s", memberId, err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved build for member.", "result": build})
+}
+
+/**
+* get all information for a single build by id community version (public).
+**/
+func (h *BuildHandler) GetBuildInfoByIdHandler(c *gin.Context) {
+
+	idParam := c.Param("id")
+
+	id, err := uuid.Parse(idParam)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.", id)})
+		return
+	}
+
+	fmt.Printf("id: %s\n", id)
+
+	build, err := h.Service.GetBuildInfoService(id)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all build information: %s", err.Error())})
 		return
 	}
 

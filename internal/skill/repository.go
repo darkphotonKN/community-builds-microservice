@@ -78,3 +78,33 @@ func (s *SkillRepository) GetSkills() (*[]models.Skill, error) {
 
 	return &skills, nil
 }
+
+func (s *SkillRepository) GetSkillsByBuildId(buildId uuid.UUID) (*[]SkillRow, error) {
+
+	var skillRows []SkillRow
+
+	query := `
+	SELECT
+		build_skill_links.id as skill_link_id,
+		build_skill_links.name as skill_link_name,
+		build_skill_links.is_main as skill_link_is_main,
+		skills.id as skill_id,
+		skills.name as skill_name,
+		skills.type as skill_type
+	FROM builds
+	JOIN build_skill_links ON build_skill_links.build_id = builds.id
+	JOIN build_skill_link_skills ON build_skill_link_skills.build_skill_link_id = build_skill_links.id
+	JOIN skills ON skills.id = build_skill_link_skills.skill_id
+	WHERE builds.id = $1 
+	ORDER BY build_skill_links.id
+	`
+
+	err := s.DB.Select(&skillRows, query, buildId)
+
+	if err != nil {
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return &skillRows, nil
+
+}

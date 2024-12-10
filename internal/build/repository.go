@@ -187,7 +187,7 @@ func (r *BuildRepository) CreateBuildTags(buildId uuid.UUID, tagIds []uuid.UUID)
 }
 
 /**
-* Multi build query By Id, for a specific member.
+* Multi build query By Id, for a specific member. Used for member personal viewing and edit.
 **/
 func (r *BuildRepository) GetBuildsByMemberId(memberId uuid.UUID) (*[]BuildListQuery, error) {
 	var builds []BuildListQuery
@@ -275,10 +275,13 @@ func (r *BuildRepository) GetBuildTagsForMemberById(buildId uuid.UUID) (*[]model
 }
 
 /**
+* Community Version for public viewing when the build is published.
+*
 * Getting all information related with builds via joins of
-* join table build skills, builds, and skills.
+* join table build skills, builds, and skills, in order to reduce DB
+* round trips.
 **/
-func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*BuildInfoResponse, error) {
+func (r *BuildRepository) GetBuildInfo(buildId uuid.UUID) (*BuildInfoResponse, error) {
 	var buildInfoRows []BuildInfoRows
 
 	query := `
@@ -296,11 +299,11 @@ func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*
 	JOIN build_skill_links ON build_skill_links.build_id = builds.id
 	JOIN build_skill_link_skills ON build_skill_link_skills.build_skill_link_id = build_skill_links.id
 	JOIN skills ON skills.id = build_skill_link_skills.skill_id
-	WHERE builds.id = $1 AND builds.member_id = $2
+	WHERE builds.id = $1 
 	ORDER BY build_skill_links.id
 	`
 
-	err := r.DB.Select(&buildInfoRows, query, buildId, memberId)
+	err := r.DB.Select(&buildInfoRows, query, buildId)
 
 	if err != nil {
 		fmt.Printf("Error when querying for build info: %s\n", err)
@@ -311,7 +314,7 @@ func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*
 		fmt.Println("No builds queried.")
 
 		// no builds queried with skills or item joins
-		return nil, fmt.Errorf("The build in relation with skills or items returned no data.")
+		return nil, nil
 	}
 
 	// create the base of the response
@@ -321,11 +324,36 @@ func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*
 		Description: buildInfoRows[0].Description,
 	}
 
+	var skillRows []SkillRow
+
+	for _, buildInfoRow := range buildInfoRows {
+		skillRows = append(skillRows, SkillRow{
+			SkillLinkID:     buildInfoRow.SkillLinkID,
+			SkillLinkName:   buildInfoRow.SkillLinkName,
+			SkillLinkIsMain: buildInfoRow.SkillLinkIsMain,
+			SkillID:         buildInfoRow.SkillID,
+			SkillType:       buildInfoRow.SkillType,
+		})
+
+	}
+
+	skills := r.GetAndFormSkillLinks(skillRows)
+
+	result.Skills = skills
+
+	return &result, nil
+}
+
+/**
+* Retrieves and organizes all skills and skill links.
+**/
+
+func (r *BuildRepository) GetAndFormSkillLinks(buildData []SkillRow) SkillGroupResponse {
 	var mainSkillLink SkillLinkResponse          // store primary skills
 	var additionalSkillLinks []SkillLinkResponse // stores additional skills
 
 	// group up all skill information
-	for _, row := range buildInfoRows {
+	for _, row := range buildData {
 
 		// --- grouping primary skills ---
 
@@ -426,9 +454,7 @@ func (r *BuildRepository) GetBuildInfo(memberId uuid.UUID, buildId uuid.UUID) (*
 		AdditionalSkills: additionalSkillLinks,
 	}
 
-	result.Skills = skills
-
-	return &result, nil
+	return skills
 }
 
 /**

@@ -27,6 +27,9 @@ const (
 	maxBuildCount = 10
 )
 
+/**
+* Gets list of public community builds.
+**/
 func (s *BuildService) GetCommunityBuildsService(pageNo int, pageSize int, sortOrder string, sortBy string, search string, skillId uuid.UUID, minRating *int, ratingCategory types.RatingCategory) ([]BuildListResponse, error) {
 	builds, err := s.Repo.GetAllBuilds(pageNo, pageSize, sortOrder, sortBy, search, skillId, minRating, ratingCategory)
 
@@ -158,10 +161,52 @@ func (s *BuildService) GetBuildForMemberByIdService(memberId uuid.UUID, buildId 
 }
 
 /**
+* TODO: member edit version, needs to not rely on skills, items, or build content
+* being complete.
+*
 * Get a single build with all join table information by ID for a member.
 **/
-func (s *BuildService) GetBuildInfoByIdService(memberId uuid.UUID, buildId uuid.UUID) (*BuildInfoResponse, error) {
-	return s.Repo.GetBuildInfo(memberId, buildId)
+func (s *BuildService) GetBuildInfoForMemberService(memberId uuid.UUID, buildId uuid.UUID) (*BuildInfoResponse, error) {
+	// base build
+	build, err := s.GetBuildForMemberByIdService(memberId, buildId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// tags
+	tags, err := s.Repo.GetBuildTagsForMemberById(buildId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// retrieve build skills
+
+	// get all skill and link info that exist in a build
+	skillRows, err := s.SkillService.GetSkillsByBuildIdService(buildId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	skills, err := s.Repo.GetAndFormSkillLinks(*skillRows)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// retrieve build items
+}
+
+/**
+* Get a single build with all join table information at once.
+* Public version.
+**/
+func (s *BuildService) GetBuildInfoService(buildId uuid.UUID) (*BuildInfoResponse, error) {
+
+	// return all join information (base, class, ascendancy, skills and items)
+	return s.Repo.GetBuildInfo(buildId)
 }
 
 /**

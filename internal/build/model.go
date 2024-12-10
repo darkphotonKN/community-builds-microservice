@@ -47,6 +47,15 @@ type BuildInfoRows struct {
 	SkillType       string    `db:"skill_type"`
 }
 
+type SkillRow struct {
+	SkillLinkID     string    `db:"skill_link_id"`
+	SkillLinkName   string    `db:"skill_link_name"`
+	SkillLinkIsMain bool      `db:"skill_link_is_main"`
+	SkillID         uuid.UUID `db:"skill_id"`
+	SkillName       string    `db:"skill_name"`
+	SkillType       string    `db:"skill_type"`
+}
+
 type TempSkillLink struct {
 	Name   string `json:"name"`
 	IsMain bool   `json:"isMain"`

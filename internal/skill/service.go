@@ -47,3 +47,10 @@ func (s *SkillService) BatchCreateSkillsService(createSkills []SeedSkill) error 
 
 	return nil
 }
+
+/**
+* Gets a list of skills belonging to a build by id.
+**/
+func (s *SkillService) GetSkillsByBuildIdService(buildId uuid.UUID) (*[]SkillRow, error) {
+	return s.Repo.GetSkillsAndLinksByBuildId(buildId)
+}

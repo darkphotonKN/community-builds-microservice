@@ -77,6 +77,7 @@ func SetupRouter() *gin.Engine {
 
 	// Public Routes
 	buildRoutes.GET("/community", buildHandler.GetCommunityBuildsHandler)
+	buildRoutes.GET("/community/:id/info", buildHandler.GetBuildInfoByIdHandler)
 
 	// Protected Routes
 	protectedBuildRoutes := buildRoutes.Group("/")
