@@ -120,7 +120,7 @@ func (h *BuildHandler) GetBuildsForMemberHandler(c *gin.Context) {
 }
 
 /**
-* Get all information for a build by ID for a particular member.
+* Get all information for a single build by ID for a particular member.
 **/
 func (h *BuildHandler) GetBuildInfoByIdHandler(c *gin.Context) {
 	memberId, _ := c.Get("userId")

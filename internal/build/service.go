@@ -35,11 +35,9 @@ func (s *BuildService) GetCommunityBuildsService(pageNo int, pageSize int, sortO
 	}
 
 	// get tags and add to build
-
 	buildList := make([]BuildListResponse, len(builds))
 
 	for index, build := range builds {
-
 		tags, err := s.Repo.GetBuildTagsForMemberById(build.ID)
 
 		// exit prematurely with error if any tags returned an error
@@ -92,7 +90,21 @@ func (s *BuildService) CreateBuildService(memberId uuid.UUID, createBuildRequest
 	}
 
 	// create build with this skill and for this member
-	return s.Repo.CreateBuild(memberId, createBuildRequest)
+	buildId, err := s.Repo.CreateBuild(memberId, createBuildRequest)
+
+	if err != nil {
+		return err
+	}
+
+	// create build tags
+	err = s.Repo.CreateBuildTags(*buildId, createBuildRequest.TagIDs)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+
 }
 
 /**
@@ -120,6 +132,7 @@ func (s *BuildService) GetBuildsForMemberService(memberId uuid.UUID) (*[]BuildLi
 			ID:                 build.ID,
 			Title:              build.Title,
 			Description:        build.Description,
+			Class:              build.Class,
 			Ascendancy:         build.Ascendancy,
 			MainSkillName:      build.MainSkillName,
 			AvgEndGameRating:   build.AvgEndGameRating,
@@ -138,14 +151,14 @@ func (s *BuildService) GetBuildsForMemberService(memberId uuid.UUID) (*[]BuildLi
 }
 
 /**
-* Get a single build for a member by Id.
+* Get a single build for a member by Id, without extra joined information.
 **/
 func (s *BuildService) GetBuildForMemberByIdService(memberId uuid.UUID, buildId uuid.UUID) (*models.Build, error) {
 	return s.Repo.GetBuildForMemberById(memberId, buildId)
 }
 
 /**
-* Get a single build with all information by ID for a member.
+* Get a single build with all join table information by ID for a member.
 **/
 func (s *BuildService) GetBuildInfoByIdService(memberId uuid.UUID, buildId uuid.UUID) (*BuildInfoResponse, error) {
 	return s.Repo.GetBuildInfo(memberId, buildId)

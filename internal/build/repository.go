@@ -115,8 +115,8 @@ func (r *BuildRepository) GetAllBuilds(
 		LIMIT $%d
 		OFFSET $%d
 	`, sortBy, sortOrder,
-		len(queryArgs)-1, // second last args is LIMIT
-		len(queryArgs),   // last args is OFFSET
+		len(queryArgs)-1, // second last arg is LIMIT
+		len(queryArgs),   // last arg is OFFSET
 	)
 
 	fmt.Printf("\n\nFinal Query: %s\n\n", query)
@@ -151,7 +151,7 @@ func (r *BuildRepository) GetAllBuilds(
 	return buildList, nil
 }
 
-func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest CreateBuildRequest) error {
+func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest CreateBuildRequest) (*uuid.UUID, error) {
 	query := `
 	INSERT INTO builds(member_id, main_skill_id, class_id, title, description)
 	VALUES($1, $2, $3, $4, $5)
@@ -162,17 +162,14 @@ func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest Cre
 	err := r.DB.QueryRowx(query, memberId, createBuildRequest.SkillID, createBuildRequest.ClassID, createBuildRequest.Title, createBuildRequest.Description).Scan(&buildId)
 
 	if err != nil {
-		return errorutils.AnalyzeDBErr(err)
+		return nil, errorutils.AnalyzeDBErr(err)
 	}
-
-	// create build tags
-	err = r.CreateBuildTags(buildId, createBuildRequest.TagIDs)
 
 	if err != nil {
-		return errorutils.AnalyzeDBErr(err)
+		return nil, errorutils.AnalyzeDBErr(err)
 	}
 
-	return nil
+	return &buildId, nil
 }
 
 func (r *BuildRepository) CreateBuildTags(buildId uuid.UUID, tagIds []uuid.UUID) error {
