@@ -161,9 +161,6 @@ func (s *BuildService) GetBuildForMemberByIdService(memberId uuid.UUID, buildId 
 }
 
 /**
-* TODO: member edit version, needs to not rely on skills, items, or build content
-* being complete.
-*
 * Get a single build with all join table information by ID for a member.
 **/
 func (s *BuildService) GetBuildInfoForMemberService(memberId uuid.UUID, buildId uuid.UUID) (*BuildInfoResponse, error) {
@@ -190,13 +187,27 @@ func (s *BuildService) GetBuildInfoForMemberService(memberId uuid.UUID, buildId 
 		return nil, err
 	}
 
-	skills, err := s.Repo.GetAndFormSkillLinks(*skillRows)
+	// group them into the skill group response
+	skills := s.Repo.GetAndFormSkillLinks(*skillRows)
 
 	if err != nil {
 		return nil, err
 	}
 
-	// retrieve build items
+	// TODO: retrieve build items
+
+	// return all join information (base, class, ascendancy, skills and items)
+	buildInfo := BuildInfoResponse{
+		ID:          build.ID,
+		Title:       build.Title,
+		Description: build.Description,
+		Skills:      skills,
+		Tags:        *tags,
+	}
+
+	fmt.Printf("Constructed build info: %+v\n", buildInfo)
+
+	return &buildInfo, nil
 }
 
 /**

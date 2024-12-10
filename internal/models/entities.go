@@ -224,3 +224,17 @@ type BaseDBMemberDateModel struct {
 	CreatedAt     time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt     time.Time `db:"updated_at" json:"updated_at"`
 }
+
+/**
+* Other helper models shared between two or more packages.
+**/
+
+// holds temporary data for joining skills skill links and builds tables.
+type SkillRow struct {
+	SkillLinkID     string    `db:"skill_link_id"`
+	SkillLinkName   string    `db:"skill_link_name"`
+	SkillLinkIsMain bool      `db:"skill_link_is_main"`
+	SkillID         uuid.UUID `db:"skill_id"`
+	SkillName       string    `db:"skill_name"`
+	SkillType       string    `db:"skill_type"`
+}

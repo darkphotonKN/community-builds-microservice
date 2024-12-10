@@ -324,10 +324,10 @@ func (r *BuildRepository) GetBuildInfo(buildId uuid.UUID) (*BuildInfoResponse, e
 		Description: buildInfoRows[0].Description,
 	}
 
-	var skillRows []SkillRow
+	var skillRows []models.SkillRow
 
 	for _, buildInfoRow := range buildInfoRows {
-		skillRows = append(skillRows, SkillRow{
+		skillRows = append(skillRows, models.SkillRow{
 			SkillLinkID:     buildInfoRow.SkillLinkID,
 			SkillLinkName:   buildInfoRow.SkillLinkName,
 			SkillLinkIsMain: buildInfoRow.SkillLinkIsMain,
@@ -348,7 +348,7 @@ func (r *BuildRepository) GetBuildInfo(buildId uuid.UUID) (*BuildInfoResponse, e
 * Retrieves and organizes all skills and skill links.
 **/
 
-func (r *BuildRepository) GetAndFormSkillLinks(buildData []SkillRow) SkillGroupResponse {
+func (r *BuildRepository) GetAndFormSkillLinks(buildData []models.SkillRow) SkillGroupResponse {
 	var mainSkillLink SkillLinkResponse          // store primary skills
 	var additionalSkillLinks []SkillLinkResponse // stores additional skills
 

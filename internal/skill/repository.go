@@ -79,9 +79,9 @@ func (s *SkillRepository) GetSkills() (*[]models.Skill, error) {
 	return &skills, nil
 }
 
-func (s *SkillRepository) GetSkillsByBuildId(buildId uuid.UUID) (*[]SkillRow, error) {
+func (s *SkillRepository) GetSkillsAndLinksByBuildId(buildId uuid.UUID) (*[]models.SkillRow, error) {
 
-	var skillRows []SkillRow
+	var skillRows []models.SkillRow
 
 	query := `
 	SELECT
