@@ -187,8 +187,31 @@ func (s *BuildService) GetBuildInfoForMemberService(memberId uuid.UUID, buildId 
 		return nil, err
 	}
 
-	// group them into the skill group response
-	skills := s.Repo.GetAndFormSkillLinks(*skillRows)
+	fmt.Printf("\nSkillrows: %+v\n\n", skillRows)
+
+	// group them into the skill group response, if there are returned data
+	var skills *SkillGroupResponse
+
+	if len(*skillRows) > 0 {
+		formedSkills := s.Repo.GetAndFormSkillLinks(*skillRows)
+		skills = &formedSkills
+	}
+
+	fmt.Printf("\nFormed Skills: %+v\n\n", skills)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// get class (name only)
+	class, err := s.Repo.GetBuildClassById(buildId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// get ascendancy (name only)
+	ascendancy, err := s.Repo.GetBuildAscendancyById(buildId)
 
 	if err != nil {
 		return nil, err
@@ -201,8 +224,11 @@ func (s *BuildService) GetBuildInfoForMemberService(memberId uuid.UUID, buildId 
 		ID:          build.ID,
 		Title:       build.Title,
 		Description: build.Description,
-		Skills:      skills,
-		Tags:        *tags,
+		// TODO: add ascendancy and class
+		Class:      *class,
+		Ascendancy: ascendancy,
+		Skills:     skills,
+		Tags:       *tags,
 	}
 
 	fmt.Printf("Constructed build info: %+v\n", buildInfo)

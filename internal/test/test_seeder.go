@@ -51,16 +51,27 @@ func (t *TestSuite) seedTestData() {
 		log.Fatalf("Failed to get skill with name '%s', error: %v", "Earthquake", err)
 	}
 
+	// get test class for creating build
+	var classId uuid.UUID
+	err = t.DB.Get(&classId, `
+		SELECT 
+			id
+		FROM 
+			classes
+		WHERE name = 'Warrior'
+	`)
+
 	// insert test build using the memberID and one of the skills
-	fmt.Printf("Seeding build with memberId: %s, mainSkillID: %s\n", memberID, mainSkillId)
+	fmt.Printf("Seeding build with memberId: %s, mainSkillID: %s, classID: %s\n", memberID, mainSkillId, classId)
 
 	testBuildName := "Earthquake Test Build"
 
 	_, err = t.DB.Exec(`
-		INSERT INTO builds (id, member_id, title, description, main_skill_id)
-		VALUES (uuid_generate_v4(), $1, $3, 'Description of Earthquake Test Build.',
+		INSERT INTO builds (id, member_id, class_id, title, description, main_skill_id)
+		VALUES (uuid_generate_v4(), $1, $3, $4, 'Description of Earthquake Test Build.',
 		$2)
 	`, memberID, mainSkillId, testBuildName) // ON CONFLICT DO NOTHING - ignore insert if already created
+
 	if err != nil {
 		log.Fatalf("Failed to seed build: %v", err)
 	}

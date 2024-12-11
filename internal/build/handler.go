@@ -147,7 +147,7 @@ func (h *BuildHandler) GetBuildInfoForMemberHandler(c *gin.Context) {
 }
 
 /**
-* get all information for a single build by id community version (public).
+* Get all information for a single build by id community version.
 **/
 func (h *BuildHandler) GetBuildInfoByIdHandler(c *gin.Context) {
 

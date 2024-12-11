@@ -66,13 +66,13 @@ type SkillGroupResponse struct {
 
 // All Build Information
 type BuildInfoResponse struct {
-	ID          uuid.UUID          `json:"id"`
-	Title       string             `json:"title"`
-	Description string             `json:"description"`
-	Class       models.Class       `json:"class"`
-	Ascendancy  models.Ascendancy  `json:"ascendancy"`
-	Tags        []models.Tag       `json:"tags"`
-	Skills      SkillGroupResponse `json:"skills"`
+	ID          uuid.UUID           `json:"id"`
+	Title       string              `json:"title"`
+	Description string              `json:"description"`
+	Class       string              `json:"class"`
+	Ascendancy  *string             `json:"ascendancy,omitempty"`
+	Tags        []models.Tag        `json:"tags"`
+	Skills      *SkillGroupResponse `json:"skills"`
 }
 
 // Build List

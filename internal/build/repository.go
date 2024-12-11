@@ -339,7 +339,7 @@ func (r *BuildRepository) GetBuildInfo(buildId uuid.UUID) (*BuildInfoResponse, e
 
 	skills := r.GetAndFormSkillLinks(skillRows)
 
-	result.Skills = skills
+	result.Skills = &skills
 
 	return &result, nil
 }
@@ -348,12 +348,12 @@ func (r *BuildRepository) GetBuildInfo(buildId uuid.UUID) (*BuildInfoResponse, e
 * Retrieves and organizes all skills and skill links.
 **/
 
-func (r *BuildRepository) GetAndFormSkillLinks(buildData []models.SkillRow) SkillGroupResponse {
+func (r *BuildRepository) GetAndFormSkillLinks(skillData []models.SkillRow) SkillGroupResponse {
 	var mainSkillLink SkillLinkResponse          // store primary skills
 	var additionalSkillLinks []SkillLinkResponse // stores additional skills
 
 	// group up all skill information
-	for _, row := range buildData {
+	for _, row := range skillData {
 
 		// --- grouping primary skills ---
 
@@ -569,4 +569,56 @@ func (r *BuildRepository) UpdateAvgRatingForBuild(buildId string, category types
 	}
 
 	return nil
+}
+
+/**
+* Get's a class belonging to a build.
+**/
+func (r *BuildRepository) GetBuildClassById(buildId uuid.UUID) (*string, error) {
+	var className string
+
+	query := `
+	SELECT 
+		classes.name as name
+	FROM builds
+	JOIN classes on classes.id = builds.class_id
+	WHERE builds.id = $1
+	`
+
+	err := r.DB.Get(&className, query, buildId)
+
+	if err != nil {
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return &className, nil
+
+}
+
+/**
+* Get's an ascendancy belonging to a build.
+**/
+func (r *BuildRepository) GetBuildAscendancyById(buildId uuid.UUID) (*string, error) {
+	var ascendancyName string
+
+	query := `
+	SELECT 
+		ascendancies.name as name
+	FROM builds
+	JOIN ascendancies on ascendancies.id = builds.ascendancy_id
+	WHERE builds.id = $1
+	`
+
+	err := r.DB.Get(&ascendancyName, query, buildId)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return &ascendancyName, nil
+
 }
