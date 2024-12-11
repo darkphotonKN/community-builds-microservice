@@ -462,7 +462,7 @@ func (r *BuildRepository) GetAndFormSkillLinks(skillData []models.SkillRow) Skil
 **/
 func (r *BuildRepository) CreateBuildSkillLinkTx(tx *sqlx.Tx, buildId uuid.UUID, name string, isMain bool) (uuid.UUID, error) {
 
-	// validate that skill doesn't already exists first
+	// validate that skill link and name combination doesn't already exists for the build
 	var existsId uuid.UUID
 
 	query := `
@@ -620,5 +620,117 @@ func (r *BuildRepository) GetBuildAscendancyById(buildId uuid.UUID) (*string, er
 	}
 
 	return &ascendancyName, nil
+}
 
+/**
+* Creates a skill link group for a build.
+**/
+func (r *BuildRepository) CreateBuildItemSetTx(tx *sqlx.Tx, buildId uuid.UUID) (uuid.UUID, error) {
+
+	var newId uuid.UUID
+
+	query := `
+	INSERT INTO build_item_sets(build_id)
+	VALUES($1)
+	RETURNING id
+	`
+
+	err := tx.QueryRowx(query, buildId).Scan(&newId)
+
+	if err != nil {
+		fmt.Printf("Error when attempting to insert into build_item_links: %s\n", err)
+		return uuid.Nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return newId, nil
+}
+
+/**
+* Adds a item to a existing item set.
+**/
+func (r *BuildRepository) CreateItemToSetTx(tx *sqlx.Tx, buildItemSetId uuid.UUID, slot string, itemId interface{}) error {
+
+	// create set item
+	query := `
+	INSERT INTO build_item_set_items(build_item_set_id, item_id, slot)
+	VALUES(:build_item_set_id, :item_id, :slot)
+	`
+
+	params := map[string]interface{}{
+		"build_item_set_id": buildItemSetId,
+		"item_id":           itemId,
+		"slot":              slot,
+	}
+
+	_, err := tx.NamedExec(query, params)
+
+	if err != nil {
+		fmt.Printf("DEBUG AddItemToSetTx: Error when attempting to insert into join table build_item_set_items: %s\n", err)
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	return nil
+}
+
+/**
+* Creates a skill link group for a build.
+**/
+func (r *BuildRepository) GetBuildItemSetIdTx(tx *sqlx.Tx, buildId uuid.UUID) (uuid.UUID, error) {
+	fmt.Println("buildId", buildId)
+	var setId uuid.UUID
+
+	query := `
+	SELECT id 
+	FROM build_item_sets
+	WHERE build_id = $1
+	`
+
+	err := tx.Get(&setId, query, buildId)
+
+	if err != nil {
+		fmt.Printf("Error when attempting to insert into build_item_links: %s\n", err)
+		return uuid.Nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return setId, nil
+}
+
+/**
+* Adds a item to a existing item set.
+**/
+func (r *BuildRepository) UpdateItemToSetTx(tx *sqlx.Tx, buildItemSetId uuid.UUID, slot string, itemId interface{}) error {
+
+	var itemSetSlotItemId uuid.UUID
+	// get item of update
+	query := `
+	SELECT id
+	FROM build_item_set_items
+	WHERE build_item_set_id = $1 AND slot = $2
+	`
+	err := tx.Get(&itemSetSlotItemId, query, buildItemSetId, slot)
+	if err != nil {
+		fmt.Printf("Error when attempting to insert into build_item_set_item: %s\n", err)
+		return errorutils.AnalyzeDBErr(err)
+	}
+	fmt.Println("itemSetSlotItemId", itemSetSlotItemId)
+	// update set item
+	query = `
+	UPDATE build_item_set_items
+	SET item_id = :item_id
+	WHERE id = :id
+	`
+
+	params := map[string]interface{}{
+		"id":      itemSetSlotItemId,
+		"item_id": itemId,
+	}
+
+	_, err = tx.NamedExec(query, params)
+
+	if err != nil {
+		fmt.Printf("DEBUG AddItemToSetTx: Error when attempting to insert into join table build_item_set_items: %s\n", err)
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	return nil
 }

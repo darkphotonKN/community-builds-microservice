@@ -106,6 +106,13 @@ func (s *BuildService) CreateBuildService(memberId uuid.UUID, createBuildRequest
 		return err
 	}
 
+	// create build default set
+	err = s.CreateDefaultItemSetsToBuildService(memberId, *buildId)
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 
 }
@@ -328,4 +335,103 @@ func (s *BuildService) UpdateBuildSkillLinksService(memberId uuid.UUID, buildId 
 **/
 func (s *BuildService) UpdateAvgRatingForBuildService(buildId string, category types.RatingCategory, avgRating float32) error {
 	return s.Repo.UpdateAvgRatingForBuild(buildId, category, avgRating)
+}
+
+/**
+* Create default set,
+* rolling back on error.
+**/
+func (s *BuildService) CreateDefaultItemSetsToBuildService(memberId uuid.UUID, buildId uuid.UUID) error {
+
+	return dbutils.ExecTx(s.Repo.DB, func(tx *sqlx.Tx) error {
+		// get build and check if it exists
+		_, err := s.GetBuildForMemberByIdService(memberId, buildId)
+
+		if err != nil {
+			return err
+		}
+
+		itemSetId, err := s.Repo.CreateBuildItemSetTx(tx, buildId)
+
+		if err != nil {
+			return err
+		}
+
+		itemSetsMap := map[string]interface{}{
+			"weapon":     "",
+			"shield":     "",
+			"helmet":     "",
+			"bodyArmour": "",
+			"gloves":     "",
+			"belt":       "",
+			"boots":      "",
+			"amulet":     "",
+			"leftRing":   "",
+			"rightRing":  "",
+		}
+		// create item relations under this item set, one item at a time
+		for key, value := range itemSetsMap {
+			if value == "" {
+				value = nil
+			}
+			err = s.Repo.CreateItemToSetTx(tx, itemSetId, key, value)
+
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+}
+
+/**
+* Adds primary and secondary items and links to an existing build via a transanction,
+* rolling back on error.
+**/
+func (s *BuildService) UpdateItemSetsToBuildService(memberId uuid.UUID, buildId uuid.UUID, request AddItemsToBuildRequest) error {
+
+	return dbutils.ExecTx(s.Repo.DB, func(tx *sqlx.Tx) error {
+		// get build and check if it exists
+		_, err := s.GetBuildForMemberByIdService(memberId, buildId)
+
+		if err != nil {
+			return err
+		}
+
+		itemSetId, err := s.Repo.GetBuildItemSetIdTx(tx, buildId)
+
+		if err != nil {
+			return err
+		}
+		fmt.Println("itemSetId", itemSetId)
+		itemSetsMap := map[string]string{
+			"weapon":     request.Weapon,
+			"shield":     request.Shield,
+			"helmet":     request.Helmet,
+			"bodyArmour": request.BodyArmour,
+			"gloves":     request.Gloves,
+			"belt":       request.Belt,
+			"boots":      request.Boots,
+			"amulet":     request.Amulet,
+			"leftRing":   request.LeftRing,
+			"rightRing":  request.RightRing,
+		}
+		// create item relations under this item set, one item at a time
+		for key, value := range itemSetsMap {
+			// 表示空值
+			var itemId interface{}
+			if value == "" {
+				itemId = nil
+			} else {
+				itemId = value
+			}
+			// not empty
+			fmt.Println("key", key)
+			fmt.Println("value", value)
+			s.Repo.UpdateItemToSetTx(tx, itemSetId, key, itemId)
+		}
+
+		return nil
+	})
 }

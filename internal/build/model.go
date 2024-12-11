@@ -32,6 +32,19 @@ type UpdateSkillsToBuildRequest struct {
 	AdditionalSkills []SkillLinks `json:"additionalSkills" binding:"required"`
 }
 
+type AddItemsToBuildRequest struct {
+	Weapon     string `json:"weapon"`
+	Shield     string `json:"shield"`
+	Helmet     string `json:"helmet"`
+	BodyArmour string `json:"bodyArmour"`
+	Boots      string `json:"boots"`
+	Gloves     string `json:"gloves"`
+	Belt       string `json:"Belt"`
+	Amulet     string `json:"amulet"`
+	LeftRing   string `json:"leftRing"`
+	RightRing  string `json:"reftRing"`
+}
+
 // --- Response ---
 
 // TEMP CONTAINER for builds JOIN build_skill_links JOIN skills data
