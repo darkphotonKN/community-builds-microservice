@@ -412,35 +412,20 @@ func getItem(currentItemThs []string, index int, tr *goquery.Selection, itemsCh 
 		if columnIndex := checkStr(currentItemThs, "Additional"); columnIndex == tdIndex {
 			myItem.Additional = td.Text()
 		}
-		slot := "One Hand"
-		// "axes",
-		// "bows",
-		// "quivers",
-		// "claws",
-		// "daggers",
-		// "fishing_rods",
-		// "maces",
-		// "sceptres",
-		// "staves",
-		// "swords",
-		// "wands",
-		// // Armor
-		// "body_armors",
-		// "helmets",
-		// "shields",
-		// // Jewellery,
-		// "rings",
+		slot := "Weapon"
 		switch category {
+		case "shields":
+			slot = "Shield"
 		case "boots":
 			slot = "Boots"
 		case "gloves":
-			slot = "Glove"
+			slot = "Gloves"
 		case "helmets":
 			slot = "Helmet"
 		case "amulets":
 			slot = "Amulet"
-		case "body_armors":
-			slot = "Body Armor"
+		case "body_armours":
+			slot = "Body Armour"
 		case "belts":
 			slot = "Belt"
 		case "rings":
@@ -451,7 +436,7 @@ func getItem(currentItemThs []string, index int, tr *goquery.Selection, itemsCh 
 		case "utility_flasks":
 			slot = "Flask"
 		default:
-			slot = "One Hand"
+			slot = "Weapon"
 		}
 
 		myItem.Slot = slot
@@ -494,7 +479,7 @@ func (r *ItemRepository) GetUniqueItems() (*[]models.Item, error) {
 		"swords",
 		"wands",
 		// Armor
-		"body_armors",
+		"body_armours",
 		"boots",
 		"gloves",
 		"helmets",
@@ -693,10 +678,11 @@ func getBaseItemTable(equipType string, table *goquery.Selection, itemsCh chan m
 	slot := ""
 	category := table.Find("h1").First()
 	if equipType == "weapon" {
-		slot = "One Hand"
-		if strings.Contains(category.Text(), "Two Hand") {
-			slot = "Two Hand"
-		}
+		slot = "Weapon"
+		// slot = "One Hand"
+		// if strings.Contains(category.Text(), "Two Hand") {
+		// 	slot = "Two Hand"
+		// }
 	}
 	if equipType == "armour" {
 		if strings.Contains(category.Text(), "Body Armour") {
@@ -709,7 +695,7 @@ func getBaseItemTable(equipType string, table *goquery.Selection, itemsCh chan m
 			slot = "Boots"
 		}
 		if strings.Contains(category.Text(), "Gloves") {
-			slot = "Glove"
+			slot = "Gloves"
 		}
 		if strings.Contains(category.Text(), "Shields") {
 			slot = "Shield"

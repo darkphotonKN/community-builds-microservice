@@ -238,3 +238,10 @@ type SkillRow struct {
 	SkillName       string    `db:"skill_name"`
 	SkillType       string    `db:"skill_type"`
 }
+
+type BuildItemSetItem struct {
+	ID             uuid.UUID `db:"id" json:"id"`
+	BuildItemSetId uuid.UUID `db:"build_item_set_id" json:"buildItemSetId"`
+	ItemId         uuid.UUID `db:"item_id" json:"itemId"`
+	Slot           string    `db:"slot" json:"slot"`
+}
