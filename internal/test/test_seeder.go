@@ -70,7 +70,7 @@ func (t *TestSuite) seedTestData() {
 		INSERT INTO builds (id, member_id, class_id, title, description, main_skill_id)
 		VALUES (uuid_generate_v4(), $1, $3, $4, 'Description of Earthquake Test Build.',
 		$2)
-	`, memberID, mainSkillId, testBuildName) // ON CONFLICT DO NOTHING - ignore insert if already created
+	`, memberID, classId, mainSkillId, testBuildName)
 
 	if err != nil {
 		log.Fatalf("Failed to seed build: %v", err)

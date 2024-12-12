@@ -91,4 +91,5 @@ func SeedDefaults(db *sqlx.DB) {
 	}
 
 	fmt.Printf("Successfully created all default active and support skills.\n\n")
+
 }

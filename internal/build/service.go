@@ -114,7 +114,40 @@ func (s *BuildService) CreateBuildService(memberId uuid.UUID, createBuildRequest
 	}
 
 	return nil
+}
 
+/**
+* Create build for a signed-in member.
+**/
+func (s *BuildService) UpdateBuildService(memberId uuid.UUID, buildId uuid.UUID, request UpdateBuildRequest) error {
+	// TODO: confirm skill exists
+	// _, err := s.SkillService.GetSkillByIdService(request.SkillID)
+
+	// if err != nil {
+	// 	return fmt.Errorf("main skill id could not be found when attempting to update build for it.")
+	// }
+
+	// check build exists before updating
+	_, err := s.Repo.GetBuildForMemberById(memberId, buildId)
+
+	if err != nil {
+		return fmt.Errorf("Can only update an existing build. %s", err)
+	}
+
+	err = s.Repo.UpdateBuild(memberId, buildId, request)
+
+	if err != nil {
+		return err
+	}
+
+	// TODO: update build tags
+	// err = s.Repo.CreateBuildTags(*buildId, request.TagIDs)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 /**
