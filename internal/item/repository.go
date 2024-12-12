@@ -1,17 +1,10 @@
 package item
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
-	"log"
-	"net/http"
 	"strings"
-	"sync"
-	"time"
 
-	"github.com/PuerkitoBio/goquery"
-	"github.com/chromedp/chromedp"
 	"github.com/darkphotonKN/community-builds/internal/models"
 	"github.com/darkphotonKN/community-builds/internal/utils/errorutils"
 	"github.com/google/uuid"
@@ -140,394 +133,60 @@ func checkStr(items []string, text string) int {
 	return strIndex
 }
 
-// , itemsCh chan Item, wg *sync.WaitGroup
-func getCategoryItem(category string, itemsCh chan models.Item, wg *sync.WaitGroup) {
+// checking unique items is exist
+func (r *ItemRepository) CheckUniqueItemExist() bool {
+	query := `SELECT EXISTS (SELECT 1 FROM items WHERE unique_item = true LIMIT 1 )`
 
-	resp, err := http.Get("https://www.poewiki.net/wiki/List_of_unique_" + category)
+	var exists bool
+	err := r.DB.QueryRow(query).Scan(&exists)
 	if err != nil {
-		panic(err)
+		fmt.Printf("Error checking item existence: %v\n", err)
+		return false
 	}
-	defer func() {
-		resp.Body.Close()
-		wg.Done()
-	}()
-
-	// fmt.Println("Response status:", resp.Status)
-
-	doc, err := goquery.NewDocumentFromReader(resp.Body)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	doc.Find(".item-table").Each(func(tableIndex int, table *goquery.Selection) {
-
-		var currentItemThs []string
-
-		currentItemThs = append(currentItemThs, "Item")
-		table.Find("th").Each(func(thIndex int, item *goquery.Selection) {
-			// text := item.Text()
-			fmt.Println("item:", item.Text())
-			titleAttr, _ := item.Find("abbr").Attr("title")
-			// fmt.Println("Href:", attr)
-
-			if strings.Contains(titleAttr, "Required level") {
-				// fmt.Println("包含子字串:", "strength")
-				currentItemThs = append(currentItemThs, "RequiredLevel")
-			}
-			if strings.Contains(titleAttr, "Required strength") {
-				// fmt.Println("包含子字串:", "strength")
-				currentItemThs = append(currentItemThs, "Strength")
-			}
-
-			if strings.Contains(titleAttr, "Required dexterity") {
-				// fmt.Println("包含子字串:", "dexterity")
-				currentItemThs = append(currentItemThs, "Dexterity")
-			}
-
-			if strings.Contains(titleAttr, "Required intelligence") {
-				// fmt.Println("包含子字串:", "intelligence")
-				currentItemThs = append(currentItemThs, "Intelligence")
-			}
-
-			if strings.Contains(titleAttr, "Armour") {
-				// fmt.Println("包含子字串:", "Armour")
-				currentItemThs = append(currentItemThs, "Armour")
-			}
-
-			if strings.Contains(titleAttr, "Energy shield") {
-				// fmt.Println("包含子字串:", "Energy shield")
-				currentItemThs = append(currentItemThs, "EnergyShield")
-			}
-
-			if strings.Contains(titleAttr, "Evasion rating") {
-				// fmt.Println("包含子字串:", "Evasion rating")
-				currentItemThs = append(currentItemThs, "Evasion")
-			}
-
-			if strings.Contains(titleAttr, "Chance to block") {
-				// fmt.Println("包含子字串:", "Armour")
-				currentItemThs = append(currentItemThs, "Block")
-			}
-
-			if strings.Contains(titleAttr, "Ward") {
-				currentItemThs = append(currentItemThs, "Ward")
-			}
-			// weapon
-			if strings.Contains(titleAttr, "Colour coded damage") {
-				currentItemThs = append(currentItemThs, "Damage")
-			}
-			if strings.Contains(titleAttr, "Attacks per second") {
-				currentItemThs = append(currentItemThs, "APS")
-			}
-			if strings.Contains(titleAttr, "Local weapon critical strike chance") {
-				currentItemThs = append(currentItemThs, "Crit")
-			}
-			if strings.Contains(titleAttr, "physical damage per second") {
-				currentItemThs = append(currentItemThs, "pDPS")
-			}
-			if strings.Contains(titleAttr, "elemental damage") {
-				currentItemThs = append(currentItemThs, "eDPS")
-			}
-			if strings.Contains(titleAttr, "total damage") {
-				currentItemThs = append(currentItemThs, "DPS")
-			}
-			// flask
-			if strings.Contains(titleAttr, "Life regenerated over the flask duration") {
-				currentItemThs = append(currentItemThs, "Life")
-			}
-
-			if strings.Contains(titleAttr, "Mana regenerated over the flask duration") {
-				currentItemThs = append(currentItemThs, "Mana")
-			}
-
-			if strings.Contains(item.Text(), "Duration") {
-				currentItemThs = append(currentItemThs, "Duration")
-			}
-
-			if strings.Contains(titleAttr, "Number of charges consumed on use") {
-				currentItemThs = append(currentItemThs, "Usage")
-			}
-			if strings.Contains(titleAttr, "Maximum number of flask charges held") {
-				currentItemThs = append(currentItemThs, "Capacity")
-			}
-			if strings.Contains(item.Text(), "Stats") {
-				currentItemThs = append(currentItemThs, "Stats")
-			}
-			if strings.Contains(item.Text(), "Additionaldrop restrictions") {
-				currentItemThs = append(currentItemThs, "Additional")
-			}
-		})
-		// for _, th := range currentItemThs {
-		// 	fmt.Println("th", th)
-		// }
-		table.Find("tbody tr").Each(func(trIndex int, tr *goquery.Selection) {
-			wg.Add(1)
-			go getItem(currentItemThs, trIndex, tr, itemsCh, wg, category)
-
-		})
-	})
-
-	// go func() {
-	// 	wg.Wait()
-	// 	close(itemsCh) // 所有 goroutine 完成後才關閉 Channel
-	// }()
-
-	// for itemCh := range itemsCh {
-	// 	items = append(items, itemCh)
-	// }
-
+	return exists
 }
 
-func getItem(currentItemThs []string, index int, tr *goquery.Selection, itemsCh chan models.Item, wg *sync.WaitGroup, category string) {
-	defer wg.Done()
-	// go getItem()
-	myItem := models.Item{}
-	tr.Find("td").Each(func(tdIndex int, td *goquery.Selection) {
+// checking base items is exist
+func (r *ItemRepository) CheckBaseItemExist() bool {
+	query := `SELECT EXISTS (SELECT 1 FROM base_items LIMIT 1 )`
 
-		if columnIndex := checkStr(currentItemThs, "Item"); columnIndex == tdIndex {
-			aTag := td.Find("a").First()
-			myItem.Name = aTag.Text()
-			aTagUrl, _ := aTag.Attr("href")
-			resp, err := http.Get("https://www.poewiki.net/" + aTagUrl)
-			if err != nil {
-				panic(err)
-			}
-			defer resp.Body.Close()
-			doc, err := goquery.NewDocumentFromReader(resp.Body)
-			if err != nil {
-				panic(err)
-			}
-
-			// first item box info
-			itemBox := doc.Find(".item-box.-unique").Children()
-			html, _ := itemBox.Html()
-			// fmt.Println("itemBox", html)
-			lines := strings.Split(html, "<br/>")
-			if len(lines) > 1 {
-				value, _ := goquery.NewDocumentFromReader(strings.NewReader(lines[1]))
-				myItem.Type = value.Text()
-			}
-
-			desc := doc.Find(".group.tc.-flavour").First()
-			// fmt.Println("desc", desc)
-			myItem.Description = desc.Text()
-			imgTag := td.Find("img").First()
-			imgUrl, _ := imgTag.Attr("src")
-			myItem.ImageUrl = imgUrl
-
-			// second item box info
-			itemBox = doc.Find("div.item-box.-unique .tc.-value").Last()
-			// value = itemBox.Find(".tc.-value").Last()
-			html, _ = itemBox.Html()
-			// fmt.Println("html", html)
-			myItem.Class = html
-			// if value == "" {
-			// 	fmt.Println("itemBox", itemBox)
-			// }
-
-		}
-		// fmt.Println("currentItemThs", currentItemThs)
-		if columnIndex := checkStr(currentItemThs, "RequiredLevel"); columnIndex == tdIndex {
-			myItem.RequiredLevel = td.Text()
-		}
-		// armor
-		if columnIndex := checkStr(currentItemThs, "Strength"); columnIndex == tdIndex {
-			myItem.RequiredStrength = td.Text()
-		}
-		if columnIndex := checkStr(currentItemThs, "Dexterity"); columnIndex == tdIndex {
-			myItem.RequiredDexterity = td.Text()
-		}
-		if columnIndex := checkStr(currentItemThs, "Intelligence"); columnIndex == tdIndex {
-			myItem.RequiredIntelligence = td.Text()
-		}
-		if columnIndex := checkStr(currentItemThs, "Armour"); columnIndex == tdIndex {
-			myItem.Armour = td.Text()
-		}
-		if columnIndex := checkStr(currentItemThs, "EnergyShield"); columnIndex == tdIndex {
-			myItem.EnergyShield = td.Text()
-		}
-		if columnIndex := checkStr(currentItemThs, "Evasion"); columnIndex == tdIndex {
-			myItem.Evasion = td.Text()
-		}
-		if columnIndex := checkStr(currentItemThs, "Block"); columnIndex == tdIndex {
-			myItem.Block = td.Text()
-		}
-		if columnIndex := checkStr(currentItemThs, "Ward"); columnIndex == tdIndex {
-			myItem.Ward = td.Text()
-		}
-		// weapon
-		if columnIndex := checkStr(currentItemThs, "Damage"); columnIndex == tdIndex {
-			myItem.Damage = td.Text()
-		}
-		if columnIndex := checkStr(currentItemThs, "APS"); columnIndex == tdIndex {
-			myItem.APS = td.Text()
-		}
-		if columnIndex := checkStr(currentItemThs, "Crit"); columnIndex == tdIndex {
-			myItem.Crit = td.Text()
-		}
-		if columnIndex := checkStr(currentItemThs, "pDPS"); columnIndex == tdIndex {
-			myItem.PDPS = td.Text()
-		}
-		if columnIndex := checkStr(currentItemThs, "eDPS"); columnIndex == tdIndex {
-			myItem.EDPS = td.Text()
-		}
-		if columnIndex := checkStr(currentItemThs, "DPS"); columnIndex == tdIndex {
-			myItem.DPS = td.Text()
-		}
-
-		// flask
-		if columnIndex := checkStr(currentItemThs, "Life"); columnIndex == tdIndex {
-			myItem.Life = td.Text()
-		}
-		if columnIndex := checkStr(currentItemThs, "Mana"); columnIndex == tdIndex {
-			myItem.Mana = td.Text()
-		}
-		if columnIndex := checkStr(currentItemThs, "Duration"); columnIndex == tdIndex {
-			myItem.Duration = td.Text()
-		}
-		if columnIndex := checkStr(currentItemThs, "Usage"); columnIndex == tdIndex {
-			myItem.Usage = td.Text()
-		}
-		if columnIndex := checkStr(currentItemThs, "Capacity"); columnIndex == tdIndex {
-			myItem.Capacity = td.Text()
-		}
-		// common
-		if columnIndex := checkStr(currentItemThs, "Stats"); columnIndex == tdIndex {
-			content, _ := td.Html()
-			lines := strings.Split(content, "<br/>")
-
-			// 移除空行並修剪空白
-			var cleanedLines []string
-			for _, line := range lines {
-				line = strings.TrimSpace(line)
-				if line != "" {
-					lineHtml, _ := goquery.NewDocumentFromReader(strings.NewReader(line))
-					cleanedLines = append(cleanedLines, lineHtml.Text())
-				}
-			}
-			myItem.Stats = cleanedLines
-		}
-
-		if columnIndex := checkStr(currentItemThs, "Additional"); columnIndex == tdIndex {
-			myItem.Additional = td.Text()
-		}
-		slot := "Weapon"
-		switch category {
-		case "shields":
-			slot = "Shield"
-		case "boots":
-			slot = "Boots"
-		case "gloves":
-			slot = "Gloves"
-		case "helmets":
-			slot = "Helmet"
-		case "amulets":
-			slot = "Amulet"
-		case "body_armours":
-			slot = "Body Armour"
-		case "belts":
-			slot = "Belt"
-		case "rings":
-			slot = "Rings"
-		case "life_flasks":
-		case "mana_flasks":
-		case "hybrid_flasks":
-		case "utility_flasks":
-			slot = "Flask"
-		default:
-			slot = "Weapon"
-		}
-
-		myItem.Slot = slot
-		myItem.Category = formatCategory(category)
-		myItem.UniqueItem = true
-
-	})
-
-	if myItem.Name != "" && myItem.ImageUrl != "" {
-		// *items = append(*items, myItem)
-		itemsCh <- myItem
+	var exists bool
+	err := r.DB.QueryRow(query).Scan(&exists)
+	if err != nil {
+		fmt.Printf("Error checking base item existence: %v\n", err)
+		return false
 	}
-
+	return exists
 }
 
-func (r *ItemRepository) GetUniqueItems() (*[]models.Item, error) {
-	// var items []models.Item
+// checking base items is exist
+func (r *ItemRepository) CheckItemModExist() bool {
+	query := `SELECT EXISTS (SELECT 1 FROM item_mods LIMIT 1 )`
 
-	// query := `
-	// SELECT * FROM items
-	// `
-
-	// err := r.DB.Select(&items, query)
-
-	// if err != nil {
-	// 	return nil, errorutils.AnalyzeDBErr(err)
-	// }
-
-	uniqueCategories := []string{
-		// Weapon
-		"axes",
-		"bows",
-		"quivers",
-		"claws",
-		"daggers",
-		"fishing_rods",
-		"maces",
-		"sceptres",
-		"staves",
-		"swords",
-		"wands",
-		// Armor
-		"body_armours",
-		"boots",
-		"gloves",
-		"helmets",
-		"shields",
-		// Jewellery,
-		"amulets",
-		"belts",
-		"rings",
-		// Flask
-		"life_flasks",
-		"mana_flasks",
-		"hybrid_flasks",
-		"utility_flasks",
-	}
-
-	// Process each category
-	// formattedCategories := make([]string, len(uniqueCategories))
-	// for i, category := range uniqueCategories {
-	// 	formattedCategories[i] = formatCategory(category)
-	// }
-
-	var wg sync.WaitGroup
-	itemsCh := make(chan models.Item)
-	items := []models.Item{}
-
-	// for _, category := range formattedCategories {
-	// 	wg.Add(1)
-	// 	go getCategoryItem(category, itemsCh, &wg)
-	// }
-	for _, category := range uniqueCategories {
-		wg.Add(1)
-		go getCategoryItem(category, itemsCh, &wg)
-	}
-	go func() {
-		wg.Wait()
-		close(itemsCh) // 所有 goroutine 完成後才關閉 Channel
-	}()
-
-	for itemCh := range itemsCh {
-		items = append(items, itemCh)
-	}
-
-	tx, err := r.DB.Begin()
+	var exists bool
+	err := r.DB.QueryRow(query).Scan(&exists)
 	if err != nil {
-		return nil, err
+		fmt.Printf("Error checking item mod existence: %v\n", err)
+		return false
 	}
+	return exists
+}
+
+func (r *ItemRepository) AddUniqueItems(tx *sqlx.Tx, items *[]models.Item) error {
+
+	generateCustomUUID := func(baseUUID string, sequence int) string {
+
+		// Format sequence as 4 digits
+		suffix := fmt.Sprintf("%04d", sequence)
+
+		// Replace the last 4 digits of the base UUID
+		customUUID := baseUUID[:len(baseUUID)-4] + suffix
+		return customUUID
+	}
+
 	stmt, err := tx.Prepare(pq.CopyIn(
 		"items",
+		"id",
 		"image_url",
 		"category",
 		"class",
@@ -564,11 +223,15 @@ func (r *ItemRepository) GetUniqueItems() (*[]models.Item, error) {
 		"additional",
 	))
 	if err != nil {
-		return nil, err
+		return err
 	}
+	// fixed uuid
+	baseUUID := "11111111-1111-1111-1111-111111110000"
+	for index, item := range *items {
+		uuid := generateCustomUUID(baseUUID, index)
 
-	for _, item := range items {
 		_, err := stmt.Exec(
+			uuid,
 			item.ImageUrl,
 			item.Category,
 			item.Class,
@@ -606,220 +269,39 @@ func (r *ItemRepository) GetUniqueItems() (*[]models.Item, error) {
 		)
 		if err != nil {
 			stmt.Close()
-			tx.Rollback()
-			return nil, err
+			return err
 		}
 	}
 
 	_, err = stmt.Exec()
 	if err != nil {
 		stmt.Close()
-		tx.Rollback()
-		return nil, err
+		return err
 	}
 
 	err = stmt.Close()
 	if err != nil {
-		tx.Rollback()
-		return nil, err
+		return err
 	}
-	tx.Commit()
 
-	return &items, nil
+	return nil
 }
 
-// get base items
+func (r *ItemRepository) AddBaseItems(tx *sqlx.Tx, items *[]models.BaseItem) error {
 
-func getBaseItemEquipType(equipType string, itemsCh chan models.BaseItem, wg *sync.WaitGroup) {
+	generateCustomUUID := func(baseUUID string, sequence int) string {
 
-	// 建立上下文
-	ctx, cancelChromedp := chromedp.NewContext(context.Background())
-	defer cancelChromedp() // 釋放資源
+		// Format sequence as 4 digits
+		suffix := fmt.Sprintf("%04d", sequence)
 
-	// 設定超時
-	ctxWithTimeout, cancelTimeout := context.WithTimeout(ctx, 30*time.Second)
-	defer cancelTimeout()
-	defer wg.Done()
-
-	var pageHTML string
-
-	// 模擬瀏覽器進入網站並抓取內容
-	err := chromedp.Run(ctxWithTimeout,
-		// 打開指定 URL
-		chromedp.Navigate("https://www.pathofexile.com/item-data/"+equipType),
-		// 等待網頁載入完成
-		chromedp.WaitReady("body"),
-		// 抓取完整 HTML
-		chromedp.OuterHTML("html", &pageHTML),
-	)
-
-	// 處理錯誤
-	if err != nil {
-		log.Fatalf("Failed to get HTML: %v", err)
+		// Replace the last 4 digits of the base UUID
+		customUUID := baseUUID[:len(baseUUID)-4] + suffix
+		return customUUID
 	}
 
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(pageHTML)))
-	if err != nil {
-		panic(err)
-	}
-
-	doc.Find(".layoutBox1.layoutBoxStretch").Each(func(index int, box *goquery.Selection) {
-		// boxHtml, _ := box.Html()
-		// fmt.Println("boxHtml", boxHtml)
-		wg.Add(1)
-		go getBaseItemTable(equipType, box, itemsCh, wg)
-	})
-
-}
-
-func getBaseItemTable(equipType string, table *goquery.Selection, itemsCh chan models.BaseItem, wg *sync.WaitGroup) {
-	defer wg.Done()
-
-	slot := ""
-	category := table.Find("h1").First()
-	if equipType == "weapon" {
-		slot = "Weapon"
-		// slot = "One Hand"
-		// if strings.Contains(category.Text(), "Two Hand") {
-		// 	slot = "Two Hand"
-		// }
-	}
-	if equipType == "armour" {
-		if strings.Contains(category.Text(), "Body Armour") {
-			slot = "Body Armour"
-		}
-		if strings.Contains(category.Text(), "Helmets") {
-			slot = "Helmet"
-		}
-		if strings.Contains(category.Text(), "Boots") {
-			slot = "Boots"
-		}
-		if strings.Contains(category.Text(), "Gloves") {
-			slot = "Gloves"
-		}
-		if strings.Contains(category.Text(), "Shields") {
-			slot = "Shield"
-		}
-	}
-	// fmt.Println("category", category.Text())
-
-	table.Find("table.itemDataTable").Each(func(index int, table *goquery.Selection) {
-
-		// tableHtml, _ := table.Html()
-		// fmt.Println("tableHtml", tableHtml)
-		thList := []string{}
-		table.Find("thead tr th").Each(func(index int, th *goquery.Selection) {
-			// thHtml, _ := th.Html()
-			// fmt.Println("thHtml", thHtml)
-			if index == 0 {
-				thList = append(thList, "ImageUrl")
-			} else {
-				thList = append(thList, th.Text())
-			}
-		})
-		// for _, th := range thList {
-		// 	fmt.Println("th", th)
-		// }
-		var baseItem models.BaseItem
-		table.Find("tbody tr").Each(func(trIndex int, tr *goquery.Selection) {
-			if trIndex%2 == 0 {
-				baseItem = models.BaseItem{
-					Category:   category.Text(),
-					Type:       category.Text(),
-					Class:      category.Text(),
-					EquipType:  equipType,
-					IsTwoHands: strings.Contains(category.Text(), "Two Hand"),
-					Slot:       slot,
-				}
-			}
-			if trIndex%2 == 0 {
-				tr.Find("td").Each(func(tdIndex int, td *goquery.Selection) {
-					// fmt.Println("td text", td.Text())
-					if columnIndex := checkStr(thList, "ImageUrl"); columnIndex == tdIndex {
-						img := td.Find("img").First()
-						imgPath, _ := img.Attr("src")
-						baseItem.ImageUrl = imgPath
-					}
-					if columnIndex := checkStr(thList, "Name"); columnIndex == tdIndex {
-						baseItem.Name = td.Text()
-					}
-					if columnIndex := checkStr(thList, "Level"); columnIndex == tdIndex {
-						baseItem.RequiredLevel = td.Text()
-					}
-					if columnIndex := checkStr(thList, "Str"); columnIndex == tdIndex {
-						baseItem.RequiredStrength = td.Text()
-					}
-					if columnIndex := checkStr(thList, "Dex"); columnIndex == tdIndex {
-						baseItem.RequiredDexterity = td.Text()
-					}
-					if columnIndex := checkStr(thList, "Int"); columnIndex == tdIndex {
-						baseItem.RequiredIntelligence = td.Text()
-					}
-					if columnIndex := checkStr(thList, "Damage"); columnIndex == tdIndex {
-						baseItem.Damage = td.Text()
-					}
-					if columnIndex := checkStr(thList, "Critical Chance"); columnIndex == tdIndex {
-						baseItem.Crit = td.Text()
-					}
-					if columnIndex := checkStr(thList, "APS"); columnIndex == tdIndex {
-						baseItem.APS = td.Text()
-					}
-					if columnIndex := checkStr(thList, "DPS"); columnIndex == tdIndex {
-						baseItem.DPS = td.Text()
-					}
-
-					if columnIndex := checkStr(thList, "Armour"); columnIndex == tdIndex {
-						baseItem.Armour = td.Text()
-					}
-					if columnIndex := checkStr(thList, "Evasion Rating"); columnIndex == tdIndex {
-						baseItem.Evasion = td.Text()
-					}
-					if columnIndex := checkStr(thList, "Energy Shield"); columnIndex == tdIndex {
-						baseItem.EnergyShield = td.Text()
-					}
-					if columnIndex := checkStr(thList, "Ward"); columnIndex == tdIndex {
-						baseItem.Ward = td.Text()
-					}
-
-				})
-			} else {
-				td := tr.Find("td").First()
-				baseItem.Implicit = append(baseItem.Implicit, strings.TrimSpace(td.Text()))
-				itemsCh <- baseItem
-			}
-		})
-	})
-
-}
-
-func (r *ItemRepository) GetBaseItems() (*[]models.BaseItem, error) {
-
-	var wg sync.WaitGroup
-	itemsCh := make(chan models.BaseItem)
-	items := []models.BaseItem{}
-
-	wg.Add(2)
-	go getBaseItemEquipType("weapon", itemsCh, &wg)
-	go getBaseItemEquipType("armour", itemsCh, &wg)
-
-	go func() {
-		wg.Wait()
-		close(itemsCh) // 所有 goroutine 完成後才關閉 Channel
-	}()
-
-	for itemCh := range itemsCh {
-		items = append(items, itemCh)
-	}
-
-	// store items to db
-
-	tx, err := r.DB.Begin()
-	if err != nil {
-		return nil, err
-	}
 	stmt, err := tx.Prepare(pq.CopyIn(
 		"base_items",
-
+		"id",
 		"image_url",
 		"category",
 		"class",
@@ -846,11 +328,15 @@ func (r *ItemRepository) GetBaseItems() (*[]models.BaseItem, error) {
 		"implicit",
 	))
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	for _, item := range items {
+	// fixed uuid
+	baseUUID := "11111111-1111-1111-1111-111111120000"
+	for index, item := range *items {
+		uuid := generateCustomUUID(baseUUID, index)
 		_, err := stmt.Exec(
+			uuid,
 			item.ImageUrl,
 			item.Category,
 			item.Class,
@@ -878,26 +364,22 @@ func (r *ItemRepository) GetBaseItems() (*[]models.BaseItem, error) {
 		)
 		if err != nil {
 			stmt.Close()
-			tx.Rollback()
-			return nil, err
+			return err
 		}
 	}
 
 	_, err = stmt.Exec()
 	if err != nil {
 		stmt.Close()
-		tx.Rollback()
-		return nil, err
+		return err
 	}
 
 	err = stmt.Close()
 	if err != nil {
-		tx.Rollback()
-		return nil, err
+		return err
 	}
-	tx.Commit()
 
-	return &items, nil
+	return nil
 }
 
 func (r *ItemRepository) GetBaseItemById(id uuid.UUID) (*models.BaseItem, error) {
@@ -921,105 +403,21 @@ func (r *ItemRepository) GetBaseItemById(id uuid.UUID) (*models.BaseItem, error)
 	return &baseItem, nil
 }
 
-func getModHtml(itemsCh chan models.ItemMod, wg *sync.WaitGroup) {
+func (r *ItemRepository) AddItemMods(tx *sqlx.Tx, items *[]models.ItemMod) error {
 
-	// 建立上下文
-	ctx, cancelChromedp := chromedp.NewContext(context.Background())
-	defer cancelChromedp() // 釋放資源
+	generateCustomUUID := func(baseUUID string, sequence int) string {
 
-	// 設定超時
-	ctxWithTimeout, cancelTimeout := context.WithTimeout(ctx, 30*time.Second)
-	defer cancelTimeout()
-	defer wg.Done()
+		// Format sequence as 4 digits
+		suffix := fmt.Sprintf("%04d", sequence)
 
-	var pageHTML string
-
-	// 模擬瀏覽器進入網站並抓取內容
-	err := chromedp.Run(ctxWithTimeout,
-		// 打開指定 URL
-		chromedp.Navigate("https://www.pathofexile.com/item-data/mods"),
-		// 等待網頁載入完成
-		chromedp.WaitReady("body"),
-		// 抓取完整 HTML
-		chromedp.OuterHTML("html", &pageHTML),
-	)
-
-	// 處理錯誤
-	if err != nil {
-		log.Fatalf("Failed to get HTML: %v", err)
+		// Replace the last 4 digits of the base UUID
+		customUUID := baseUUID[:len(baseUUID)-4] + suffix
+		return customUUID
 	}
 
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(pageHTML)))
-	if err != nil {
-		panic(err)
-	}
-
-	table := doc.Find(".layoutBox1.layoutBoxStretch").First()
-
-	table.Find("table.itemDataTable tbody tr").Each(func(index int, tr *goquery.Selection) {
-		// boxHtml, _ := box.Html()
-		// fmt.Println("boxHtml", boxHtml)
-		wg.Add(1)
-		go getItemMod(tr, itemsCh, wg)
-	})
-}
-
-func getItemMod(tr *goquery.Selection, itemsCh chan models.ItemMod, wg *sync.WaitGroup) {
-	defer wg.Done()
-	itemMod := models.ItemMod{}
-	thList := []string{"Affix", "Name", "Level", "Stat", "Tags"}
-
-	tr.Find("td").Each(func(tdIndex int, td *goquery.Selection) {
-		if columnIndex := checkStr(thList, "Affix"); columnIndex == tdIndex {
-			itemMod.Affix = td.Text()
-		}
-		if columnIndex := checkStr(thList, "Name"); columnIndex == tdIndex {
-			text := td.Text()
-			text = strings.Replace(text, "of", "", 1)
-			text = strings.TrimSpace(text)
-			itemMod.Name = text
-		}
-		if columnIndex := checkStr(thList, "Level"); columnIndex == tdIndex {
-			itemMod.Level = td.Text()
-		}
-		if columnIndex := checkStr(thList, "Stat"); columnIndex == tdIndex {
-			itemMod.Stat = td.Text()
-		}
-		if columnIndex := checkStr(thList, "Tags"); columnIndex == tdIndex {
-			itemMod.Tags = td.Text()
-		}
-	})
-
-	itemsCh <- itemMod
-}
-
-func (r *ItemRepository) GetItemMods() (*[]models.ItemMod, error) {
-
-	var wg sync.WaitGroup
-	itemsCh := make(chan models.ItemMod)
-	items := []models.ItemMod{}
-
-	wg.Add(1)
-	go getModHtml(itemsCh, &wg)
-
-	go func() {
-		wg.Wait()
-		close(itemsCh) // 所有 goroutine 完成後才關閉 Channel
-	}()
-
-	for item := range itemsCh {
-		items = append(items, item)
-	}
-
-	// store items to db
-
-	tx, err := r.DB.Begin()
-	if err != nil {
-		return nil, err
-	}
 	stmt, err := tx.Prepare(pq.CopyIn(
 		"item_mods",
-
+		"id",
 		"affix",
 		"name",
 		"level",
@@ -1027,11 +425,15 @@ func (r *ItemRepository) GetItemMods() (*[]models.ItemMod, error) {
 		"tags",
 	))
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	for _, item := range items {
+	// fixed uuid
+	baseUUID := "11111111-1111-1111-1111-111111130000"
+	for index, item := range *items {
+		uuid := generateCustomUUID(baseUUID, index)
 		_, err := stmt.Exec(
+			uuid,
 			item.Affix,
 			item.Name,
 			item.Level,
@@ -1041,26 +443,23 @@ func (r *ItemRepository) GetItemMods() (*[]models.ItemMod, error) {
 
 		if err != nil {
 			stmt.Close()
-			tx.Rollback()
-			return nil, err
+			return err
 		}
 	}
 
 	_, err = stmt.Exec()
 	if err != nil {
 		stmt.Close()
-		tx.Rollback()
-		return nil, err
+		return err
 	}
 
 	err = stmt.Close()
 	if err != nil {
-		tx.Rollback()
-		return nil, err
+		return err
 	}
 	tx.Commit()
 
-	return &items, nil
+	return nil
 }
 
 func (r *ItemRepository) CreateRareItem(id uuid.UUID, createRareItemReq CreateRareItemReq) error {

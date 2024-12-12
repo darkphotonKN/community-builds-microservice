@@ -99,55 +99,14 @@ func (h *ItemHandler) AddItemToBuildHandler(c *gin.Context) {
 }
 
 func (h *ItemHandler) GetUniqueItemsHandler(c *gin.Context) {
-	items, err := h.Service.GetUniqueItemsService()
+	err := h.Service.CrawlingAndAddUniqueItemsService()
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to retrieve all items: %s\n", err.Error())})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all items.", "result": items})
-}
-
-func (h *ItemHandler) GetBaseItemsHandler(c *gin.Context) {
-	items, err := h.Service.GetBaseItemsService()
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to retrieve all items: %s\n", err.Error())})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all items.", "result": items})
-}
-
-func (h *ItemHandler) GetBaseItemByIdHandler(c *gin.Context) {
-	idParam := c.Param("id")
-	id, err := uuid.Parse(idParam)
-	// fmt.Println("base item id", id)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Invalid UUID format for id.")})
-		return
-	}
-
-	item, err := h.Service.GetBaseItemByIdService(id)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to retrieve all items: %s\n", err.Error())})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved item.", "result": item})
-}
-
-func (h *ItemHandler) GetItemModsHandler(c *gin.Context) {
-	items, err := h.Service.GetItemModsService()
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to retrieve all items: %s\n", err.Error())})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all items.", "result": items})
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all items."})
 }
 
 func (h *ItemHandler) CreateRareItemHandler(c *gin.Context) {
