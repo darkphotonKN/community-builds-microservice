@@ -132,5 +132,3 @@ type BuildListResponse struct {
 	Status             int          `json:"status"`
 	CreatedAt          string       `json:"createdAt"`
 }
-
-type BuildListRespose struc
