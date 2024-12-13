@@ -8,6 +8,7 @@ import (
 
 	"github.com/darkphotonKN/community-builds/internal/class"
 	"github.com/darkphotonKN/community-builds/internal/constants"
+	"github.com/darkphotonKN/community-builds/internal/item"
 	"github.com/darkphotonKN/community-builds/internal/member"
 	"github.com/darkphotonKN/community-builds/internal/skill"
 	"github.com/jmoiron/sqlx"
@@ -92,4 +93,9 @@ func SeedDefaults(db *sqlx.DB) {
 
 	fmt.Printf("Successfully created all default active and support skills.\n\n")
 
+	itemRepo := item.NewItemRepository(db)
+	itemService := item.NewItemService(itemRepo)
+	itemService.CrawlingAndAddUniqueItemsService()
+	itemService.CrawlingAndAddBaseItemsService()
+	itemService.CrawlingAndAddItemModsService()
 }
