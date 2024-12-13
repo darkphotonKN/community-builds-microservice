@@ -402,7 +402,10 @@ func (s *ItemService) CrawlingAndAddUniqueItemsService() error {
 			items = append(items, itemCh)
 		}
 
-		s.Repo.AddUniqueItems(tx, &items)
+		err := s.Repo.AddUniqueItems(tx, &items)
+		if err != nil {
+			return err
+		}
 		return nil
 	})
 
@@ -414,7 +417,7 @@ func (s *ItemService) CrawlingAndAddBaseItemsService() error {
 
 		isExist := s.Repo.CheckBaseItemExist()
 		if isExist {
-			fmt.Println("base Items already exist, skipping unique item crawling.")
+			fmt.Println("base Items already exist, skipping base item crawling.")
 			return nil
 		}
 
@@ -434,7 +437,10 @@ func (s *ItemService) CrawlingAndAddBaseItemsService() error {
 		for itemCh := range itemsCh {
 			items = append(items, itemCh)
 		}
-		s.Repo.AddBaseItems(tx, &items)
+		err := s.Repo.AddBaseItems(tx, &items)
+		if err != nil {
+			return err
+		}
 		return nil
 	})
 }
@@ -608,7 +614,7 @@ func (s *ItemService) CrawlingAndAddItemModsService() error {
 
 		isExist := s.Repo.CheckItemModExist()
 		if isExist {
-			fmt.Println("Item mods already exist, skipping unique item crawling.")
+			fmt.Println("Item mods already exist, skipping item mods crawling.")
 			return nil
 		}
 
@@ -624,11 +630,14 @@ func (s *ItemService) CrawlingAndAddItemModsService() error {
 			close(itemsCh) // 所有 goroutine 完成後才關閉 Channel
 		}()
 
-		for item := range itemsCh {
-			items = append(items, item)
+		for itemCh := range itemsCh {
+			items = append(items, itemCh)
 		}
 
-		s.Repo.AddItemMods(tx, &items)
+		err := s.Repo.AddItemMods(tx, &items)
+		if err != nil {
+			return err
+		}
 		return nil
 	})
 }

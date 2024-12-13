@@ -174,14 +174,18 @@ func (r *ItemRepository) CheckItemModExist() bool {
 
 func (r *ItemRepository) AddUniqueItems(tx *sqlx.Tx, items *[]models.Item) error {
 
-	generateCustomUUID := func(baseUUID string, sequence int) string {
+	generateCustomUUID := func(baseUUID string, sequence int) (*uuid.UUID, error) {
 
 		// Format sequence as 4 digits
 		suffix := fmt.Sprintf("%04d", sequence)
 
 		// Replace the last 4 digits of the base UUID
 		customUUID := baseUUID[:len(baseUUID)-4] + suffix
-		return customUUID
+		parseUuid, err := uuid.Parse(customUUID)
+		if err != nil {
+			return nil, err
+		}
+		return &parseUuid, nil
 	}
 
 	stmt, err := tx.Prepare(pq.CopyIn(
@@ -228,9 +232,12 @@ func (r *ItemRepository) AddUniqueItems(tx *sqlx.Tx, items *[]models.Item) error
 	// fixed uuid
 	baseUUID := "11111111-1111-1111-1111-111111110000"
 	for index, item := range *items {
-		uuid := generateCustomUUID(baseUUID, index)
+		uuid, err := generateCustomUUID(baseUUID, index)
+		if err != nil {
+			return err
+		}
 
-		_, err := stmt.Exec(
+		_, err = stmt.Exec(
 			uuid,
 			item.ImageUrl,
 			item.Category,
@@ -289,14 +296,18 @@ func (r *ItemRepository) AddUniqueItems(tx *sqlx.Tx, items *[]models.Item) error
 
 func (r *ItemRepository) AddBaseItems(tx *sqlx.Tx, items *[]models.BaseItem) error {
 
-	generateCustomUUID := func(baseUUID string, sequence int) string {
+	generateCustomUUID := func(baseUUID string, sequence int) (*uuid.UUID, error) {
 
 		// Format sequence as 4 digits
 		suffix := fmt.Sprintf("%04d", sequence)
 
 		// Replace the last 4 digits of the base UUID
 		customUUID := baseUUID[:len(baseUUID)-4] + suffix
-		return customUUID
+		parseUuid, err := uuid.Parse(customUUID)
+		if err != nil {
+			return nil, err
+		}
+		return &parseUuid, nil
 	}
 
 	stmt, err := tx.Prepare(pq.CopyIn(
@@ -334,8 +345,11 @@ func (r *ItemRepository) AddBaseItems(tx *sqlx.Tx, items *[]models.BaseItem) err
 	// fixed uuid
 	baseUUID := "11111111-1111-1111-1111-111111120000"
 	for index, item := range *items {
-		uuid := generateCustomUUID(baseUUID, index)
-		_, err := stmt.Exec(
+		uuid, err := generateCustomUUID(baseUUID, index)
+		if err != nil {
+			return err
+		}
+		_, err = stmt.Exec(
 			uuid,
 			item.ImageUrl,
 			item.Category,
@@ -405,14 +419,18 @@ func (r *ItemRepository) GetBaseItemById(id uuid.UUID) (*models.BaseItem, error)
 
 func (r *ItemRepository) AddItemMods(tx *sqlx.Tx, items *[]models.ItemMod) error {
 
-	generateCustomUUID := func(baseUUID string, sequence int) string {
+	generateCustomUUID := func(baseUUID string, sequence int) (*uuid.UUID, error) {
 
 		// Format sequence as 4 digits
 		suffix := fmt.Sprintf("%04d", sequence)
 
 		// Replace the last 4 digits of the base UUID
 		customUUID := baseUUID[:len(baseUUID)-4] + suffix
-		return customUUID
+		parseUuid, err := uuid.Parse(customUUID)
+		if err != nil {
+			return nil, err
+		}
+		return &parseUuid, nil
 	}
 
 	stmt, err := tx.Prepare(pq.CopyIn(
@@ -431,8 +449,11 @@ func (r *ItemRepository) AddItemMods(tx *sqlx.Tx, items *[]models.ItemMod) error
 	// fixed uuid
 	baseUUID := "11111111-1111-1111-1111-111111130000"
 	for index, item := range *items {
-		uuid := generateCustomUUID(baseUUID, index)
-		_, err := stmt.Exec(
+		uuid, err := generateCustomUUID(baseUUID, index)
+		if err != nil {
+			return err
+		}
+		_, err = stmt.Exec(
 			uuid,
 			item.Affix,
 			item.Name,
@@ -457,7 +478,6 @@ func (r *ItemRepository) AddItemMods(tx *sqlx.Tx, items *[]models.ItemMod) error
 	if err != nil {
 		return err
 	}
-	tx.Commit()
 
 	return nil
 }
