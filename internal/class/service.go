@@ -2,6 +2,9 @@ package class
 
 import "fmt"
 
+/**
+* Classes an Ascendancies Services
+**/
 type ClassService struct {
 	Repo *ClassRepository
 }

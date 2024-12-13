@@ -16,6 +16,15 @@ type CreateBuildRequest struct {
 	AscendancyID uuid.UUID   `json:"ascendancyId" db:"ascendancy_id"`
 }
 
+type UpdateBuildRequest struct {
+	SkillID      uuid.UUID   `json:"skillId" binding:"omitempty" db:"main_skill_id"`
+	TagIDs       []uuid.UUID `json:"tagIds" binding:"omitempty" db:"tag_ids"`
+	Title        string      `json:"title" binding:"omitempty,min=6" db:"title"`
+	Description  string      `json:"description"  binding:"omitempty,min=10" db:"description"`
+	ClassID      uuid.UUID   `json:"classId" binding:"omitempty" db:"class_id"`
+	AscendancyID uuid.UUID   `json:"ascendancyId" binding:"omitempty" db:"ascendancy_id"`
+}
+
 type SkillLinks struct {
 	SkillLinkName string      `json:"skillLinkName" binding:"required"`
 	Skill         uuid.UUID   `json:"skill" binding:"required,uuid"`
@@ -123,3 +132,5 @@ type BuildListResponse struct {
 	Status             int          `json:"status"`
 	CreatedAt          string       `json:"createdAt"`
 }
+
+type BuildListRespose struc

@@ -104,6 +104,39 @@ func (h *BuildHandler) CreateBuildHandler(c *gin.Context) {
 }
 
 /**
+* Updates an existing build for a signed-in member.
+**/
+func (h *BuildHandler) UpdateBuildHandler(c *gin.Context) {
+	memberId, _ := c.Get("userId")
+
+	buildIdQuery := c.Param("id")
+
+	buildId, err := uuid.Parse(buildIdQuery)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.", buildId)})
+		return
+	}
+
+	var request UpdateBuildRequest
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		fmt.Printf("Failed to bind JSON payload: %+v, Error: %s", request, err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON: %s", err)})
+		return
+	}
+
+	err = h.Service.UpdateBuildService(memberId.(uuid.UUID), buildId, request)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to update a build: %s", err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusCreated, "message": "Successfully updated the build."})
+}
+
+/**
 * Get list of builds by a signed-in member's ID.
 **/
 func (h *BuildHandler) GetBuildsForMemberHandler(c *gin.Context) {

@@ -172,6 +172,39 @@ func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest Cre
 	return &buildId, nil
 }
 
+func (r *BuildRepository) UpdateBuild(memberId uuid.UUID, buildId uuid.UUID, request UpdateBuildRequest) error {
+
+	query := `
+	UPDATE builds
+	SET 
+		title = :title,
+		description = :description,
+		main_skill_id = :main_skill_id,
+		class_id = :class_id,
+		ascendancy_id = :ascendancy_id,
+		updated_at = CURRENT_TIMESTAMP
+	WHERE id = :build_id AND member_id = :member_id
+	`
+
+	params := map[string]interface{}{
+		"title":         request.Title,
+		"description":   request.Description,
+		"main_skill_id": request.SkillID,
+		"class_id":      request.ClassID,
+		"ascendancy_id": request.AscendancyID,
+		"build_id":      buildId,
+		"member_id":     memberId,
+	}
+
+	_, err := r.DB.NamedExec(query, params)
+
+	if err != nil {
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	return nil
+}
+
 func (r *BuildRepository) CreateBuildTags(buildId uuid.UUID, tagIds []uuid.UUID) error {
 
 	buildTagQuery := `
@@ -299,7 +332,7 @@ func (r *BuildRepository) GetBuildInfo(buildId uuid.UUID) (*BuildInfoResponse, e
 	JOIN build_skill_links ON build_skill_links.build_id = builds.id
 	JOIN build_skill_link_skills ON build_skill_link_skills.build_skill_link_id = build_skill_links.id
 	JOIN skills ON skills.id = build_skill_link_skills.skill_id
-	WHERE builds.id = $1 
+	WHERE builds.id = $1
 	ORDER BY build_skill_links.id
 	`
 
@@ -578,7 +611,7 @@ func (r *BuildRepository) GetBuildClassById(buildId uuid.UUID) (*string, error) 
 	var className string
 
 	query := `
-	SELECT 
+	SELECT
 		classes.name as name
 	FROM builds
 	JOIN classes on classes.id = builds.class_id
@@ -602,7 +635,7 @@ func (r *BuildRepository) GetBuildAscendancyById(buildId uuid.UUID) (*string, er
 	var ascendancyName string
 
 	query := `
-	SELECT 
+	SELECT
 		ascendancies.name as name
 	FROM builds
 	JOIN ascendancies on ascendancies.id = builds.ascendancy_id
@@ -680,7 +713,7 @@ func (r *BuildRepository) GetBuildItemSetIdTx(tx *sqlx.Tx, buildId uuid.UUID) (u
 	var setId uuid.UUID
 
 	query := `
-	SELECT id 
+	SELECT id
 	FROM build_item_sets
 	WHERE build_id = $1
 	`
