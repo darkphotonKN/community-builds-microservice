@@ -3,6 +3,7 @@ package build
 import (
 	"github.com/darkphotonKN/community-builds/internal/models"
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 // --- Request ---
@@ -88,13 +89,14 @@ type SkillGroupResponse struct {
 
 // All Build Information
 type BuildInfoResponse struct {
-	ID          uuid.UUID           `json:"id"`
-	Title       string              `json:"title"`
-	Description string              `json:"description"`
-	Class       string              `json:"class"`
-	Ascendancy  *string             `json:"ascendancy,omitempty"`
-	Tags        []models.Tag        `json:"tags"`
-	Skills      *SkillGroupResponse `json:"skills"`
+	ID          uuid.UUID              `json:"id"`
+	Title       string                 `json:"title"`
+	Description string                 `json:"description"`
+	Class       string                 `json:"class"`
+	Ascendancy  *string                `json:"ascendancy,omitempty"`
+	Tags        []models.Tag           `json:"tags"`
+	Skills      *SkillGroupResponse    `json:"skills"`
+	Sets        []BuildItemSetResponse `json:"sets"`
 }
 
 // Build List
@@ -131,4 +133,48 @@ type BuildListResponse struct {
 	Tags               []models.Tag `json:"tags"`
 	Status             int          `json:"status"`
 	CreatedAt          string       `json:"createdAt"`
+}
+
+type BuildItemSetResponse struct {
+	BuildId uuid.UUID `db:"build_id"`
+	SetId   uuid.UUID `db:"set_id"`
+	ItemId  uuid.UUID `db:"item_id"`
+	SetSlot string    `db:"set_slot"`
+	// MemberID    uuid.UUID `json:"memberId" db:"member_id"`
+	// BaseItemId  uuid.UUID `json:"baseItemId,omitempty" db:"base_item_id"`
+	ImageUrl    string `json:"imageUrl" db:"image_url"`
+	Category    string `json:"category" db:"category"`
+	Class       string `json:"class" db:"class"`
+	Name        string `json:"name" db:"name"`
+	Type        string `json:"type" db:"type"`
+	Description string `json:"description" db:"description"`
+	UniqueItem  bool   `json:"uniqueItem" db:"unique_item"`
+	Slot        string `json:"slot" db:"slot"`
+	// armor
+	RequiredLevel        *string `json:"requiredLevel,omitempty" db:"required_level"`
+	RequiredStrength     *string `json:"requiredStrength,omitempty" db:"required_strength"`
+	RequiredDexterity    *string `json:"requiredDexterity,omitempty" db:"required_dexterity"`
+	RequiredIntelligence *string `json:"requiredIntelligence,omitempty" db:"required_intelligence"`
+	Armour               *string `json:"armour,omitempty" db:"armour"`
+	EnergyShield         *string `json:"energyShield,omitempty" db:"energy_shield"`
+	Evasion              *string `json:"evasion,omitempty" db:"evasion"`
+	Block                *string `json:"block,omitempty" db:"block"`
+	Ward                 *string `json:"ward,omitempty" db:"ward"`
+	// weapon
+	Damage *string `json:"damage,omitempty" db:"damage"`
+	APS    *string `json:"aps,omitempty" db:"aps"`
+	Crit   *string `json:"crit,omitempty" db:"crit"`
+	PDPS   *string `json:"pdps,omitempty" db:"pdps"`
+	EDPS   *string `json:"edps,omitempty" db:"edps"`
+	DPS    *string `json:"dps,omitempty" db:"dps"`
+	// poison
+	Life     *string `json:"life,omitempty" db:"life"`
+	Mana     *string `json:"mana,omitempty" db:"mana"`
+	Duration *string `json:"duration,omitempty" db:"duration"`
+	Usage    *string `json:"usage,omitempty" db:"usage"`
+	Capacity *string `json:"capacity,omitempty" db:"capacity"`
+	// common
+	Additional *string         `json:"additional,omitempty" db:"additional"`
+	Stats      pq.StringArray  `json:"stats,omitempty" db:"stats"`
+	Implicit   *pq.StringArray `json:"implicit,omitempty" db:"implicit"`
 }
