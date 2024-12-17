@@ -51,6 +51,7 @@ type Ascendancy struct {
 
 type Item struct {
 	BaseDBDateModel
+	MemberID    uuid.UUID `json:"memberId" db:"member_id"`
 	BaseItemId  uuid.UUID `json:"baseItemId,omitempty" db:"base_item_id"`
 	ImageUrl    string    `json:"imageUrl" db:"image_url"`
 	Category    string    `json:"category" db:"category"`

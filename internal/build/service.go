@@ -258,6 +258,12 @@ func (s *BuildService) GetBuildInfoForMemberService(memberId uuid.UUID, buildId 
 	}
 
 	// TODO: retrieve build items
+	set, err := s.Repo.GetBuildItemSetById(buildId)
+	if err != nil {
+		fmt.Println("set err", err)
+		return nil, err
+	}
+	fmt.Println("set", set)
 
 	// return all join information (base, class, ascendancy, skills and items)
 	buildInfo := BuildInfoResponse{
@@ -269,6 +275,7 @@ func (s *BuildService) GetBuildInfoForMemberService(memberId uuid.UUID, buildId 
 		Ascendancy: ascendancy,
 		Skills:     skills,
 		Tags:       *tags,
+		Sets:       set,
 	}
 
 	fmt.Printf("Constructed build info: %+v\n", buildInfo)
