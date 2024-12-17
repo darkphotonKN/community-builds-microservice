@@ -78,7 +78,6 @@ func (h *BuildHandler) GetCommunityBuildsHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all builds for member.", "result": builds})
-
 }
 
 /**
@@ -302,6 +301,33 @@ func (h *BuildHandler) UpdateBuildSkillLinksHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all builds for member."})
+}
+
+/**
+* Deletes build by member Id.
+**/
+
+func (h *BuildHandler) DeleteBuildForMemberHandler(c *gin.Context) {
+	memberId, _ := c.Get("userId")
+
+	idParam := c.Param("id")
+
+	buildId, err := uuid.Parse(idParam)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.", buildId)})
+		return
+	}
+
+	err = h.Service.DeleteBuildByMemberService(memberId.(uuid.UUID), buildId)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all builds for memberId %s: %s", memberId, err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": fmt.Sprintf("Successfully deleted build with build id: %s.", buildId)})
+
 }
 
 /**

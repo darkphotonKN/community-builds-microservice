@@ -165,10 +165,6 @@ func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest Cre
 		return nil, errorutils.AnalyzeDBErr(err)
 	}
 
-	if err != nil {
-		return nil, errorutils.AnalyzeDBErr(err)
-	}
-
 	return &buildId, nil
 }
 
@@ -765,6 +761,22 @@ func (r *BuildRepository) UpdateItemToSetTx(tx *sqlx.Tx, buildItemSetId uuid.UUI
 
 	if err != nil {
 		fmt.Printf("DEBUG AddItemToSetTx: Error when attempting to insert into join table build_item_set_items: %s\n", err)
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	return nil
+}
+
+func (r *BuildRepository) DeleteBuildByIdForMember(memberId uuid.UUID, buildId uuid.UUID) error {
+
+	query := `
+	DELETE FROM builds 
+	WHERE id = $1 AND member_id = $2
+	`
+
+	_, err := r.DB.Exec(query, buildId, memberId)
+
+	if err != nil {
 		return errorutils.AnalyzeDBErr(err)
 	}
 
