@@ -327,7 +327,6 @@ func (h *BuildHandler) DeleteBuildForMemberHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": fmt.Sprintf("Successfully deleted build with build id: %s.", buildId)})
-
 }
 
 /**

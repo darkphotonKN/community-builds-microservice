@@ -481,7 +481,15 @@ func (s *BuildService) UpdateItemSetsToBuildService(memberId uuid.UUID, buildId 
 **/
 
 func (s *BuildService) DeleteBuildByMemberService(memberId uuid.UUID, buildId uuid.UUID) error {
-	err := s.Repo.DeleteBuildByIdForMember(memberId, buildId)
+	// check if build is member's
+	_, err := s.GetBuildForMemberByIdService(memberId, buildId)
+
+	if err != nil {
+		return fmt.Errorf("The build does not belong to this member or does not exist.")
+	}
+
+	// delete build from db
+	err = s.Repo.DeleteBuildByIdForMember(memberId, buildId)
 
 	if err != nil {
 		return err

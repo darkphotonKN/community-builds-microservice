@@ -818,11 +818,9 @@ func (r *BuildRepository) DeleteBuildByIdForMember(memberId uuid.UUID, buildId u
 	`
 
 	_, err := r.DB.Exec(query, buildId, memberId)
-
 	if err != nil {
 		return errorutils.AnalyzeDBErr(err)
 	}
 
 	return nil
-
 }

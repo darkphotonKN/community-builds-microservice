@@ -36,7 +36,6 @@ type Class struct {
 /**
 * Ascendancy
 **/
-
 type Ascendancy struct {
 	BaseDBDateModel
 	ClassID     uuid.UUID `db:"class_id" json:"classId"`
@@ -48,7 +47,6 @@ type Ascendancy struct {
 /**
 * Items
 **/
-
 type Item struct {
 	BaseDBDateModel
 	MemberID    uuid.UUID `json:"memberId" db:"member_id"`
