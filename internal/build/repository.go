@@ -165,23 +165,21 @@ func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest Cre
 		return nil, errorutils.AnalyzeDBErr(err)
 	}
 
-	if err != nil {
-		return nil, errorutils.AnalyzeDBErr(err)
-	}
-
 	return &buildId, nil
 }
 
 func (r *BuildRepository) UpdateBuild(memberId uuid.UUID, buildId uuid.UUID, request UpdateBuildRequest) error {
 
+	fmt.Printf("request.SkillID :%s\n", request.SkillID)
+
 	query := `
 	UPDATE builds
 	SET 
-		title = :title,
-		description = :description,
-		main_skill_id = :main_skill_id,
-		class_id = :class_id,
-		ascendancy_id = :ascendancy_id,
+		title = COALESCE(:title, title),
+		description = COALESCE(:description, description),
+		main_skill_id = COALESCE(:main_skill_id, main_skill_id),
+		class_id = COALESCE(:class_id, class_id),
+		ascendancy_id = COALESCE(:ascendancy_id, ascendancy_id),
 		updated_at = CURRENT_TIMESTAMP
 	WHERE id = :build_id AND member_id = :member_id
 	`
@@ -196,6 +194,8 @@ func (r *BuildRepository) UpdateBuild(memberId uuid.UUID, buildId uuid.UUID, req
 		"member_id":     memberId,
 	}
 
+	fmt.Printf("Final Query: %s\n", query)
+
 	_, err := r.DB.NamedExec(query, params)
 
 	if err != nil {
@@ -206,7 +206,6 @@ func (r *BuildRepository) UpdateBuild(memberId uuid.UUID, buildId uuid.UUID, req
 }
 
 func (r *BuildRepository) CreateBuildTags(buildId uuid.UUID, tagIds []uuid.UUID) error {
-
 	buildTagQuery := `
 	INSERT INTO build_tags(build_id, tag_id)
 	VALUES($1, unnest($2::uuid[]))
@@ -858,4 +857,20 @@ func (r *BuildRepository) GetBuildItemSetById(buildId uuid.UUID) ([]BuildItemSet
 	}
 
 	return buildItemSetItems, nil
+}
+
+func (r *BuildRepository) DeleteBuildByIdForMember(memberId uuid.UUID, buildId uuid.UUID) error {
+	query := `
+	DELETE FROM builds 
+	WHERE id = $1 AND member_id = $2
+	`
+
+	_, err := r.DB.Exec(query, buildId, memberId)
+
+	if err != nil {
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	return nil
+
 }

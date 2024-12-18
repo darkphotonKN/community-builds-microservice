@@ -475,3 +475,17 @@ func (s *BuildService) UpdateItemSetsToBuildService(memberId uuid.UUID, buildId 
 		return nil
 	})
 }
+
+/**
+* Deletes a build for a member by its build id.
+**/
+
+func (s *BuildService) DeleteBuildByMemberService(memberId uuid.UUID, buildId uuid.UUID) error {
+	err := s.Repo.DeleteBuildByIdForMember(memberId, buildId)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -84,6 +84,7 @@ func SetupRouter() *gin.Engine {
 	protectedBuildRoutes.PATCH("/:id", buildHandler.UpdateBuildHandler)
 	protectedBuildRoutes.POST("/:id/addSkills", buildHandler.AddSkillLinksToBuildHandler)
 	protectedBuildRoutes.PATCH("/:id/updateSet", buildHandler.UpdateItemSetsToBuildHandler)
+	protectedBuildRoutes.DELETE("/:id", buildHandler.DeleteBuildForMemberHandler)
 
 	// --- TAG ---
 
