@@ -69,6 +69,9 @@ type BuildInfoRows struct {
 	SkillName       string    `db:"skill_name"`
 	SkillType       string    `db:"skill_type"`
 }
+type BuildItemRows struct {
+	BuildItemSetResponse
+}
 
 type TempSkillLink struct {
 	Name   string `json:"name"`

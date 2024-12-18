@@ -335,13 +335,59 @@ func (r *BuildRepository) GetBuildInfo(buildId uuid.UUID) (*BuildInfoResponse, e
 	ORDER BY build_skill_links.id
 	`
 
+	fmt.Println("buildId", buildId)
 	err := r.DB.Select(&buildInfoRows, query, buildId)
+
+	fmt.Println("buildInfoRows", buildInfoRows)
 
 	if err != nil {
 		fmt.Printf("Error when querying for build info: %s\n", err)
 		return nil, errorutils.AnalyzeDBErr(err)
 	}
 
+	var buildItemRows []BuildItemSetResponse
+	itemQuery := `
+	SELECT
+		builds.id AS build_id,
+		build_item_sets.id AS set_id,
+		build_item_set_items.slot AS set_slot,
+		COALESCE(items.unique_item, false) AS unique_item,
+		COALESCE(items.id, null) AS item_id,
+		COALESCE(items.name, '') AS name,
+		COALESCE(items.description, '') AS description,
+		COALESCE(items.required_level, null) AS required_level,
+		COALESCE(items.required_strength, null) AS required_strength,
+		COALESCE(items.required_dexterity, null) AS required_dexterity,
+		COALESCE(items.required_intelligence, null) AS required_intelligence,
+		COALESCE(items.damage, null) AS damage,
+		COALESCE(items.aps, null) AS aps,
+		COALESCE(items.crit, null) AS crit,
+		COALESCE(items.pdps, null) AS pdps,
+		COALESCE(items.edps, null) AS edps,
+		COALESCE(items.dps, null) AS dps,
+		COALESCE(items.additional, null) AS additional,
+		COALESCE(items.stats, null) AS stats,
+		COALESCE(items.implicit, null) AS implicit,
+		COALESCE(items.slot, '') AS slot,
+		COALESCE(items.armour, null) AS armour,
+		COALESCE(items.energy_shield, null) AS energy_shield,
+		COALESCE(items.evasion, null) AS evasion,
+		COALESCE(items.block, null) AS block,
+		COALESCE(items.ward, null) AS ward
+	FROM builds
+	JOIN build_item_sets ON build_item_sets.build_id = builds.id
+	JOIN build_item_set_items ON build_item_set_items.build_item_set_id = build_item_sets.id
+	LEFT JOIN items ON items.id = build_item_set_items.item_id
+	WHERE builds.id = $1
+	`
+	err = r.DB.Select(&buildItemRows, itemQuery, buildId)
+
+	if err != nil {
+		fmt.Printf("Error when querying for build items: %s\n", err)
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	fmt.Println("buildItemRows", &buildItemRows)
 	if len(buildInfoRows) == 0 {
 		fmt.Println("No builds queried.")
 
@@ -372,6 +418,8 @@ func (r *BuildRepository) GetBuildInfo(buildId uuid.UUID) (*BuildInfoResponse, e
 	skills := r.GetAndFormSkillLinks(skillRows)
 
 	result.Skills = &skills
+
+	result.Sets = buildItemRows
 
 	return &result, nil
 }
