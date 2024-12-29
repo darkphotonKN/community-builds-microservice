@@ -70,4 +70,6 @@ var SupportSkills []skill.SeedSkill = []skill.SeedSkill{
 	{ID: uuid.MustParse("00000000-0000-0000-0000-000000000115"), Name: "Concentrated Effect", Type: "support"},
 	{ID: uuid.MustParse("00000000-0000-0000-0000-000000000116"), Name: "Multistrike", Type: "support"},
 	{ID: uuid.MustParse("00000000-0000-0000-0000-000000000117"), Name: "Faster Attacks", Type: "support"},
+
+	{ID: uuid.MustParse("00000000-0000-0000-0000-000000000118"), Name: "Sunder", Type: "active"},
 }

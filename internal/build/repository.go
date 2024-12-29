@@ -152,11 +152,27 @@ func (r *BuildRepository) GetAllBuilds(
 }
 
 func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest CreateBuildRequest) (*uuid.UUID, error) {
-	query := `
-	INSERT INTO builds(member_id, main_skill_id, class_id, title, description)
+
+	baseQuery := `
+	INSERT INTO 
+		builds(member_id, main_skill_id, class_id, title, description
+	`
+
+	if createBuildRequest.AscendancyID != uuid.Nil {
+		baseQuery += ", ascendancy_id"
+
+	}
+
+	endQuery := `
+	)
 	VALUES($1, $2, $3, $4, $5)
 	RETURNING id
 	`
+
+	query := baseQuery + endQuery
+
+	fmt.Printf("\nFinal query: %+v\n\n", query)
+
 	var buildId uuid.UUID
 
 	err := r.DB.QueryRowx(query, memberId, createBuildRequest.SkillID, createBuildRequest.ClassID, createBuildRequest.Title, createBuildRequest.Description).Scan(&buildId)
