@@ -32,3 +32,11 @@ func (s *ClassService) CreateDefaultClassesAndAscendanciesService(classes []Crea
 
 	return nil
 }
+
+/**
+* Gets list of classes and ascendancies.
+**/
+func (s *ClassService) GetClassesAndAscendancies() (*GetClassesAndAscendanciesResponse, error) {
+
+	return s.Repo.GetClassesAndAscendancies()
+}

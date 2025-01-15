@@ -1,6 +1,7 @@
 package class
 
 import (
+	"github.com/darkphotonKN/community-builds/internal/models"
 	"github.com/darkphotonKN/community-builds/internal/utils/errorutils"
 	"github.com/jmoiron/sqlx"
 )
@@ -44,4 +45,37 @@ func (r *ClassRepository) BatchCreateDefaultAscendancies(ascendancies []CreateDe
 	}
 
 	return nil
+}
+
+func (r *ClassRepository) GetClassesAndAscendancies() (*GetClassesAndAscendanciesResponse, error) {
+
+	var classes []models.Class
+
+	classQuery := `
+	SELECT * FROM classes
+	`
+	err := r.DB.Select(&classes, classQuery)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var ascendancies []models.Ascendancy
+
+	ascendancyQuery := `
+	SELECT * FROM ascendancies
+	`
+
+	err = r.DB.Select(&ascendancies, ascendancyQuery)
+
+	if err != nil {
+		return nil, err
+	}
+
+	response := GetClassesAndAscendanciesResponse{
+		Classes:      classes,
+		Ascendancies: ascendancies,
+	}
+
+	return &response, nil
 }
