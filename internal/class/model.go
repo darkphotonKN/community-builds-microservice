@@ -1,6 +1,9 @@
 package class
 
-import "github.com/google/uuid"
+import (
+	"github.com/darkphotonKN/community-builds/internal/models"
+	"github.com/google/uuid"
+)
 
 type CreateDefaultClass struct {
 	ID          uuid.UUID `db:"id" json:"id"`
@@ -15,4 +18,9 @@ type CreateDefaultAscendancy struct {
 	Name        string    `db:"name" json:"name"`
 	Description string    `db:"description" json:"description"`
 	ImageURL    string    `db:"image_url" json:"imageUrl"`
+}
+
+type GetClassesAndAscendanciesResponse struct {
+	Classes      []models.Class
+	Ascendancies []models.Ascendancy
 }

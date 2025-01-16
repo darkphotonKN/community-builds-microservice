@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/darkphotonKN/community-builds/internal/auth"
 	"github.com/darkphotonKN/community-builds/internal/build"
+	"github.com/darkphotonKN/community-builds/internal/class"
 	"github.com/darkphotonKN/community-builds/internal/item"
 	"github.com/darkphotonKN/community-builds/internal/member"
 	"github.com/darkphotonKN/community-builds/internal/rating"
@@ -28,6 +29,14 @@ func SetupRouter() *gin.Engine {
 
 	// base route
 	api := router.Group("/api")
+
+	// --- CLASS AND ASCENDANCY ---
+	classRepo := class.NewClassRepository(DB)
+	classService := class.NewClassService(classRepo)
+	classHandler := class.NewClassHandler(classService)
+
+	classRoutes := api.Group("/class")
+	classRoutes.GET("/", classHandler.GetClassesAndAscendanciesHandler)
 
 	// --- ITEM ---
 
