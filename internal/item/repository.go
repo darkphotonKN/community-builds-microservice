@@ -41,14 +41,19 @@ func (r *ItemRepository) CreateItem(createItemReq CreateItemRequest) error {
 	return nil
 }
 
-func (r *ItemRepository) GetItems() (*[]models.Item, error) {
+func (r *ItemRepository) GetItems(slot string) (*[]models.Item, error) {
 	var items []models.Item
 
 	query := `
 	SELECT * FROM items
 	`
-
-	err := r.DB.Select(&items, query)
+	var err error
+	if slot != "" {
+		query = query + ` WHERE items.slot = $1`
+		err = r.DB.Select(&items, query, slot)
+	} else {
+		err = r.DB.Select(&items, query)
+	}
 
 	if err != nil {
 		return nil, errorutils.AnalyzeDBErr(err)

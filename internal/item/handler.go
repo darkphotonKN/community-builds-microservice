@@ -38,7 +38,10 @@ func (h *ItemHandler) CreateItemHandler(c *gin.Context) {
 }
 
 func (h *ItemHandler) GetItemsHandler(c *gin.Context) {
-	items, err := h.Service.GetItemsService()
+
+	slot := c.Query("slot")
+	fmt.Println("slot", slot)
+	items, err := h.Service.GetItemsService(slot)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to retrieve all items: %s\n", err.Error())})

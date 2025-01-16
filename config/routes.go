@@ -20,7 +20,7 @@ func SetupRouter() *gin.Engine {
 
 	// TODO: CORS for development, remove in PROD
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3666"},
+		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
 		AllowHeaders:     []string{"Content-Type", "Authorization"},
 		AllowCredentials: true,
