@@ -1,7 +1,5 @@
 version: "3.8"
 
-name: community_builds
-
 services:
   db:
     image: postgres:latest

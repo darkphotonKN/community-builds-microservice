@@ -21,6 +21,6 @@ type CreateDefaultAscendancy struct {
 }
 
 type GetClassesAndAscendanciesResponse struct {
-	Classes      []models.Class
-	Ascendancies []models.Ascendancy
+	Classes      []models.Class      `json:"classes"`
+	Ascendancies []models.Ascendancy `json:"ascendancies"`
 }

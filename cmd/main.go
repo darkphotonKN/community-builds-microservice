@@ -17,7 +17,6 @@ import (
 * NOTE: Keep code here as clean and little as possible.
 **/
 func main() {
-
 	// env setup
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found, using system environment variables")
@@ -35,7 +34,7 @@ func main() {
 		validation.RegisterValidators(v)
 	}
 
-	defaultDevPort := ":8080"
+	defaultDevPort := ":5050"
 
 	port := os.Getenv("PORT")
 	if port == "" {
