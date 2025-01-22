@@ -153,6 +153,8 @@ func (r *BuildRepository) GetAllBuilds(
 
 func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest CreateBuildRequest) (*uuid.UUID, error) {
 
+	fmt.Println("createBuildRequest", createBuildRequest)
+	fmt.Println("memberId", memberId)
 	baseQuery := `
 	INSERT INTO 
 		builds(member_id, main_skill_id, class_id, title, description
@@ -165,17 +167,32 @@ func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest Cre
 
 	endQuery := `
 	)
-	VALUES($1, $2, $3, $4, $5)
-	RETURNING id
-	`
+	VALUES($1, $2, $3, $4, $5`
 
-	query := baseQuery + endQuery
+	finalQuery := ""
+
+	if createBuildRequest.AscendancyID != uuid.Nil {
+		finalQuery = finalQuery + `, $6)
+			RETURNING id
+			`
+	} else {
+		finalQuery = finalQuery + `)
+		RETURNING id
+			`
+	}
+
+	query := baseQuery + endQuery + finalQuery
 
 	fmt.Printf("\nFinal query: %+v\n\n", query)
 
 	var buildId uuid.UUID
 
-	err := r.DB.QueryRowx(query, memberId, createBuildRequest.SkillID, createBuildRequest.ClassID, createBuildRequest.Title, createBuildRequest.Description).Scan(&buildId)
+	var err error
+	if createBuildRequest.AscendancyID != uuid.Nil {
+		err = r.DB.QueryRowx(query, memberId, createBuildRequest.SkillID, createBuildRequest.ClassID, createBuildRequest.Title, createBuildRequest.Description, createBuildRequest.AscendancyID).Scan(&buildId)
+	} else {
+		err = r.DB.QueryRowx(query, memberId, createBuildRequest.SkillID, createBuildRequest.ClassID, createBuildRequest.Title, createBuildRequest.Description).Scan(&buildId)
+	}
 
 	if err != nil {
 		return nil, errorutils.AnalyzeDBErr(err)
