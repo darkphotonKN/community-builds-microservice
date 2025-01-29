@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+
 	"github.com/darkphotonKN/community-builds/internal/auth"
 	"github.com/darkphotonKN/community-builds/internal/build"
 	"github.com/darkphotonKN/community-builds/internal/class"
@@ -18,6 +20,12 @@ import (
 **/
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
+
+	// NOTE: debugging middleware
+	router.Use(func(c *gin.Context) {
+		fmt.Println("Incoming request to:", c.Request.Method, c.Request.URL.Path, "from", c.Request.Host)
+		c.Next()
+	})
 
 	// TODO: CORS for development, remove in PROD
 	router.Use(cors.New(cors.Config{
@@ -67,8 +75,8 @@ func SetupRouter() *gin.Engine {
 
 	// Protected Routes
 	skillRoutes.Use(auth.AuthMiddleware())
-	skillRoutes.GET("/", skillHandler.GetSkillsHandler)
-	skillRoutes.POST("/", skillHandler.CreateSkillHandler)
+	skillRoutes.GET("", skillHandler.GetSkillsHandler)
+	skillRoutes.POST("", skillHandler.CreateSkillHandler)
 
 	// --- BUILD ---
 
@@ -85,7 +93,7 @@ func SetupRouter() *gin.Engine {
 	buildRoutes.GET("/community/:id/info", buildHandler.GetBuildInfoByIdHandler)
 
 	// Protected Routes
-	protectedBuildRoutes := buildRoutes.Group("/")
+	protectedBuildRoutes := buildRoutes.Group("")
 	protectedBuildRoutes.Use(auth.AuthMiddleware())
 	protectedBuildRoutes.GET("/", buildHandler.GetBuildsForMemberHandler)
 	protectedBuildRoutes.GET("/:id/info", buildHandler.GetBuildInfoForMemberHandler)
@@ -107,8 +115,8 @@ func SetupRouter() *gin.Engine {
 
 	// Protected Routes
 	tagRoutes.Use(auth.AuthMiddleware())
-	tagRoutes.GET("/", tagHandler.GetTagsHandler)
-	tagRoutes.POST("/", tagHandler.CreateTagHandler)
+	tagRoutes.GET("", tagHandler.GetTagsHandler)
+	tagRoutes.POST("", tagHandler.CreateTagHandler)
 	tagRoutes.PATCH("/:id", tagHandler.UpdateTagsHandler)
 
 	// -- RATING --
@@ -121,7 +129,7 @@ func SetupRouter() *gin.Engine {
 	ratingRoutes := api.Group("/rating")
 
 	ratingRoutes.Use(auth.AuthMiddleware())
-	ratingRoutes.POST("/", ratingHandler.CreateRatingByBuildIdHandler)
+	ratingRoutes.POST("", ratingHandler.CreateRatingByBuildIdHandler)
 
 	// --- MEMBER ---
 
@@ -139,7 +147,7 @@ func SetupRouter() *gin.Engine {
 	memberRoutes.POST("/signin", memberHandler.LoginMemberHandler)
 
 	// Protected Routes
-	protectedMemberRoutes := memberRoutes.Group("/")
+	protectedMemberRoutes := memberRoutes.Group("")
 	protectedMemberRoutes.Use(auth.AuthMiddleware())
 	protectedMemberRoutes.POST("/update-password", memberHandler.UpdatePasswordMemberHandler)
 	protectedMemberRoutes.POST("/update-info", memberHandler.UpdateInfoMemberHandler)
