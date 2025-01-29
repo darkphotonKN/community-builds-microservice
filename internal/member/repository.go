@@ -128,6 +128,8 @@ func (r *MemberRepository) CreateDefaultMembers(members []CreateDefaultMember) e
 	`
 	_, err := r.DB.NamedExec(query, members)
 
+	fmt.Printf("DEBUG: Error when creating default member: %s\n", err)
+
 	if err != nil {
 		return errorutils.AnalyzeDBErr(err)
 	}
