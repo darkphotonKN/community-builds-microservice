@@ -24,9 +24,8 @@ func (r *MemberRepository) Create(member models.Member) error {
 
 	_, err := r.DB.NamedExec(query, member)
 
-	fmt.Println("Error when creating member:", err)
-
 	if err != nil {
+		fmt.Println("Error when creating member:", err)
 		return errorutils.AnalyzeDBErr(err)
 	}
 

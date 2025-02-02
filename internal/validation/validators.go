@@ -11,6 +11,7 @@ import (
 func RegisterValidators(v *validator.Validate) {
 	// --- Item ---
 	v.RegisterValidation("category", func(fl validator.FieldLevel) bool {
+		// --- Item ---
 		return item.IsValidCategory(fl.Field().String())
 	})
 

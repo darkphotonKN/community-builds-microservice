@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/darkphotonKN/community-builds/config"
@@ -19,7 +18,7 @@ import (
 func main() {
 	// env setup
 	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, using system environment variables")
+		fmt.Println("No .env file found, using system environment variables")
 	}
 
 	// database setup
@@ -35,7 +34,6 @@ func main() {
 	}
 
 	defaultDevPort := ":5050"
-
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultDevPort
