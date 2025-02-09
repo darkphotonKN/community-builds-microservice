@@ -44,7 +44,7 @@ func SetupRouter() *gin.Engine {
 	classHandler := class.NewClassHandler(classService)
 
 	classRoutes := api.Group("/class")
-	classRoutes.GET("/", classHandler.GetClassesAndAscendanciesHandler)
+	classRoutes.GET("", classHandler.GetClassesAndAscendanciesHandler)
 
 	// --- ITEM ---
 
@@ -58,8 +58,8 @@ func SetupRouter() *gin.Engine {
 
 	// Protected Routes
 	itemRoutes.Use(auth.AuthMiddleware())
-	itemRoutes.GET("/", itemHandler.GetItemsHandler)
-	itemRoutes.POST("/", itemHandler.CreateItemHandler)
+	itemRoutes.GET("", itemHandler.GetItemsHandler)
+	itemRoutes.POST("", itemHandler.CreateItemHandler)
 	itemRoutes.PATCH("/:id", itemHandler.UpdateItemsHandler)
 	itemRoutes.POST("/rare-item", itemHandler.CreateRareItemHandler)
 
