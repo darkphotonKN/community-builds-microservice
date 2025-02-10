@@ -44,7 +44,7 @@ func SetupRouter() *gin.Engine {
 	classHandler := class.NewClassHandler(classService)
 
 	classRoutes := api.Group("/class")
-	classRoutes.GET("/", classHandler.GetClassesAndAscendanciesHandler)
+	classRoutes.GET("", classHandler.GetClassesAndAscendanciesHandler)
 
 	// --- ITEM ---
 
