@@ -33,7 +33,7 @@ func main() {
 		validation.RegisterValidators(v)
 	}
 
-	defaultDevPort := ":5050"
+	defaultDevPort := ":7001"
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultDevPort

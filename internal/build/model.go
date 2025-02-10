@@ -52,7 +52,7 @@ type AddItemsToBuildRequest struct {
 	Belt       string `json:"Belt"`
 	Amulet     string `json:"amulet"`
 	LeftRing   string `json:"leftRing"`
-	RightRing  string `json:"reftRing"`
+	RightRing  string `json:"rightRing"`
 }
 
 // --- Response ---

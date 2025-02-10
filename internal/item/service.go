@@ -39,6 +39,14 @@ func (s *ItemService) GetItemsService(slot string) (*[]models.Item, error) {
 	return s.Repo.GetItems(slot)
 }
 
+func (s *ItemService) GetBaseItemsService() (*[]models.BaseItem, error) {
+	return s.Repo.GetBaseItems()
+}
+
+func (s *ItemService) GetItemModsService() (*[]models.ItemMod, error) {
+	return s.Repo.GetItemMods()
+}
+
 func (s *ItemService) UpdateItemsService(id uuid.UUID, updateItemReq UpdateItemReq) (*models.Item, error) {
 	return s.Repo.UpdateItemById(id, updateItemReq)
 }
