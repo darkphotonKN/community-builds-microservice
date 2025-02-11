@@ -216,7 +216,7 @@ func getItem(currentItemThs []string, index int, tr *goquery.Selection, itemsCh 
 			myItem.Description = desc.Text()
 			imgTag := td.Find("img").First()
 			imgUrl, _ := imgTag.Attr("src")
-			myItem.ImageUrl = imgUrl
+			myItem.ImageUrl = "https://www.poewiki.net" + imgUrl
 
 			// second item box info
 			itemBox = doc.Find("div.item-box.-unique .tc.-value").Last()
