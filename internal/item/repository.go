@@ -50,10 +50,44 @@ func (r *ItemRepository) GetItems(slot string) (*[]models.Item, error) {
 	var err error
 	if slot != "" {
 		query = query + ` WHERE items.slot = $1`
-		err = r.DB.Select(&items, query, slot)
+		formatSlot := strings.ToUpper(string(slot[0])) + slot[1:]
+		fmt.Println("formatSlot", formatSlot)
+		err = r.DB.Select(&items, query, formatSlot)
 	} else {
 		err = r.DB.Select(&items, query)
 	}
+
+	if err != nil {
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return &items, nil
+}
+
+func (r *ItemRepository) GetBaseItems() (*[]models.BaseItem, error) {
+	var items []models.BaseItem
+
+	query := `
+	SELECT * FROM base_items
+	`
+
+	err := r.DB.Select(&items, query)
+
+	if err != nil {
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return &items, nil
+}
+
+func (r *ItemRepository) GetItemMods() (*[]models.ItemMod, error) {
+	var items []models.ItemMod
+
+	query := `
+	SELECT * FROM item_mods
+	`
+
+	err := r.DB.Select(&items, query)
 
 	if err != nil {
 		return nil, errorutils.AnalyzeDBErr(err)

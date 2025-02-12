@@ -30,7 +30,7 @@ func SetupRouter() *gin.Engine {
 	// TODO: CORS for development, remove in PROD
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
+		AllowMethods:     []string{"GET", "POST", "PATCH", "OPTIONS"},
 		AllowHeaders:     []string{"Content-Type", "Authorization"},
 		AllowCredentials: true,
 	}))
@@ -62,6 +62,9 @@ func SetupRouter() *gin.Engine {
 	itemRoutes.POST("", itemHandler.CreateItemHandler)
 	itemRoutes.PATCH("/:id", itemHandler.UpdateItemsHandler)
 	itemRoutes.POST("/rare-item", itemHandler.CreateRareItemHandler)
+
+	itemRoutes.GET("/base-items", itemHandler.GetBaseItemsHandler)
+	itemRoutes.GET("/item-mods", itemHandler.GetItemModsHandler)
 
 	// --- SKILL ---
 
@@ -95,12 +98,12 @@ func SetupRouter() *gin.Engine {
 	// Protected Routes
 	protectedBuildRoutes := buildRoutes.Group("")
 	protectedBuildRoutes.Use(auth.AuthMiddleware())
-	protectedBuildRoutes.GET("/", buildHandler.GetBuildsForMemberHandler)
+	protectedBuildRoutes.GET("", buildHandler.GetBuildsForMemberHandler)
 	protectedBuildRoutes.GET("/:id/info", buildHandler.GetBuildInfoForMemberHandler)
-	protectedBuildRoutes.POST("/", buildHandler.CreateBuildHandler)
+	protectedBuildRoutes.POST("", buildHandler.CreateBuildHandler)
 	protectedBuildRoutes.PATCH("/:id", buildHandler.UpdateBuildHandler)
 	protectedBuildRoutes.POST("/:id/addSkills", buildHandler.AddSkillLinksToBuildHandler)
-	protectedBuildRoutes.PATCH("/:id/updateSet", buildHandler.UpdateItemSetsToBuildHandler)
+	protectedBuildRoutes.PATCH(":id/update-set", buildHandler.UpdateItemSetsToBuildHandler)
 	protectedBuildRoutes.DELETE("/:id", buildHandler.DeleteBuildForMemberHandler)
 
 	// --- TAG ---
@@ -113,9 +116,9 @@ func SetupRouter() *gin.Engine {
 	// -- Tag Routes --
 	tagRoutes := api.Group("/tag")
 
+	tagRoutes.GET("", tagHandler.GetTagsHandler)
 	// Protected Routes
 	tagRoutes.Use(auth.AuthMiddleware())
-	tagRoutes.GET("", tagHandler.GetTagsHandler)
 	tagRoutes.POST("", tagHandler.CreateTagHandler)
 	tagRoutes.PATCH("/:id", tagHandler.UpdateTagsHandler)
 

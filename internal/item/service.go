@@ -39,6 +39,14 @@ func (s *ItemService) GetItemsService(slot string) (*[]models.Item, error) {
 	return s.Repo.GetItems(slot)
 }
 
+func (s *ItemService) GetBaseItemsService() (*[]models.BaseItem, error) {
+	return s.Repo.GetBaseItems()
+}
+
+func (s *ItemService) GetItemModsService() (*[]models.ItemMod, error) {
+	return s.Repo.GetItemMods()
+}
+
 func (s *ItemService) UpdateItemsService(id uuid.UUID, updateItemReq UpdateItemReq) (*models.Item, error) {
 	return s.Repo.UpdateItemById(id, updateItemReq)
 }
@@ -208,7 +216,7 @@ func getItem(currentItemThs []string, index int, tr *goquery.Selection, itemsCh 
 			myItem.Description = desc.Text()
 			imgTag := td.Find("img").First()
 			imgUrl, _ := imgTag.Attr("src")
-			myItem.ImageUrl = imgUrl
+			myItem.ImageUrl = "https://www.poewiki.net" + imgUrl
 
 			// second item box info
 			itemBox = doc.Find("div.item-box.-unique .tc.-value").Last()

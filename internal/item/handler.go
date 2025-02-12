@@ -51,6 +51,30 @@ func (h *ItemHandler) GetItemsHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all items.", "result": items})
 }
 
+func (h *ItemHandler) GetBaseItemsHandler(c *gin.Context) {
+
+	items, err := h.Service.GetBaseItemsService()
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to retrieve all items: %s\n", err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all items.", "result": items})
+}
+
+func (h *ItemHandler) GetItemModsHandler(c *gin.Context) {
+
+	items, err := h.Service.GetItemModsService()
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to retrieve all items: %s\n", err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all items.", "result": items})
+}
+
 func (h *ItemHandler) UpdateItemsHandler(c *gin.Context) {
 	// item id to update
 	idParam := c.Param("id")
