@@ -521,12 +521,112 @@ func (r *ItemRepository) AddItemMods(tx *sqlx.Tx, items *[]models.ItemMod) error
 	return nil
 }
 
-func (r *ItemRepository) CreateRareItem(id uuid.UUID, createRareItemReq CreateRareItemReq) error {
-
+func (r *ItemRepository) CreateRareItem(id uuid.UUID, createRareItemReq CreateRareItemReq) (*uuid.UUID, error) {
 	baseItem, err := r.GetBaseItemById(createRareItemReq.BaseItemId)
 
 	if err != nil {
-		return errorutils.AnalyzeDBErr(err)
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	query := `
+		INSERT INTO items(
+		base_item_id,
+		image_url, 
+		name, 
+		category, 
+		type, 
+		slot, 
+		unique_item, 
+		class, 
+		stats,
+		required_level,
+		required_intelligence,
+		required_strength,
+		required_dexterity,
+		damage,
+		crit,
+		aps,
+		dps,
+		implicit,
+		armour,
+		evasion,
+		energy_shield,
+		ward
+		)
+		VALUES(
+		:base_item_id,
+		:image_url, 
+		:name, 
+		:category, 
+		:type, 
+		:slot, 
+		:unique_item, 
+		:class, 
+		:stats,
+		:required_level,
+		:required_intelligence,
+		:required_strength,
+		:required_dexterity,
+		:damage,
+		:crit,
+		:aps,
+		:dps,
+		:implicit,
+		:armour,
+		:evasion,
+		:energy_shield,
+		:ward
+		)
+		RETURNING id;
+	`
+
+	payload := map[string]interface{}{
+		"base_item_id":          createRareItemReq.BaseItemId,
+		"image_url":             baseItem.ImageUrl,
+		"name":                  createRareItemReq.Name,
+		"category":              baseItem.Category,
+		"type":                  baseItem.Type,
+		"slot":                  baseItem.Slot,
+		"unique_item":           false,
+		"class":                 baseItem.Class,
+		"stats":                 pq.StringArray(createRareItemReq.Stats),
+		"required_level":        baseItem.RequiredLevel,
+		"required_intelligence": baseItem.RequiredIntelligence,
+		"required_strength":     baseItem.RequiredStrength,
+		"required_dexterity":    baseItem.RequiredDexterity,
+		"damage":                baseItem.Damage,
+		"crit":                  baseItem.Crit,
+		"aps":                   baseItem.APS,
+		"dps":                   baseItem.DPS,
+		"implicit":              pq.StringArray(baseItem.Implicit),
+		"armour":                baseItem.Armour,
+		"evasion":               baseItem.Evasion,
+		"energy_shield":         baseItem.EnergyShield,
+		"ward":                  baseItem.Ward,
+	}
+	rows, createErr := r.DB.NamedQuery(query, payload)
+	var lastInsertID uuid.UUID
+
+	if rows.Next() {
+		err := rows.Scan(&lastInsertID)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if createErr != nil {
+		return nil, errorutils.AnalyzeDBErr(createErr)
+	}
+
+	return &lastInsertID, nil
+}
+
+func (r *ItemRepository) CreateRareItemToList(id uuid.UUID, createRareItemReq CreateRareItemReq) (*uuid.UUID, error) {
+	baseItem, err := r.GetBaseItemById(createRareItemReq.BaseItemId)
+
+	if err != nil {
+		return nil, errorutils.AnalyzeDBErr(err)
 	}
 
 	query := `
@@ -580,6 +680,7 @@ func (r *ItemRepository) CreateRareItem(id uuid.UUID, createRareItemReq CreateRa
 		:energy_shield,
 		:ward
 		)
+		RETURNING id;
 	`
 
 	payload := map[string]interface{}{
@@ -607,13 +708,20 @@ func (r *ItemRepository) CreateRareItem(id uuid.UUID, createRareItemReq CreateRa
 		"energy_shield":         baseItem.EnergyShield,
 		"ward":                  baseItem.Ward,
 	}
-	_, createErr := r.DB.NamedExec(query, payload)
+	rows, createErr := r.DB.NamedQuery(query, payload)
+	var lastInsertID uuid.UUID
 
-	fmt.Print("Error when creating item:", createErr)
+	if rows.Next() {
+		err := rows.Scan(&lastInsertID)
 
-	if createErr != nil {
-		return errorutils.AnalyzeDBErr(createErr)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	return nil
+	if createErr != nil {
+		return nil, errorutils.AnalyzeDBErr(createErr)
+	}
+
+	return &lastInsertID, nil
 }

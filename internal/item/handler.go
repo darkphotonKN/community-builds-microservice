@@ -146,12 +146,12 @@ func (h *ItemHandler) CreateRareItemHandler(c *gin.Context) {
 		return
 	}
 
-	resErr := h.Service.CreateRareItemService(userId.(uuid.UUID), createRareItemReq)
+	id, resErr := h.Service.CreateRareItemService(userId.(uuid.UUID), createRareItemReq)
 
 	if resErr != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to retrieve all items: %s\n", resErr.Error())})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all items."})
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all items.", "result": id})
 }

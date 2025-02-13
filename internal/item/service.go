@@ -55,8 +55,12 @@ func (s *ItemService) GetBaseItemByIdService(id uuid.UUID) (*models.BaseItem, er
 	return s.Repo.GetBaseItemById(id)
 }
 
-func (s *ItemService) CreateRareItemService(id uuid.UUID, createRareItemReq CreateRareItemReq) error {
-	return s.Repo.CreateRareItem(id, createRareItemReq)
+func (s *ItemService) CreateRareItemService(id uuid.UUID, createRareItemReq CreateRareItemReq) (*uuid.UUID, error) {
+	if createRareItemReq.ToList {
+		return s.Repo.CreateRareItemToList(id, createRareItemReq)
+	} else {
+		return s.Repo.CreateRareItem(id, createRareItemReq)
+	}
 }
 
 func getCategoryItem(category string, itemsCh chan models.Item, wg *sync.WaitGroup) {
