@@ -25,3 +25,7 @@ func (s *TagService) UpdateTagsService(updateTagReq UpdateTagRequest) error {
 func (s *TagService) GetTagsService() (*[]models.Tag, error) {
 	return s.Repo.GetTags()
 }
+
+func (s *TagService) CreateDefaultTags(tags []models.Tag) error {
+	return s.Repo.BatchCreateTags(tags)
+}

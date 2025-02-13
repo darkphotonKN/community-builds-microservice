@@ -11,6 +11,7 @@ import (
 	"github.com/darkphotonKN/community-builds/internal/item"
 	"github.com/darkphotonKN/community-builds/internal/member"
 	"github.com/darkphotonKN/community-builds/internal/skill"
+	"github.com/darkphotonKN/community-builds/internal/tag"
 	"github.com/jmoiron/sqlx"
 
 	// Importing for side effects - Dont Remove
@@ -90,6 +91,13 @@ func SeedDefaults(db *sqlx.DB) {
 	if err != nil {
 		log.Fatal("Error when attempting to create default support skills:", err)
 	}
+
+	// --- default tags ---
+	tagsRepo := tag.NewTagRepository(db)
+	tagsService := tag.NewTagService(tagsRepo)
+	err = tagsService.CreateDefaultTags(constants.DefaultTags)
+
+	// --- default items ---
 
 	fmt.Printf("Successfully created all default active and support skills.\n\n")
 

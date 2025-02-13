@@ -66,3 +66,18 @@ func (r *TagRepository) UpdateTag(payload UpdateTagRequest) error {
 	}
 	return nil
 }
+
+func (r *TagRepository) BatchCreateTags(tags []models.Tag) error {
+	query := `
+	INSERT INTO tags(id, name)
+	VALUES(:id, :name)
+	ON CONFLICT DO NOTHING
+	`
+	_, err := r.DB.NamedExec(query, tags)
+
+	if err != nil {
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	return nil
+}
