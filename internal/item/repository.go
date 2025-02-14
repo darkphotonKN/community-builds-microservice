@@ -45,7 +45,31 @@ func (r *ItemRepository) GetItems(slot string) (*[]models.Item, error) {
 	var items []models.Item
 
 	query := `
-	SELECT * FROM items
+	SELECT 
+		id,
+		image_url, 
+		name, 
+		category, 
+		type, 
+		slot, 
+		unique_item, 
+		class, 
+		stats,
+		required_level,
+		required_intelligence,
+		required_strength,
+		required_dexterity,
+		damage,
+		crit,
+		aps,
+		dps,
+		implicit,
+		armour,
+		evasion,
+		energy_shield,
+		ward,
+		COALESCE(description, '') AS description
+	FROM items
 	`
 	var err error
 	if slot != "" {
