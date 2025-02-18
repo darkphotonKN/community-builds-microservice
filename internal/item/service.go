@@ -47,6 +47,10 @@ func (s *ItemService) GetItemModsService() (*[]models.ItemMod, error) {
 	return s.Repo.GetItemMods()
 }
 
+func (s *ItemService) GetMemberRareItemsService(id uuid.UUID) (*[]models.Item, error) {
+	return s.Repo.GetMemberRareItems(id)
+}
+
 func (s *ItemService) UpdateItemsService(id uuid.UUID, updateItemReq UpdateItemReq) (*models.Item, error) {
 	return s.Repo.UpdateItemById(id, updateItemReq)
 }
@@ -59,7 +63,7 @@ func (s *ItemService) CreateRareItemService(id uuid.UUID, createRareItemReq Crea
 	if createRareItemReq.ToList {
 		return s.Repo.CreateRareItemToList(id, createRareItemReq)
 	} else {
-		return s.Repo.CreateRareItem(id, createRareItemReq)
+		return s.Repo.CreateRareItem(createRareItemReq)
 	}
 }
 
