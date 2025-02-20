@@ -31,6 +31,7 @@ const (
 * Gets list of public community builds.
 **/
 func (s *BuildService) GetCommunityBuildsService(pageNo int, pageSize int, sortOrder string, sortBy string, search string, skillId uuid.UUID, minRating *int, ratingCategory types.RatingCategory) ([]BuildListResponse, error) {
+
 	builds, err := s.Repo.GetAllBuilds(pageNo, pageSize, sortOrder, sortBy, search, skillId, minRating, ratingCategory)
 
 	if err != nil {

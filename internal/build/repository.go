@@ -32,6 +32,7 @@ func (r *BuildRepository) GetAllBuilds(
 	skillId uuid.UUID,
 	minRating *int,
 	ratingCategory types.RatingCategory) ([]BuildListQuery, error) {
+
 	var builds []BuildListQuery
 
 	// allowed columns and sort directions
@@ -85,8 +86,7 @@ func (r *BuildRepository) GetAllBuilds(
 
 	// set default where status is published
 	query += fmt.Sprintf("\nWHERE status = $1")
-
-	queryArgs = append(queryArgs, types.IsPublished)
+	queryArgs = append(queryArgs, types.IsDraft)
 
 	// keyword search filter
 	if search != "" {
@@ -101,7 +101,7 @@ func (r *BuildRepository) GetAllBuilds(
 		query += fmt.Sprintf("\nAND main_skill_id = $%d", len(queryArgs))
 	}
 
-	// WIP - rating filter
+	// TODO: WIP - rating filter
 	// if minRating != nil {
 	// 	queryArgs = append(queryArgs, minRating)
 	// 	query += fmt.Sprintf("\nAND main_skill_id = $%d", len(queryArgs))
@@ -120,6 +120,7 @@ func (r *BuildRepository) GetAllBuilds(
 	)
 
 	fmt.Printf("\n\nFinal Query: %s\n\n", query)
+	fmt.Printf("\n\nFinal QueryArgs: %+v\n\n", queryArgs)
 
 	err := r.DB.Select(&builds, query, queryArgs...)
 
@@ -128,6 +129,8 @@ func (r *BuildRepository) GetAllBuilds(
 	}
 
 	buildList := make([]BuildListQuery, len(builds))
+
+	fmt.Println("Builds after query:", builds)
 
 	for index, build := range builds {
 		buildList[index] = BuildListQuery{
@@ -147,6 +150,8 @@ func (r *BuildRepository) GetAllBuilds(
 			CreatedAt:          build.CreatedAt,
 		}
 	}
+
+	fmt.Println("all community buildList:", buildList)
 
 	return buildList, nil
 }
