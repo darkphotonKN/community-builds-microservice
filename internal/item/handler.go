@@ -155,3 +155,17 @@ func (h *ItemHandler) CreateRareItemHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all items.", "result": id})
 }
+
+func (h *ItemHandler) GetMemberRareItemHandler(c *gin.Context) {
+	userId, _ := c.Get("userId")
+	fmt.Println("userId", userId)
+
+	items, err := h.Service.GetMemberRareItemsService(userId.(uuid.UUID))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to retrieve all items: %s\n", err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all items.", "result": items})
+}

@@ -45,7 +45,31 @@ func (r *ItemRepository) GetItems(slot string) (*[]models.Item, error) {
 	var items []models.Item
 
 	query := `
-	SELECT * FROM items
+	SELECT 
+		id,
+		image_url, 
+		name, 
+		category, 
+		type, 
+		slot, 
+		unique_item, 
+		class, 
+		stats,
+		required_level,
+		required_intelligence,
+		required_strength,
+		required_dexterity,
+		damage,
+		crit,
+		aps,
+		dps,
+		implicit,
+		armour,
+		evasion,
+		energy_shield,
+		ward,
+		COALESCE(description, '') AS description
+	FROM items
 	`
 	var err error
 	if slot != "" {
@@ -88,6 +112,46 @@ func (r *ItemRepository) GetItemMods() (*[]models.ItemMod, error) {
 	`
 
 	err := r.DB.Select(&items, query)
+
+	if err != nil {
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return &items, nil
+}
+
+func (r *ItemRepository) GetMemberRareItems(id uuid.UUID) (*[]models.Item, error) {
+	var items []models.Item
+	query := `
+	SELECT 
+		id,
+		image_url, 
+		name, 
+		category, 
+		type, 
+		slot, 
+		unique_item, 
+		class, 
+		stats,
+		required_level,
+		required_intelligence,
+		required_strength,
+		required_dexterity,
+		damage,
+		crit,
+		aps,
+		dps,
+		implicit,
+		armour,
+		evasion,
+		energy_shield,
+		ward,
+		COALESCE(description, '') AS description
+	FROM items
+	WHERE member_id = $1
+	`
+
+	err := r.DB.Select(&items, query, id)
 
 	if err != nil {
 		return nil, errorutils.AnalyzeDBErr(err)
@@ -521,7 +585,7 @@ func (r *ItemRepository) AddItemMods(tx *sqlx.Tx, items *[]models.ItemMod) error
 	return nil
 }
 
-func (r *ItemRepository) CreateRareItem(id uuid.UUID, createRareItemReq CreateRareItemReq) (*uuid.UUID, error) {
+func (r *ItemRepository) CreateRareItem(createRareItemReq CreateRareItemReq) (*uuid.UUID, error) {
 	baseItem, err := r.GetBaseItemById(createRareItemReq.BaseItemId)
 
 	if err != nil {
@@ -583,7 +647,7 @@ func (r *ItemRepository) CreateRareItem(id uuid.UUID, createRareItemReq CreateRa
 	payload := map[string]interface{}{
 		"base_item_id":          createRareItemReq.BaseItemId,
 		"image_url":             baseItem.ImageUrl,
-		"name":                  createRareItemReq.Name,
+		"name":                  baseItem.Name,
 		"category":              baseItem.Category,
 		"type":                  baseItem.Type,
 		"slot":                  baseItem.Slot,
@@ -682,12 +746,11 @@ func (r *ItemRepository) CreateRareItemToList(id uuid.UUID, createRareItemReq Cr
 		)
 		RETURNING id;
 	`
-
 	payload := map[string]interface{}{
 		"member_id":             id,
 		"base_item_id":          createRareItemReq.BaseItemId,
 		"image_url":             baseItem.ImageUrl,
-		"name":                  createRareItemReq.Name,
+		"name":                  baseItem.Name,
 		"category":              baseItem.Category,
 		"type":                  baseItem.Type,
 		"slot":                  baseItem.Slot,
