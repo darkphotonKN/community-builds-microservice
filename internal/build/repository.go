@@ -84,9 +84,9 @@ func (r *BuildRepository) GetAllBuilds(
 	// arguments for final query execution
 	var queryArgs []interface{}
 
-	// set default where status is published
+	// by default status is published when searching for community builds
 	query += fmt.Sprintf("\nWHERE status = $1")
-	queryArgs = append(queryArgs, types.IsDraft)
+	queryArgs = append(queryArgs, types.IsPublished)
 
 	// keyword search filter
 	if search != "" {
@@ -907,6 +907,43 @@ func (r *BuildRepository) DeleteBuildByIdForMember(memberId uuid.UUID, buildId u
 	if err != nil {
 		return errorutils.AnalyzeDBErr(err)
 	}
+
+	return nil
+}
+
+func (r *BuildRepository) GetBuildByIdForMember(id uuid.UUID, memberId uuid.UUID) (*models.Build, error) {
+	var build models.Build
+	query := `
+	SELECT 
+		id,
+		title,
+		description,
+		main_skill_id,
+		class_id,
+		ascendancy_id,
+		avg_end_game_rating,
+		avg_fun_rating,
+		avg_creative_rating,
+		avg_speed_farm_rating,
+		views,
+		status,
+		created_at,
+		updated_at
+	FROM builds
+	WHERE builds.member_id = $1
+	AND builds.id = $2
+	`
+
+	err := r.DB.Get(&build, query, memberId, id)
+
+	if err != nil {
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return &build, nil
+}
+
+func (r *BuildRepository) UpdateBuildByIdForMemberService(id uuid.UUID, memberId uuid.UUID) error {
 
 	return nil
 }

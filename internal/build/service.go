@@ -7,6 +7,7 @@ import (
 	"github.com/darkphotonKN/community-builds/internal/skill"
 	"github.com/darkphotonKN/community-builds/internal/types"
 	"github.com/darkphotonKN/community-builds/internal/utils/dbutils"
+	"github.com/darkphotonKN/community-builds/internal/utils/errorutils"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
@@ -480,7 +481,6 @@ func (s *BuildService) UpdateItemSetsToBuildService(memberId uuid.UUID, buildId 
 /**
 * Deletes a build for a member by its build id.
 **/
-
 func (s *BuildService) DeleteBuildByMemberService(memberId uuid.UUID, buildId uuid.UUID) error {
 	// check if build is member's
 	_, err := s.GetBuildForMemberByIdService(memberId, buildId)
@@ -497,4 +497,21 @@ func (s *BuildService) DeleteBuildByMemberService(memberId uuid.UUID, buildId uu
 	}
 
 	return nil
+}
+
+/**
+* Publish a build for a member by Id service.
+**/
+func (s *BuildService) PublishBuildService(id uuid.UUID, memberId uuid.UUID) error {
+
+	// check if build belongs to member
+	build, err := s.Repo.GetBuildByIdForMember(id, memberId)
+
+	fmt.Printf("Build retrieved for member: %+v", build)
+
+	if err != nil {
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	return s.Repo.UpdateBuildByIdForMemberService(id, memberId)
 }
