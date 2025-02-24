@@ -505,7 +505,7 @@ func (s *BuildService) DeleteBuildByMemberService(memberId uuid.UUID, buildId uu
 func (s *BuildService) PublishBuildService(id uuid.UUID, memberId uuid.UUID) error {
 
 	// check if build belongs to member
-	build, err := s.Repo.GetBuildByIdForMember(id, memberId)
+	build, err := s.Repo.GetBasicBuildInfoByIdForMember(id, memberId)
 
 	fmt.Printf("Build retrieved for member: %+v", build)
 

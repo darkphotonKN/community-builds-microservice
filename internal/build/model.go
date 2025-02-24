@@ -1,6 +1,8 @@
 package build
 
 import (
+	"time"
+
 	"github.com/darkphotonKN/community-builds/internal/models"
 	"github.com/google/uuid"
 	"github.com/lib/pq"
@@ -100,6 +102,24 @@ type BuildInfoResponse struct {
 	Tags        []models.Tag           `json:"tags"`
 	Skills      *SkillGroupResponse    `json:"skills"`
 	Sets        []BuildItemSetResponse `json:"sets"`
+}
+
+// Partial, basic build information
+type BasicBuildInfoResponse struct {
+	ID                     uuid.UUID `json:"id" db:"id"`
+	Title                  string    `json:"title" db:"title"`
+	Description            string    `json:"description" db:"description"`
+	Class                  string    `json:"class" db:"class"`
+	MainSkill              string    `json:"mainSkill" db:"main_skill"`
+	Views                  string    `json:"views" db:"views"`
+	AverageEndGameRating   string    `json:"averageEndGameRating" db:"avg_end_game_rating"`
+	AverageFunRating       string    `json:"averageFunRating" db:"avg_fun_rating"`
+	AverageCreativeRating  string    `json:"averageCreativeRating" db:"avg_creative_rating"`
+	AverageSpeedFarmRating string    `json:"averageSpeedFarmRating" db:"avg_speed_farm_rating"`
+	Status                 string    `json:"status" db:"status"`
+	CreatedAt              time.Time `json:"createdAt" db:"created_at"`
+	UpdatedAt              time.Time `json:"updatedAt" db:"updated_at"`
+	Ascendancy             *string   `json:"ascendancy,omitempty" db:"ascendancy"`
 }
 
 // Build List

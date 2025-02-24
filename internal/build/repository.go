@@ -911,25 +911,29 @@ func (r *BuildRepository) DeleteBuildByIdForMember(memberId uuid.UUID, buildId u
 	return nil
 }
 
-func (r *BuildRepository) GetBuildByIdForMember(id uuid.UUID, memberId uuid.UUID) (*models.Build, error) {
-	var build models.Build
+func (r *BuildRepository) GetBasicBuildInfoByIdForMember(id uuid.UUID, memberId uuid.UUID) (*BasicBuildInfoResponse, error) {
+	var build BasicBuildInfoResponse
+
 	query := `
 	SELECT 
-		id,
+		builds.id as id,
 		title,
-		description,
-		main_skill_id,
-		class_id,
-		ascendancy_id,
+		builds.description as description,
+		skills.name as main_skill,
+		classes.name as class,
+		ascendancies.name as ascendancy,
 		avg_end_game_rating,
 		avg_fun_rating,
 		avg_creative_rating,
 		avg_speed_farm_rating,
 		views,
 		status,
-		created_at,
-		updated_at
+		builds.created_at as created_at,
+		builds.updated_at as updated_at
 	FROM builds
+	JOIN classes ON classes.id = builds.class_id
+	JOIN ascendancies ON ascendancies.id = builds.ascendancy_id
+	JOIN skills ON skills.id = builds.main_skill_id
 	WHERE builds.member_id = $1
 	AND builds.id = $2
 	`
