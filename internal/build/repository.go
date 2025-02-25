@@ -32,6 +32,7 @@ func (r *BuildRepository) GetAllBuilds(
 	skillId uuid.UUID,
 	minRating *int,
 	ratingCategory types.RatingCategory) ([]BuildListQuery, error) {
+
 	var builds []BuildListQuery
 
 	// allowed columns and sort directions
@@ -83,9 +84,8 @@ func (r *BuildRepository) GetAllBuilds(
 	// arguments for final query execution
 	var queryArgs []interface{}
 
-	// set default where status is published
+	// by default status is published when searching for community builds
 	query += fmt.Sprintf("\nWHERE status = $1")
-
 	queryArgs = append(queryArgs, types.IsPublished)
 
 	// keyword search filter
@@ -101,7 +101,7 @@ func (r *BuildRepository) GetAllBuilds(
 		query += fmt.Sprintf("\nAND main_skill_id = $%d", len(queryArgs))
 	}
 
-	// WIP - rating filter
+	// TODO: WIP - rating filter
 	// if minRating != nil {
 	// 	queryArgs = append(queryArgs, minRating)
 	// 	query += fmt.Sprintf("\nAND main_skill_id = $%d", len(queryArgs))
@@ -120,6 +120,7 @@ func (r *BuildRepository) GetAllBuilds(
 	)
 
 	fmt.Printf("\n\nFinal Query: %s\n\n", query)
+	fmt.Printf("\n\nFinal QueryArgs: %+v\n\n", queryArgs)
 
 	err := r.DB.Select(&builds, query, queryArgs...)
 
@@ -128,6 +129,8 @@ func (r *BuildRepository) GetAllBuilds(
 	}
 
 	buildList := make([]BuildListQuery, len(builds))
+
+	fmt.Println("Builds after query:", builds)
 
 	for index, build := range builds {
 		buildList[index] = BuildListQuery{
@@ -147,6 +150,8 @@ func (r *BuildRepository) GetAllBuilds(
 			CreatedAt:          build.CreatedAt,
 		}
 	}
+
+	fmt.Println("all community buildList:", buildList)
 
 	return buildList, nil
 }
@@ -902,6 +907,47 @@ func (r *BuildRepository) DeleteBuildByIdForMember(memberId uuid.UUID, buildId u
 	if err != nil {
 		return errorutils.AnalyzeDBErr(err)
 	}
+
+	return nil
+}
+
+func (r *BuildRepository) GetBasicBuildInfoByIdForMember(id uuid.UUID, memberId uuid.UUID) (*BasicBuildInfoResponse, error) {
+	var build BasicBuildInfoResponse
+
+	query := `
+	SELECT 
+		builds.id as id,
+		title,
+		builds.description as description,
+		skills.name as main_skill,
+		classes.name as class,
+		ascendancies.name as ascendancy,
+		avg_end_game_rating,
+		avg_fun_rating,
+		avg_creative_rating,
+		avg_speed_farm_rating,
+		views,
+		status,
+		builds.created_at as created_at,
+		builds.updated_at as updated_at
+	FROM builds
+	JOIN classes ON classes.id = builds.class_id
+	JOIN ascendancies ON ascendancies.id = builds.ascendancy_id
+	JOIN skills ON skills.id = builds.main_skill_id
+	WHERE builds.member_id = $1
+	AND builds.id = $2
+	`
+
+	err := r.DB.Get(&build, query, memberId, id)
+
+	if err != nil {
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return &build, nil
+}
+
+func (r *BuildRepository) UpdateBuildByIdForMemberService(id uuid.UUID, memberId uuid.UUID) error {
 
 	return nil
 }

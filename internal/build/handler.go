@@ -65,7 +65,10 @@ func (h *BuildHandler) GetCommunityBuildsHandler(c *gin.Context) {
 		fmt.Println("minRating:", minRating)
 
 		if minRating < 1 || minRating > 10 {
-			c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": "min_rating needs to be in the range 1-10."})
+			c.JSON(http.StatusBadRequest,
+				gin.H{
+					"statusCode": http.StatusBadRequest,
+					"message":    "min_rating needs to be in the range 1-10."})
 			return
 		}
 	}
@@ -343,4 +346,29 @@ func (h *BuildHandler) GetBuildsTemplate(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all builds for member.", "result": builds})
+}
+
+/**
+* Publish a build for a member by Id.
+**/
+func (h *BuildHandler) PublishBuildHandler(c *gin.Context) {
+	memberId, _ := c.Get("userId")
+	idParams := c.Param("id")
+
+	id, err := uuid.Parse(idParams)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.\n", id)})
+		return
+	}
+
+	err = h.Service.PublishBuildService(id, memberId.(uuid.UUID))
+
+	if err != nil {
+
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Could not publish build due to error: %s\n", err)})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully published build.", "result": "success"})
 }
