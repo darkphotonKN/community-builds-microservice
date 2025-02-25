@@ -196,6 +196,14 @@ type Tag struct {
 }
 
 /**
+* Items
+**/
+type Article struct {
+	BaseDBDateModel
+	Content string `db:"content" json:"content"`
+}
+
+/**
 * Base models for default table columns.
 **/
 

@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 
+	"github.com/darkphotonKN/community-builds/internal/article"
 	"github.com/darkphotonKN/community-builds/internal/auth"
 	"github.com/darkphotonKN/community-builds/internal/build"
 	"github.com/darkphotonKN/community-builds/internal/class"
@@ -122,6 +123,21 @@ func SetupRouter() *gin.Engine {
 	tagRoutes.Use(auth.AuthMiddleware())
 	tagRoutes.POST("", tagHandler.CreateTagHandler)
 	tagRoutes.PATCH("/:id", tagHandler.UpdateTagsHandler)
+
+	// --- Article ---
+
+	// -- Article Setup --
+	articleRepo := article.NewArticleRepository(DB)
+	articleService := article.NewArticleService(articleRepo)
+	articleHandler := article.NewArticleHandler(articleService)
+	// -- Article Routes --
+	articleRoutes := api.Group("/article")
+
+	articleRoutes.GET("", articleHandler.GetArticlesHandler)
+	// Protected Routes
+	articleRoutes.Use(auth.AuthMiddleware())
+	articleRoutes.POST("", articleHandler.CreateArticleHandler)
+	articleRoutes.PATCH("/:id", articleHandler.UpdateArticlesHandler)
 
 	// -- RATING --
 
