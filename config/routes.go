@@ -47,6 +47,23 @@ func SetupRouter() *gin.Engine {
 	classRoutes := api.Group("/class")
 	classRoutes.GET("", classHandler.GetClassesAndAscendanciesHandler)
 
+	// --- SKILL ---
+
+	// -- Skill Setup --
+	skillRepo := skill.NewSkillRepository(DB)
+	skillService := skill.NewSkillService(skillRepo)
+	skillHandler := skill.NewSkillHandler(skillService)
+
+	// -- Skill Routes --
+	skillRoutes := api.Group("/skill")
+
+	// Public Routes
+	skillRoutes.GET("", skillHandler.GetSkillsHandler)
+
+	// Protected Routes
+	skillRoutes.Use(auth.AuthMiddleware())
+	skillRoutes.POST("", skillHandler.CreateSkillHandler)
+
 	// --- ITEM ---
 
 	// -- Item Setup --
@@ -68,22 +85,8 @@ func SetupRouter() *gin.Engine {
 	itemRoutes.GET("/item-mods", itemHandler.GetItemModsHandler)
 	itemRoutes.GET("/member-rare-item", itemHandler.GetMemberRareItemHandler)
 
-	// --- SKILL ---
-
-	// -- Skill Setup --
-	skillRepo := skill.NewSkillRepository(DB)
-	skillService := skill.NewSkillService(skillRepo)
-	skillHandler := skill.NewSkillHandler(skillService)
-
-	// -- Skill Routes --
-	skillRoutes := api.Group("/skill")
-
-	// Public Routes
-	skillRoutes.GET("", skillHandler.GetSkillsHandler)
-
-	// Protected Routes
-	skillRoutes.Use(auth.AuthMiddleware())
-	skillRoutes.POST("", skillHandler.CreateSkillHandler)
+	// base-item, items. skills,
+	itemRoutes.GET("/all-data", itemHandler.GetAllDataHandler)
 
 	// --- BUILD ---
 

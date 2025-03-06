@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -49,6 +50,41 @@ func (s *ItemService) GetItemModsService() (*[]models.ItemMod, error) {
 
 func (s *ItemService) GetMemberRareItemsService(id uuid.UUID) (*[]models.Item, error) {
 	return s.Repo.GetMemberRareItems(id)
+}
+
+func (s *ItemService) GetAllDataService(id uuid.UUID) (*[]interface{}, error) {
+	baseItems, _ := s.Repo.GetBaseItems()
+	items, _ := s.Repo.GetItems("")
+
+	result := make([]interface{}, 0)
+
+	for _, item := range *baseItems {
+		result = append(result, item)
+	}
+	for _, item := range *items {
+		result = append(result, item)
+	}
+
+	sort.Slice(result, func(i, j int) bool {
+		var nameI, nameJ string
+
+		switch v := result[i].(type) {
+		case models.Item:
+			nameI = v.Name
+		case models.BaseItem:
+			nameI = v.Name
+		}
+		switch v := result[j].(type) {
+		case models.Item:
+			nameJ = v.Name
+		case models.BaseItem:
+			nameJ = v.Name
+		}
+
+		return nameI < nameJ
+	})
+
+	return &result, nil
 }
 
 func (s *ItemService) UpdateItemsService(id uuid.UUID, updateItemReq UpdateItemReq) (*models.Item, error) {

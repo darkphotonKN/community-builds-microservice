@@ -31,11 +31,11 @@ func (h *ArticleHandler) CreateArticleHandler(c *gin.Context) {
 	err := h.Service.CreateArticleService(createArticleReq)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to create tag: %s", err.Error())})
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to create article: %s", err.Error())})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusCreated, "message": "Successfully created tag."})
+	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusCreated, "message": "Successfully created article."})
 }
 
 func (h *ArticleHandler) GetArticlesHandler(c *gin.Context) {
@@ -50,7 +50,7 @@ func (h *ArticleHandler) GetArticlesHandler(c *gin.Context) {
 }
 
 func (h *ArticleHandler) UpdateArticlesHandler(c *gin.Context) {
-	// tag id to update
+	// article id to update
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 
@@ -59,7 +59,7 @@ func (h *ArticleHandler) UpdateArticlesHandler(c *gin.Context) {
 		return
 	}
 
-	// update tag payload
+	// update article payload
 	var updateArticleReq UpdateArticleRequest
 	if err := c.ShouldBindJSON(&updateArticleReq); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON.")})

@@ -3,15 +3,15 @@ package article
 import "github.com/google/uuid"
 
 type CreateArticleRequest struct {
-	Name string `json:"name" binding:"required" db:"name"`
+	Content string `json:"content" binding:"required" db:"content"`
 }
 
 type UpdateArticleRequest struct {
-	ID   uuid.UUID `db:"id" json:"id"`
-	Name string    `json:"name" binding:"required" db:"name"`
+	ID      uuid.UUID `db:"id" json:"id"`
+	Content string    `json:"content" binding:"required" db:"content"`
 }
 
 type UpdateArticleParams struct {
-	ID   uuid.UUID `db:"id" json:"id"`
-	Name string    `db:"name" json:"name"`
+	ID      uuid.UUID `db:"id" json:"id"`
+	Content string    `db:"content" json:"content"`
 }
