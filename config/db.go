@@ -102,7 +102,7 @@ func SeedDefaults(db *sqlx.DB) {
 	fmt.Printf("Successfully created all default active and support skills.\n\n")
 
 	itemRepo := item.NewItemRepository(db)
-	itemService := item.NewItemService(itemRepo)
+	itemService := item.NewItemService(itemRepo, skillService)
 	itemService.CrawlingAndAddUniqueItemsService()
 	itemService.CrawlingAndAddBaseItemsService()
 	itemService.CrawlingAndAddItemModsService()

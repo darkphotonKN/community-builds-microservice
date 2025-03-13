@@ -13,18 +13,21 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/chromedp/chromedp"
 	"github.com/darkphotonKN/community-builds/internal/models"
+	"github.com/darkphotonKN/community-builds/internal/skill"
 	"github.com/darkphotonKN/community-builds/internal/utils/dbutils"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
 type ItemService struct {
-	Repo *ItemRepository
+	SkillService *skill.SkillService
+	Repo         *ItemRepository
 }
 
-func NewItemService(repo *ItemRepository) *ItemService {
+func NewItemService(repo *ItemRepository, skillService *skill.SkillService) *ItemService {
 	return &ItemService{
-		Repo: repo,
+		Repo:         repo,
+		SkillService: skillService,
 	}
 }
 
@@ -55,6 +58,7 @@ func (s *ItemService) GetMemberRareItemsService(id uuid.UUID) (*[]models.Item, e
 func (s *ItemService) GetAllDataService(id uuid.UUID) (*[]interface{}, error) {
 	baseItems, _ := s.Repo.GetBaseItems()
 	items, _ := s.Repo.GetItems("")
+	skills, _ := s.SkillService.GetSkillsService()
 
 	result := make([]interface{}, 0)
 
@@ -63,6 +67,10 @@ func (s *ItemService) GetAllDataService(id uuid.UUID) (*[]interface{}, error) {
 	}
 	for _, item := range *items {
 		result = append(result, item)
+	}
+	for _, item := range *skills {
+		result = append(result, item)
+
 	}
 
 	sort.Slice(result, func(i, j int) bool {
@@ -73,11 +81,15 @@ func (s *ItemService) GetAllDataService(id uuid.UUID) (*[]interface{}, error) {
 			nameI = v.Name
 		case models.BaseItem:
 			nameI = v.Name
+		case models.Skill:
+			nameI = v.Name
 		}
 		switch v := result[j].(type) {
 		case models.Item:
 			nameJ = v.Name
 		case models.BaseItem:
+			nameJ = v.Name
+		case models.Skill:
 			nameJ = v.Name
 		}
 

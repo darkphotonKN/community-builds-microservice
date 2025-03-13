@@ -68,7 +68,7 @@ func SetupRouter() *gin.Engine {
 
 	// -- Item Setup --
 	itemRepo := item.NewItemRepository(DB)
-	itemService := item.NewItemService(itemRepo)
+	itemService := item.NewItemService(itemRepo, skillService)
 	itemHandler := item.NewItemHandler(itemService)
 
 	// -- Item Routes --
