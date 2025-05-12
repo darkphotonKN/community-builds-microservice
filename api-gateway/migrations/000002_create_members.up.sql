@@ -1,7 +1,3 @@
--- Members Table with Auto-update Trigger
--- +goose Up
--- +goose StatementBegin
-
 -- Create members table
 CREATE TABLE IF NOT EXISTS members (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -31,18 +27,4 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER set_members_updated_at
 BEFORE UPDATE ON members
 FOR EACH ROW
-EXECUTE FUNCTION update_members_updated_at();
-
--- +goose StatementEnd
-
--- +goose Down
--- +goose StatementBegin
-
--- Drop trigger and function
-DROP TRIGGER IF EXISTS set_members_updated_at ON members;
-DROP FUNCTION IF EXISTS update_members_updated_at;
-
--- Drop members table
-DROP TABLE IF EXISTS members;
-
--- +goose StatementEnd
+EXECUTE FUNCTION update_members_updated_at(); 

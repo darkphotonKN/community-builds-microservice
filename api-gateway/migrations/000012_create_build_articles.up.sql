@@ -1,8 +1,3 @@
--- Build articles Table
--- Join Table between articles and Builds
-
--- +goose Up
--- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS build_articles (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     article_id UUID NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
@@ -12,10 +7,4 @@ CREATE TABLE IF NOT EXISTS build_articles (
 );
 -- optimize index 
 CREATE INDEX idx_build_articles_build_id ON build_articles(build_id);
-CREATE INDEX idx_build_articles_article_id ON build_articles(article_id);
--- +goose StatementEnd
-
--- +goose Down
--- +goose StatementBegin
-DROP TABLE IF EXISTS build_articles;
--- +goose StatementEnd
+CREATE INDEX idx_build_articles_article_id ON build_articles(article_id); 

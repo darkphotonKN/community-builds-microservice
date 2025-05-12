@@ -1,16 +1,7 @@
--- Items Table
--- Many to Many with Builds
-
--- +goose Up
--- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS items (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     member_id UUID REFERENCES members(id) ON DELETE RESTRICT,
     base_item_id UUID REFERENCES base_items(id) ON DELETE RESTRICT,
-    -- category TEXT NOT NULL CHECK (category <> ''), -- E.g., "Two Handed Weapon", "Gems"
-    -- class TEXT NOT NULL CHECK (class <> ''), -- Class of Item, below category. E.g., "Body Armours", "Two Hand Swords"
-    -- type TEXT NOT NULL CHECK (type <> ''), -- Type of Item, below class. E.g., "Glourious Plate"
-    -- name TEXT NOT NULL CHECK (name <> ''), -- Name of the item (e.g., "Kaom's Heart")
     category TEXT  NOT NULL,
     class TEXT  NOT NULL,
     type TEXT NOT NULL,
@@ -49,10 +40,4 @@ CREATE TABLE IF NOT EXISTS items (
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
--- +goose StatementEnd
-
--- +goose Down
--- +goose StatementBegin
-DROP TABLE IF EXISTS items;
--- +goose StatementEnd
+); 

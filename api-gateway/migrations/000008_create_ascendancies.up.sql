@@ -1,8 +1,3 @@
--- Ascendancies Table
--- MANY TO ONE in relaton to Classes
-
--- +goose Up
--- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS ascendancies (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     class_id UUID NOT NULL REFERENCES classes(id) ON DELETE CASCADE, -- FK to classes table
@@ -11,10 +6,4 @@ CREATE TABLE IF NOT EXISTS ascendancies (
     image_url TEXT, -- URL for ascendancy image
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
--- +goose StatementEnd
-
--- +goose Down
--- +goose StatementBegin
-DROP TABLE IF EXISTS ascendancies
--- +goose StatementEnd
+); 

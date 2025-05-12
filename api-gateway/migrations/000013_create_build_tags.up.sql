@@ -1,8 +1,3 @@
--- Build Tags Table
--- Join Table between Tags and Builds
-
--- +goose Up
--- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS build_tags (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     tag_id UUID NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
@@ -12,10 +7,4 @@ CREATE TABLE IF NOT EXISTS build_tags (
 );
 -- optimize index 
 CREATE INDEX idx_build_tags_build_id ON build_tags(build_id);
-CREATE INDEX idx_build_tags_tag_id ON build_tags(tag_id);
--- +goose StatementEnd
-
--- +goose Down
--- +goose StatementBegin
-DROP TABLE IF EXISTS build_tags;
--- +goose StatementEnd
+CREATE INDEX idx_build_tags_tag_id ON build_tags(tag_id); 

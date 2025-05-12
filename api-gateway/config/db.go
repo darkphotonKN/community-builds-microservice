@@ -12,6 +12,9 @@ import (
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/member"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/skill"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/tag"
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jmoiron/sqlx"
 
 	// Importing for side effects - Dont Remove
@@ -45,12 +48,40 @@ func InitDB() *sqlx.DB {
 
 	fmt.Printf("\nConnected to the database successfully.\n\n")
 
+	// Run migrations
+	if err := runMigrations(db); err != nil {
+		log.Fatalf("Failed to run migrations: %v", err)
+	}
+
 	// seed default
 	SeedDefaults(db)
 
 	// set global instance for the database
 	DB = db
 	return DB
+}
+
+func runMigrations(db *sqlx.DB) error {
+	driver, err := postgres.WithInstance(db.DB, &postgres.Config{})
+	if err != nil {
+		return fmt.Errorf("could not create migration driver: %v", err)
+	}
+
+	m, err := migrate.NewWithDatabaseInstance(
+		"file://migrations",
+		"postgres",
+		driver,
+	)
+	if err != nil {
+		return fmt.Errorf("could not create migration instance: %v", err)
+	}
+
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		return fmt.Errorf("could not run migrations: %v", err)
+	}
+
+	fmt.Printf("Successfully ran all migrations.\n\n")
+	return nil
 }
 
 func SeedDefaults(db *sqlx.DB) {
