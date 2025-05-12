@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/darkphotonKN/community-builds/config"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/config"
 	"github.com/google/uuid"
 )
 

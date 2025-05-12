@@ -1,7 +1,7 @@
 package skill
 
 import (
-	"github.com/darkphotonKN/community-builds/internal/models"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/models"
 	"github.com/google/uuid"
 )
 

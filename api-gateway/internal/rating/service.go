@@ -3,9 +3,9 @@ package rating
 import (
 	"fmt"
 
-	"github.com/darkphotonKN/community-builds/internal/build"
-	"github.com/darkphotonKN/community-builds/internal/models"
-	"github.com/darkphotonKN/community-builds/internal/types"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/build"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/models"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/types"
 	"github.com/google/uuid"
 )
 

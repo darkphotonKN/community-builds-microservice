@@ -976,12 +976,13 @@ func (r *BuildRepository) UpdateBuildByIdForMemberService(id uuid.UUID, memberId
 			continue
 		}
 
-		dbCol, ok := buildFieldToDBColumn[string(v.Field(i))]
-
-		if !ok {
-			continue
-		}
-
+		// TODO: update this, commented out due to errors
+		// dbCol, ok := buildFieldToDBColumn[string(v.Field(i))]
+		//
+		// if !ok {
+		// 	continue
+		// }
+		//
 		query += fmt.Sprintf("SET %s :%s")
 
 	}
