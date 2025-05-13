@@ -39,6 +39,12 @@ migrate-down-to:
 	fi; \
 	migrate -path migrations -database "$(DB_STRING)" down $(VERSION)
 
+# reset everything to a specific version
+migrate-fix:
+	@echo "Fixing dirty migration by setting version to $(version)..."
+	$(MIGRATE_COMMAND) force $(version)
+
+
 # drop ALL table
 migrate-reset:
 	@migrate -path migrations -database "$(DB_STRING)" drop
