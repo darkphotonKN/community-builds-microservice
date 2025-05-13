@@ -1,7 +1,10 @@
 package example
 
 import (
-	"errors"
+	"context"
+
+	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/example"
+	"github.com/google/uuid"
 )
 
 type service struct {
@@ -10,28 +13,38 @@ type service struct {
 
 type Repository interface {
 	Create(example *ExampleCreate) (*Example, error)
-	GetByID(id string) (*Example, error)
+	GetByID(id uuid.UUID) (*Example, error)
 }
 
 func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
 
-func (s *service) CreateExample(example *ExampleCreate) (*Example, error) {
-	if example.Name == "" {
-		return nil, errors.New("name is required")
+func (s *service) CreateExample(ctx context.Context, req *pb.CreateExampleRequest) (*pb.Example, error) {
+	createExample := &ExampleCreate{
+		Name: req.Name,
+	}
+	example, err := s.repo.Create(createExample)
+
+	if err != nil {
+		return nil, err
 	}
 
-	return s.repo.Create(example)
+	return &pb.Example{
+		Id:   example.ID,
+		Name: example.Name,
+	}, nil
 }
 
-func (s *service) GetExample(id string) (*Example, error) {
-	if id == "" {
-		return nil, errors.New("id is required")
+func (s *service) GetExample(ctx context.Context, id uuid.UUID) (*pb.Example, error) {
+	example, err := s.repo.GetByID(id)
+
+	if err != nil {
+		return nil, err
 	}
 
-	return s.repo.GetByID(id)
+	return &pb.Example{
+		Id:   example.ID,
+		Name: example.Name,
+	}, nil
 }
-
-
-
