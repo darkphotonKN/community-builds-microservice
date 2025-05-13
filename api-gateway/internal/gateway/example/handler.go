@@ -8,10 +8,10 @@ import (
 )
 
 type Handler struct {
-	client *Client
+	client ExampleClient
 }
 
-func NewHandler(client *Client) *Handler {
+func NewHandler(client ExampleClient) *Handler {
 	return &Handler{
 		client: client,
 	}

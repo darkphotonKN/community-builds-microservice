@@ -1,47 +1,81 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
-	"os"
+	"time"
 
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/config"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/validation"
+	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
+	"github.com/darkphotonKN/community-builds-microservice/common/discovery/consul"
+	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 )
 
+
+var (
+	httpAddr         = commonhelpers.GetEnvString("PORT", "7001")
+	exampleServiceAddr = commonhelpers.GetEnvString("GRPC_EXAMPLE_ADDR", "7010")
+	consulAddr       = commonhelpers.GetEnvString("CONSUL_ADDR", "localhost:8500")
+	serviceName      = "api-gateway"
+)
 /**
 * Main entry point to entire application.
 * NOTE: Keep code here as clean and little as possible.
 **/
 func main() {
-	// env setup
+	// --- env setup ---
 	if err := godotenv.Load(); err != nil {
 		fmt.Println("No .env file found, using system environment variables")
 	}
 
-	// database setup
+	// --- database setup ---
 	db := config.InitDB()
 	defer db.Close()
 
-	// router setup
-	router := config.SetupRouter()
+	// --- service discovery setup ---
 
-	// Register custom validators
+	// -- consul client --
+	registry, err := consul.NewRegistry(consulAddr, serviceName)
+	if err != nil {
+		log.Fatal("Failed to create Consul registry")
+	}
+
+	ctx := context.Background()
+	instanceID := discovery.GenerateInstanceID(serviceName)
+
+	// -- discovery --
+	if err := registry.Register(ctx, instanceID, serviceName, "localhost:"+httpAddr); err != nil {
+		fmt.Printf("\nError when registering service:\n\n%s\n\n", err)
+		panic(err)
+	}
+
+	// -- health check --
+	go func() {
+		for {
+			if err := registry.HealthCheck(instanceID, serviceName); err != nil {
+				log.Fatal("Health check failed.")
+			}
+			time.Sleep(time.Second * 1)
+		}
+	}()
+
+	defer registry.Deregister(ctx, instanceID, serviceName)
+
+	// --- router setup ---
+	router := config.SetupRouter(registry)
+
+	// -- custom validators --
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		validation.RegisterValidators(v)
 	}
 
-	defaultDevPort := ":7001"
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = defaultDevPort
-	}
-
-	// starts server and listen on port
-	if err := router.Run(fmt.Sprintf(":%s", port)); err != nil {
+	// -- start server --
+	if err := router.Run(fmt.Sprintf(":%s", httpAddr)); err != nil {
 		log.Fatal("Failed to start server")
 	}
 }

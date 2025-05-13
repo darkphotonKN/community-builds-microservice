@@ -7,11 +7,13 @@ import (
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/auth"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/build"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/class"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/example"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/item"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/member"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/rating"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/skill"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/tag"
+	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -19,7 +21,7 @@ import (
 /**
 * Sets up API prefix route and all routers.
 **/
-func SetupRouter() *gin.Engine {
+func SetupRouter(registry discovery.Registry) *gin.Engine {
 	router := gin.Default()
 
 	// NOTE: debugging middleware
@@ -38,6 +40,24 @@ func SetupRouter() *gin.Engine {
 
 	// base route
 	api := router.Group("/api")
+
+	/***************
+	* MICROSERVICES
+	***************/
+
+	// --- EXAMPLE MICROSERVICE ---
+
+	exampleClient := example.NewClient(registry)
+	exampleHandler := example.NewHandler(exampleClient)
+
+	exampleRoutes := api.Group("/example")
+	exampleRoutes.GET("", exampleHandler.GetExample)
+	exampleRoutes.POST("", exampleHandler.CreateExample)
+
+
+	/*********************
+	* LEGACY MONOLITH APIS
+	**********************/
 
 	// --- CLASS AND ASCENDANCY ---
 	classRepo := class.NewClassRepository(DB)
