@@ -14,10 +14,5 @@ type Example struct {
 
 // ExampleCreate represents the data needed to create a new example
 type ExampleCreate struct {
-	Name string `json:"name" validate:"required"`
+	Name string `json:"name" db:"name"`
 }
-
-// ExampleUpdate represents the data needed to update an existing example
-type ExampleUpdate struct {
-	Name string `json:"name" validate:"required"`
-} 

@@ -1,53 +1,48 @@
 package example
 
 import (
-	"net/http"
+	"golang.org/x/net/context"
 
-	"github.com/gin-gonic/gin"
+	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/example"
+	"github.com/google/uuid"
 )
 
 type Handler struct {
 	service Service
+	pb.UnimplementedExampleServiceServer
 }
 
 type Service interface {
-	CreateExample(example *ExampleCreate) (*Example, error)
-	GetExample(id string) (*Example, error)
+	CreateExample(ctx context.Context, example *pb.CreateExampleRequest) (*pb.Example, error)
+	GetExample(ctx context.Context, id uuid.UUID) (*pb.Example, error)
 }
 
 func NewHandler(service Service) *Handler {
 	return &Handler{service: service}
 }
 
+func (h *Handler) CreateExample(ctx context.Context, req *pb.CreateExampleRequest) (*pb.Example, error) {
+	result, err := h.service.CreateExample(ctx, req)
 
-func (h *Handler) CreateExample(c *gin.Context) {
-	var example ExampleCreate
-	if err := c.ShouldBindJSON(&example); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	result, err := h.service.CreateExample(&example)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		return nil, err
 	}
 
-	c.JSON(http.StatusCreated, result)
+	return result, nil
 }
 
-func (h *Handler) GetExample(c *gin.Context) {
-	id := c.Param("id")
-	result, err := h.service.GetExample(id)
+func (h *Handler) GetExample(ctx context.Context, req *pb.GetExampleRequest) (*pb.Example, error) {
+	id, err := uuid.Parse(req.Id)
+
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		return nil, err
 	}
 
-	if result == nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "example not found"})
-		return
+	result, err := h.service.GetExample(ctx, id)
+
+	if err != nil {
+		return nil, err
 	}
 
-	c.JSON(http.StatusOK, result)
+	return result, nil
 }

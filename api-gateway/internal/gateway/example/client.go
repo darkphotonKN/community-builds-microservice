@@ -1,0 +1,89 @@
+package example
+
+import (
+	"context"
+	"fmt"
+	"log"
+
+	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/example"
+	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
+)
+
+/*
+client.go implements the ExampleGateway interface, providing methods to interact with
+the example-service through gRPC. It uses Consul service discovery to locate the service
+and establishes a connection dynamically at runtime.
+
+This gateway serves as a client-side adapter between the API Gateway's REST endpoints and
+the example-service's gRPC methods, handling the protocol translation and service location.
+It's part of the Gateway pattern that isolates the API Gateway from the implementation
+details of the backend microservices.
+
+Each method follows a consistent pattern:
+1. Establish connection to the service via service discovery
+2. Create a gRPC client
+3. Make the gRPC call
+4. Return the result or error
+
+Usage:
+    registry := consul.NewRegistry(...)
+    exampleGateway := gateway.NewExampleGateway(registry)
+    example, err := exampleGateway.GetExample(ctx, &pb.GetExampleRequest{Id: "123"})
+
+Note: Remove after copy pasting this as scaffolding.
+*/
+
+const (
+	serviceName = "example-service"
+)
+
+type Client struct {
+	registry discovery.Registry
+}
+
+func NewClient(registry discovery.Registry) ExampleClient {
+	return &Client{
+		registry: registry,
+	}
+}
+
+func (c *Client) CreateExample(ctx context.Context, req *pb.CreateExampleRequest) (*pb.Example, error) {
+
+	// connection instance created through service discovery first
+	// searches for the service registered as "orders"
+	conn, err := discovery.ServiceConnection(ctx, serviceName, c.registry)
+
+	if err != nil {
+		log.Fatalf("Failed to dial to server. Error: %s\n", err)
+	}
+
+	client := pb.NewExampleServiceClient(conn)
+
+	// create client to interface with through service discovery connection
+	exampleItem, err := client.CreateExample(ctx, &pb.CreateExampleRequest{
+		Name: req.Name,
+	})
+
+	fmt.Printf("Creating example %+v through gateway after service discovery\n", exampleItem)
+
+	return exampleItem, nil
+}
+
+func (c *Client) GetExample(ctx context.Context, req *pb.GetExampleRequest) (*pb.Example, error) {
+	// discovery
+	conn, err := discovery.ServiceConnection(ctx, serviceName, c.registry)
+
+	if err != nil {
+		log.Fatalf("Failed to dial to server. Error: %s\n", err)
+	}
+
+	// create client to interface with through service discovery connection
+	client := pb.NewExampleServiceClient(conn)
+	order, err := client.GetExample(ctx, &pb.GetExampleRequest{
+		Id: req.Id,
+	})
+
+	fmt.Printf("Creating order %+v through gateway after service discovery\n", order)
+
+	return order, nil
+}
