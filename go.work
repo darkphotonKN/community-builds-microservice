@@ -5,4 +5,5 @@ use (
 	./common
 	./item-service
 	./notification-service
+	./example-service
 )
