@@ -36,20 +36,12 @@ func (h *Handler) CreateExample(c *gin.Context) {
 		return
 	}
 
-	// Convert gRPC response to REST response
-	response := pb.Example{
-		Id:        example.Id,
-		Name:      example.Name,
-		CreatedAt: example.CreatedAt,
-		UpdatedAt: example.UpdatedAt,
-	}
-
-	c.JSON(http.StatusCreated, response)
+	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusOK, "message": "success", "result": example})
 }
 
 func (h *Handler) GetExample(c *gin.Context) {
 	id := c.Param("id")
-	
+
 	// Convert REST request to gRPC request
 	grpcReq := &pb.GetExampleRequest{
 		Id: id,
@@ -62,13 +54,5 @@ func (h *Handler) GetExample(c *gin.Context) {
 		return
 	}
 
-	// Convert gRPC response to REST response
-	response := pb.Example{
-		Id:        example.Id,
-		Name:      example.Name,
-		CreatedAt: example.CreatedAt,
-		UpdatedAt: example.UpdatedAt,
-	}
-
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusOK, "message": "success", "result": example})
 }

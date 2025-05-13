@@ -21,6 +21,7 @@ func NewService(repo Repository) Service {
 }
 
 func (s *service) CreateExample(ctx context.Context, req *pb.CreateExampleRequest) (*pb.Example, error) {
+	// format to fit model for db tags
 	createExample := &ExampleCreate{
 		Name: req.Name,
 	}
@@ -43,6 +44,7 @@ func (s *service) GetExample(ctx context.Context, id uuid.UUID) (*pb.Example, er
 		return nil, err
 	}
 
+	// format to fit grpc structure
 	return &pb.Example{
 		Id:   example.ID,
 		Name: example.Name,

@@ -1,4 +1,4 @@
-version: '3.9'
+version: "3.9"
 
 services:
   db:
@@ -9,22 +9,9 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: community_builds_example_service_db
     ports:
-      - '5002:5432'
+      - "5010:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-
-  test-db:
-    image: postgres:latest
-    container_name: community_builds_example_service_test_db
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: community_builds_example_service_test_db
-    ports:
-      - '6002:5432'
-    volumes:
-      - test_pgdata:/var/lib/postgresql/data
-    restart: 'no'
 
 volumes:
   pgdata:
