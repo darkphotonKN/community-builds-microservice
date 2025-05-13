@@ -16,13 +16,13 @@ import (
 	"github.com/joho/godotenv"
 )
 
-
 var (
-	httpAddr         = commonhelpers.GetEnvString("PORT", "7001")
-	exampleServiceAddr = commonhelpers.GetEnvString("GRPC_EXAMPLE_ADDR", "7010")
-	consulAddr       = commonhelpers.GetEnvString("CONSUL_ADDR", "localhost:8500")
-	serviceName      = "api-gateway"
+	httpAddr               = commonhelpers.GetEnvString("PORT", "7001")
+	exampleServiceGrpcAddr = commonhelpers.GetEnvString("GRPC_EXAMPLE_ADDR", "7010")
+	consulAddr             = commonhelpers.GetEnvString("CONSUL_ADDR", "localhost:8500")
+	serviceName            = "api-gateway"
 )
+
 /**
 * Main entry point to entire application.
 * NOTE: Keep code here as clean and little as possible.

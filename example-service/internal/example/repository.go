@@ -47,7 +47,7 @@ func (r *repository) Create(example *ExampleCreate) (*Example, error) {
 	return exampleModel, nil
 }
 
-func (r *repository) GetByID(id string) (*Example, error) {
+func (r *repository) GetByID(id uuid.UUID) (*Example, error) {
 	var example Example
 	err := r.db.Get(&example, "SELECT * FROM examples WHERE id = $1", id)
 	if err == sql.ErrNoRows {
@@ -58,27 +58,4 @@ func (r *repository) GetByID(id string) (*Example, error) {
 		return nil, commonhelpers.AnalyzeDBErr(err)
 	}
 	return &example, nil
-}
-
-func (r *repository) Update(id string, example *ExampleUpdate) (*Example, error) {
-	query := `
-		UPDATE examples
-		SET name = $1, updated_at = $2
-		WHERE id = $3
-		RETURNING id, name, created_at, updated_at
-	`
-
-	var updatedExample Example
-	err := r.db.QueryRowx(
-		query,
-		example.Name,
-		time.Now(),
-		id,
-	).StructScan(&updatedExample)
-
-	if err != nil {
-		return nil, commonhelpers.AnalyzeDBErr(err)
-	}
-
-	return &updatedExample, nil
 }
