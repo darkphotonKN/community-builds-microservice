@@ -4,16 +4,15 @@ import (
 	"context"
 	"log"
 	"net"
-	"os"
 	"time"
 
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/example"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery/consul"
 	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
+	"github.com/darkphotonKN/community-builds-microservice/example-service/config"
 	"github.com/darkphotonKN/community-builds-microservice/example-service/internal/example"
-	"github.com/jmoiron/sqlx"
-	"github.com/joho/godotenv"
+	_ "github.com/joho/godotenv/autoload"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 )
@@ -21,20 +20,14 @@ import (
 var (
 	serviceName = "examples"
 	grpcAddr    = commonhelpers.GetEnvString("GRPC_EXAMPLE_ADDR", "7010")
-	consulAddr  = commonhelpers.GetEnvString("CONSUL_ADDR", "localhost:8500")
+	consulAddr  = commonhelpers.GetEnvString("CONSUL_ADDR", "localhost:8510")
 )
 
 func main() {
-	// --- env setup ---
-	if err := godotenv.Load(); err != nil {
-		log.Printf("Warning: .env file not found")
-	}
 
 	// --- database setup ---
-	db, err := sqlx.Connect("postgres", os.Getenv("DATABASE_URL"))
-	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
-	}
+
+	db := config.InitDB()
 	defer db.Close()
 
 	// --- service discovery setup ---

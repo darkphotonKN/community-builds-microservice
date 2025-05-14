@@ -1,0 +1,75 @@
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Go build artifacts
+bin/
+build/
+dist/
+*.out
+tmp/
+
+# Temporary files
+*.log
+*.tmp
+*.temp
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE-specific files
+.vscode/
+.idea/
+*.swp
+
+# Environment variables and credentials
+**/.env
+
+# Dependencies
+**/vendor/
+
+# Go module files (if not using vendoring)
+**/go.sum
+
+# Docker
+**/.dockerignore
+
+# Test results
+*.test
+coverage.out
+
+# Service-specific artifacts
+**/node_modules/
+*-service/bin/
+*-service/build/
+*-service/dist/
+
+# Service-specific database files
+*.db
+*.sqlite
+
+# Logs directory
+logs/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+
+# Kubernetes
+kubeconfig
+*.kubeconfig
+
+# Generated API documentation
+api-docs/
+
+# Temporary backup files
+*.bak
+
+# Local configuration overrides
+*.local.yaml
+*.local.yml
