@@ -33,7 +33,7 @@ Note: Remove after copy pasting this as scaffolding.
 */
 
 const (
-	serviceName = "example-service"
+	serviceName = "examples"
 )
 
 type Client struct {
@@ -87,4 +87,3 @@ func (c *Client) GetExample(ctx context.Context, req *pb.GetExampleRequest) (*pb
 
 	return order, nil
 }
-
