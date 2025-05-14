@@ -13,14 +13,14 @@ import (
 	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
-	"github.com/joho/godotenv"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 var (
 	serviceName            = "api-gateway"
 	httpAddr               = commonhelpers.GetEnvString("PORT", "7001")
 	exampleServiceGrpcAddr = commonhelpers.GetEnvString("GRPC_EXAMPLE_ADDR", "7010")
-	consulAddr             = commonhelpers.GetEnvString("CONSUL_ADDR", "localhost:8500")
+	consulAddr             = commonhelpers.GetEnvString("CONSUL_ADDR", "localhost:8510")
 )
 
 /**
@@ -28,11 +28,6 @@ var (
 * NOTE: Keep code here as clean and little as possible.
 **/
 func main() {
-	// --- env setup ---
-	if err := godotenv.Load(); err != nil {
-		fmt.Println("No .env file found, using system environment variables")
-	}
-
 	// --- database setup ---
 	db := config.InitDB()
 	defer db.Close()
