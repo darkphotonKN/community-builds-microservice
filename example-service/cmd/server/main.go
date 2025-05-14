@@ -4,15 +4,14 @@ import (
 	"context"
 	"log"
 	"net"
-	"os"
 	"time"
 
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/example"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery/consul"
 	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
+	"github.com/darkphotonKN/community-builds-microservice/example-service/config"
 	"github.com/darkphotonKN/community-builds-microservice/example-service/internal/example"
-	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
@@ -31,10 +30,8 @@ func main() {
 	}
 
 	// --- database setup ---
-	db, err := sqlx.Connect("postgres", os.Getenv("DATABASE_URL"))
-	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
-	}
+
+	db := config.InitDB()
 	defer db.Close()
 
 	// --- service discovery setup ---
