@@ -3,14 +3,13 @@ package example
 import (
 	"context"
 	"fmt"
-	"log"
 
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/example"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
 )
 
 /*
-client.go implements the ExampleGateway interface, providing methods to interact with
+client.go implements the ExampleClient interface, providing methods to interact with
 the example-service through gRPC. It uses Consul service discovery to locate the service
 and establishes a connection dynamically at runtime.
 
@@ -54,8 +53,9 @@ func (c *Client) CreateExample(ctx context.Context, req *pb.CreateExampleRequest
 	conn, err := discovery.ServiceConnection(ctx, serviceName, c.registry)
 
 	if err != nil {
-		log.Fatalf("Failed to dial to server. Error: %s\n", err)
+		return nil, fmt.Errorf("failed to connect to example service: %w", err)
 	}
+	defer conn.Close()
 
 	client := pb.NewExampleServiceClient(conn)
 
@@ -72,10 +72,10 @@ func (c *Client) CreateExample(ctx context.Context, req *pb.CreateExampleRequest
 func (c *Client) GetExample(ctx context.Context, req *pb.GetExampleRequest) (*pb.Example, error) {
 	// discovery
 	conn, err := discovery.ServiceConnection(ctx, serviceName, c.registry)
-
 	if err != nil {
-		log.Fatalf("Failed to dial to server. Error: %s\n", err)
+		return nil, fmt.Errorf("failed to connect to example service: %w", err)
 	}
+	defer conn.Close()
 
 	// create client to interface with through service discovery connection
 	client := pb.NewExampleServiceClient(conn)
@@ -87,3 +87,4 @@ func (c *Client) GetExample(ctx context.Context, req *pb.GetExampleRequest) (*pb
 
 	return order, nil
 }
+
