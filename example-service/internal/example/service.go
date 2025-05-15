@@ -11,7 +11,7 @@ import (
 )
 
 type service struct {
-	repo Repository
+	repo      Repository
 	publishCh *amqp.Channel
 }
 
@@ -35,7 +35,7 @@ func (s *service) CreateExample(ctx context.Context, req *pb.CreateExampleReques
 		return nil, err
 	}
 
-	// publish rabbit mq message after succesfuly creating 
+	// publish rabbit mq message after succesfuly creating
 	marshalledExample, err := json.Marshal(example)
 
 	if err != nil {

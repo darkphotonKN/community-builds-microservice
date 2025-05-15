@@ -32,7 +32,6 @@ var (
 )
 
 func main() {
-
 	// --- database setup ---
 
 	db := config.InitDB()

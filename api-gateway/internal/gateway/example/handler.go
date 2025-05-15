@@ -18,19 +18,14 @@ func NewHandler(client ExampleClient) *Handler {
 }
 
 func (h *Handler) CreateExample(c *gin.Context) {
-	var request pb.CreateExampleRequest
+	var request *pb.CreateExampleRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Convert REST request to gRPC request
-	grpcReq := &pb.CreateExampleRequest{
-		Name: request.Name,
-	}
-
 	// Call the service
-	example, err := h.client.CreateExample(c.Request.Context(), grpcReq)
+	example, err := h.client.CreateExample(c.Request.Context(), request)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

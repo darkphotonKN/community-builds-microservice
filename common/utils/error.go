@@ -29,7 +29,6 @@ func AnalyzeDBErr(err error) error {
 	}
 	if errors.Is(err, sql.ErrNoRows) {
 		return commonconstants.ErrNotFound
-	
 	}
 
 	// unexpected errors
