@@ -51,9 +51,8 @@ func SetupRouter(registry discovery.Registry) *gin.Engine {
 	exampleHandler := example.NewHandler(exampleClient)
 
 	exampleRoutes := api.Group("/example")
-	exampleRoutes.GET("", exampleHandler.GetExample)
+	exampleRoutes.GET("/:id", exampleHandler.GetExample)
 	exampleRoutes.POST("", exampleHandler.CreateExample)
-
 
 	/*********************
 	* LEGACY MONOLITH APIS
