@@ -7,6 +7,7 @@ import (
 	"time"
 
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/example"
+	"github.com/darkphotonKN/community-builds-microservice/common/broker"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery/consul"
 	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
@@ -18,9 +19,16 @@ import (
 )
 
 var (
+	// grpc
 	serviceName = "examples"
 	grpcAddr    = commonhelpers.GetEnvString("GRPC_EXAMPLE_ADDR", "7010")
 	consulAddr  = commonhelpers.GetEnvString("CONSUL_ADDR", "localhost:8510")
+
+	// rabbit mq
+	amqpUser     = commonhelpers.GetEnvString("RABBITMQ_USER", "guest")
+	amqpPassword = commonhelpers.GetEnvString("RABBITMQ_PASS", "guest")
+	amqpHost     = commonhelpers.GetEnvString("RABBITMQ_HOST", "localhost")
+	amqpPort     = commonhelpers.GetEnvString("RABBITMQ_PORT", "5672")
 )
 
 func main() {
@@ -59,7 +67,7 @@ func main() {
 
 	defer registry.Deregister(ctx, instanceID, serviceName)
 
-	// --- server initialization ---
+	// --- grpc ---
 	grpcServer := grpc.NewServer()
 
 	// create a network listener to this service
@@ -70,12 +78,22 @@ func main() {
 			"Failed to listen at port: %s\nError: %s\n", grpcAddr, err,
 		)
 	}
-
 	defer listener.Close()
 
+	// --- message broker - rabbit mq ---
+	ch, close := broker.Connect(amqpUser, amqpPassword, amqpHost, amqpPort)
+
+	defer func() {
+		close()
+		ch.Close()
+	}()
+
 	repo := example.NewRepository(db)
-	service := example.NewService(repo)
+	service := example.NewService(repo, ch)
 	handler := example.NewHandler(service)
+	consumer := example.NewConsumer(service, ch)
+	// start goroutine and listen to events from message broker
+	consumer.Listen()
 
 	pb.RegisterExampleServiceServer(grpcServer, handler)
 
