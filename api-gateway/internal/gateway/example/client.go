@@ -47,7 +47,6 @@ func NewClient(registry discovery.Registry) ExampleClient {
 }
 
 func (c *Client) CreateExample(ctx context.Context, req *pb.CreateExampleRequest) (*pb.Example, error) {
-
 	// connection instance created through service discovery first
 	// searches for the service registered as "orders"
 	conn, err := discovery.ServiceConnection(ctx, serviceName, c.registry)
