@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 
-	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/example"
 	commonconstants "github.com/darkphotonKN/community-builds-microservice/common/constants"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -48,7 +47,7 @@ func (c *consumer) Listen() {
 	// start a goroutine to listen for events
 	go func() {
 		for msg := range msgs {
-			var createdExample *pb.Example
+			var createdExample *CreateExampleEvent
 
 			err := json.Unmarshal(msg.Body, &createdExample)
 			if err != nil {
@@ -59,4 +58,3 @@ func (c *consumer) Listen() {
 		}
 	}()
 }
-
