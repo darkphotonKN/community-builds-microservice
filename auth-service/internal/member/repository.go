@@ -3,22 +3,23 @@ package member
 import (
 	"fmt"
 
+	"github.com/darkphotonKN/community-builds-microservice/auth-service/internal/models"
 	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
-type MemberRepository struct {
+type Repository struct {
 	DB *sqlx.DB
 }
 
-func NewMemberRepository(db *sqlx.DB) *MemberRepository {
-	return &MemberRepository{
+func NewRepository(db *sqlx.DB) *Repository {
+	return &Repository{
 		DB: db,
 	}
 }
 
-func (r *MemberRepository) Create(name, email, password string) (uuid.UUID, error) {
+func (r *Repository) Create(name, email, password string) (uuid.UUID, error) {
 	memberId := uuid.New()
 	query := `INSERT INTO members (id, name, email, password) VALUES ($1, $2, $3, $4)`
 
@@ -31,7 +32,7 @@ func (r *MemberRepository) Create(name, email, password string) (uuid.UUID, erro
 	return memberId, nil
 }
 
-func (r *MemberRepository) UpdatePassword(params MemberUpdatePasswordParams) error {
+func (r *Repository) UpdatePassword(params MemberUpdatePasswordParams) error {
 	query := `UPDATE members SET password = :password WHERE id = :id`
 
 	result, err := r.DB.NamedExec(query, params)
@@ -51,7 +52,7 @@ func (r *MemberRepository) UpdatePassword(params MemberUpdatePasswordParams) err
 	return nil
 }
 
-func (r *MemberRepository) UpdateMemberInfo(id uuid.UUID, name, status string) error {
+func (r *Repository) UpdateMemberInfo(id uuid.UUID, name, status string) error {
 	params := MemberUpdateInfoParams{
 		ID:     id,
 		Name:   name,
@@ -77,10 +78,10 @@ func (r *MemberRepository) UpdateMemberInfo(id uuid.UUID, name, status string) e
 	return nil
 }
 
-func (r *MemberRepository) GetByIdWithPassword(id uuid.UUID) (*Member, error) {
+func (r *Repository) GetByIdWithPassword(id uuid.UUID) (*models.Member, error) {
 	query := `SELECT * FROM members WHERE members.id = $1`
 
-	var member Member
+	var member models.Member
 	err := r.DB.Get(&member, query, id)
 	if err != nil {
 		return nil, err
@@ -89,10 +90,10 @@ func (r *MemberRepository) GetByIdWithPassword(id uuid.UUID) (*Member, error) {
 	return &member, nil
 }
 
-func (r *MemberRepository) GetById(id uuid.UUID) (*Member, error) {
+func (r *Repository) GetById(id uuid.UUID) (*models.Member, error) {
 	query := `SELECT * FROM members WHERE members.id = $1`
 
-	var member Member
+	var member models.Member
 	err := r.DB.Get(&member, query, id)
 	if err != nil {
 		return nil, err
@@ -104,8 +105,8 @@ func (r *MemberRepository) GetById(id uuid.UUID) (*Member, error) {
 	return &member, nil
 }
 
-func (r *MemberRepository) GetMemberByEmail(email string) (*Member, error) {
-	var member Member
+func (r *Repository) GetMemberByEmail(email string) (*models.Member, error) {
+	var member models.Member
 	query := `SELECT * FROM members WHERE members.email = $1`
 
 	err := r.DB.Get(&member, query, email)
@@ -116,7 +117,7 @@ func (r *MemberRepository) GetMemberByEmail(email string) (*Member, error) {
 	return &member, nil
 }
 
-func (r *MemberRepository) VerifyCredentials(email, password string) (*Member, error) {
+func (r *Repository) VerifyCredentials(email, password string) (*models.Member, error) {
 	// First get the member by email
 	member, err := r.GetMemberByEmail(email)
 	if err != nil {
@@ -127,7 +128,7 @@ func (r *MemberRepository) VerifyCredentials(email, password string) (*Member, e
 	return member, nil
 }
 
-func (r *MemberRepository) CreateDefaultMembers(members []CreateDefaultMember) error {
+func (r *Repository) CreateDefaultMembers(members []CreateDefaultMember) error {
 	query := `
 	INSERT INTO members(id, email, name, password, status)
 	VALUES(:id, :email, :name, :password, :status)
@@ -141,4 +142,3 @@ func (r *MemberRepository) CreateDefaultMembers(members []CreateDefaultMember) e
 
 	return nil
 }
-

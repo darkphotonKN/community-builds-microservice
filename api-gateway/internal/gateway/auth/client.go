@@ -105,4 +105,3 @@ func (c *Client) ValidateToken(ctx context.Context, req *pb.ValidateTokenRequest
 	response, err := client.ValidateToken(ctx, req)
 	return response, err
 }
-

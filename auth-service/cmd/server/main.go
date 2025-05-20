@@ -6,13 +6,13 @@ import (
 	"net"
 	"time"
 
-	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/example"
+	"github.com/darkphotonKN/community-builds-microservice/auth-service/config"
+	"github.com/darkphotonKN/community-builds-microservice/auth-service/internal/member"
+	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/auth"
 	"github.com/darkphotonKN/community-builds-microservice/common/broker"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery/consul"
 	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
-	"github.com/darkphotonKN/community-builds-microservice/example-service/config"
-	"github.com/darkphotonKN/community-builds-microservice/example-service/internal/example"
 	_ "github.com/joho/godotenv/autoload"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
@@ -20,7 +20,7 @@ import (
 
 var (
 	// grpc
-	serviceName = "examples"
+	serviceName = "auth"
 	grpcAddr    = commonhelpers.GetEnvString("GRPC_EXAMPLE_ADDR", "7010")
 	consulAddr  = commonhelpers.GetEnvString("CONSUL_ADDR", "localhost:8510")
 
@@ -87,37 +87,18 @@ func main() {
 		ch.Close()
 	}()
 
-	repo := example.NewRepository(db)
-	service := example.NewService(repo, ch)
-	handler := example.NewHandler(service)
-	consumer := example.NewConsumer(service, ch)
+	repo := member.NewRepository(db)
+	service := member.NewService(repo, ch)
+	handler := member.NewHandler(service)
+	// consumer := member.NewConsumer(service, ch)
 	// start goroutine and listen to events from message broker
-	consumer.Listen()
+	// consumer.Listen()
 
-	pb.RegisterExampleServiceServer(grpcServer, handler)
+	pb.RegisterAuthServiceServer(grpcServer, handler)
 
 	log.Printf("grpc Order Server started on PORT: %s\n", grpcAddr)
 
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatal("Can't connect to grpc server. Error:", err.Error())
 	}
-
-	/*
-	   // service setup
-	   repo := order.NewRepository(db)
-	   service := order.NewService(repo, ch)
-
-	   // start grpc server
-	   handler := order.NewGrpcHandler(service)
-
-	   // create server
-	   pb.RegisterOrderServiceServer(grpcServer, handler)
-
-	   log.Printf("grpc Order Server started on PORT: %s\n", grpcAddr)
-	   // start serving requests
-
-	   	if err := grpcServer.Serve(l); err != nil {
-	   		log.Fatal("Can't connect to grpc server. Error:", err.Error())
-	   	}
-	*/
 }
