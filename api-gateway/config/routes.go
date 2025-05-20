@@ -7,9 +7,9 @@ import (
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/auth"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/build"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/class"
+	authService "github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/auth"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/example"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/item"
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/member"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/rating"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/skill"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/tag"
@@ -53,6 +53,18 @@ func SetupRouter(registry discovery.Registry) *gin.Engine {
 	exampleRoutes := api.Group("/example")
 	exampleRoutes.GET("/:id", exampleHandler.GetExample)
 	exampleRoutes.POST("", exampleHandler.CreateExample)
+
+	// --- AUTH & MEMBERS MICROSERVICE ---
+	// -- Member Setup --
+	authClient := authService.NewClient(registry)
+	authHandler := authService.NewHandler(authClient)
+
+	// -- Member Routes --
+	memberRoutes := api.Group("/member")
+
+	// Public Routes
+	memberRoutes.GET("/:id", authHandler.GetMemberByIdHandler)
+	memberRoutes.POST("/signup", authHandler.CreateMemberHandler)
 
 	/*********************
 	* LEGACY MONOLITH APIS
@@ -176,27 +188,6 @@ func SetupRouter(registry discovery.Registry) *gin.Engine {
 
 	ratingRoutes.Use(auth.AuthMiddleware())
 	ratingRoutes.POST("", ratingHandler.CreateRatingByBuildIdHandler)
-
-	// --- MEMBER ---
-
-	// -- Member Setup --
-	memberRepo := member.NewMemberRepository(DB)
-	memberService := member.NewMemberService(memberRepo)
-	memberHandler := member.NewMemberHandler(memberService, ratingService)
-
-	// -- Member Routes --
-	memberRoutes := api.Group("/member")
-
-	// Public Routes
-	memberRoutes.GET("/:id", memberHandler.GetMemberByIdHandler)
-	memberRoutes.POST("/signup", memberHandler.CreateMemberHandler)
-	memberRoutes.POST("/signin", memberHandler.LoginMemberHandler)
-
-	// Protected Routes
-	protectedMemberRoutes := memberRoutes.Group("")
-	protectedMemberRoutes.Use(auth.AuthMiddleware())
-	protectedMemberRoutes.POST("/update-password", memberHandler.UpdatePasswordMemberHandler)
-	protectedMemberRoutes.POST("/update-info", memberHandler.UpdateInfoMemberHandler)
 
 	return router
 }
