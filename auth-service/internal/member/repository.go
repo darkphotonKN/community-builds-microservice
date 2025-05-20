@@ -1,0 +1,144 @@
+package member
+
+import (
+	"fmt"
+
+	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
+	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
+)
+
+type MemberRepository struct {
+	DB *sqlx.DB
+}
+
+func NewMemberRepository(db *sqlx.DB) *MemberRepository {
+	return &MemberRepository{
+		DB: db,
+	}
+}
+
+func (r *MemberRepository) Create(name, email, password string) (uuid.UUID, error) {
+	memberId := uuid.New()
+	query := `INSERT INTO members (id, name, email, password) VALUES ($1, $2, $3, $4)`
+
+	_, err := r.DB.Exec(query, memberId, name, email, password)
+	if err != nil {
+		fmt.Println("Error when creating member:", err)
+		return uuid.Nil, commonhelpers.AnalyzeDBErr(err)
+	}
+
+	return memberId, nil
+}
+
+func (r *MemberRepository) UpdatePassword(params MemberUpdatePasswordParams) error {
+	query := `UPDATE members SET password = :password WHERE id = :id`
+
+	result, err := r.DB.NamedExec(query, params)
+	if err != nil {
+		return commonhelpers.AnalyzeDBErr(err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check affected rows: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("no member found with id: %v", params.ID)
+	}
+
+	return nil
+}
+
+func (r *MemberRepository) UpdateMemberInfo(id uuid.UUID, name, status string) error {
+	params := MemberUpdateInfoParams{
+		ID:     id,
+		Name:   name,
+		Status: status,
+	}
+
+	query := `UPDATE members SET name = :name, status = :status WHERE id = :id`
+
+	result, err := r.DB.NamedExec(query, params)
+	if err != nil {
+		return commonhelpers.AnalyzeDBErr(err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check affected rows: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("no member found with id: %v", params.ID)
+	}
+
+	return nil
+}
+
+func (r *MemberRepository) GetByIdWithPassword(id uuid.UUID) (*Member, error) {
+	query := `SELECT * FROM members WHERE members.id = $1`
+
+	var member Member
+	err := r.DB.Get(&member, query, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &member, nil
+}
+
+func (r *MemberRepository) GetById(id uuid.UUID) (*Member, error) {
+	query := `SELECT * FROM members WHERE members.id = $1`
+
+	var member Member
+	err := r.DB.Get(&member, query, id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Remove password from the struct
+	member.Password = ""
+
+	return &member, nil
+}
+
+func (r *MemberRepository) GetMemberByEmail(email string) (*Member, error) {
+	var member Member
+	query := `SELECT * FROM members WHERE members.email = $1`
+
+	err := r.DB.Get(&member, query, email)
+	if err != nil {
+		return nil, err
+	}
+
+	return &member, nil
+}
+
+func (r *MemberRepository) VerifyCredentials(email, password string) (*Member, error) {
+	// First get the member by email
+	member, err := r.GetMemberByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+
+	// The password validation will be handled in the service layer
+	return member, nil
+}
+
+func (r *MemberRepository) CreateDefaultMembers(members []CreateDefaultMember) error {
+	query := `
+	INSERT INTO members(id, email, name, password, status)
+	VALUES(:id, :email, :name, :password, :status)
+	ON CONFLICT (id) DO NOTHING
+	`
+	_, err := r.DB.NamedExec(query, members)
+
+	if err != nil {
+		return commonhelpers.AnalyzeDBErr(err)
+	}
+
+	return nil
+}
+
