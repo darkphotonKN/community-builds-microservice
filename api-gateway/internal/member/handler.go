@@ -6,21 +6,18 @@ import (
 	"net/http"
 
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/models"
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/rating"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/utils/errorutils"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
 type MemberHandler struct {
-	Service       *MemberService
-	RatingService *rating.RatingService
+	Service *MemberService
 }
 
-func NewMemberHandler(service *MemberService, ratingService *rating.RatingService) *MemberHandler {
+func NewMemberHandler(service *MemberService) *MemberHandler {
 	return &MemberHandler{
-		Service:       service,
-		RatingService: ratingService,
+		Service: service,
 	}
 }
 

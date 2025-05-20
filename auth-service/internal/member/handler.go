@@ -8,41 +8,50 @@ import (
 
 type Handler struct {
 	pb.UnimplementedAuthServiceServer
-	Service *MemberService
+	service Service
 }
 
-func NewHandler(service *MemberService) *Handler {
+type Service interface {
+	CreateMember(ctx context.Context, req *pb.CreateMemberRequest) (*pb.Member, error)
+	GetMember(ctx context.Context, req *pb.GetMemberRequest) (*pb.Member, error)
+	LoginMember(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error)
+	UpdateMemberInfo(ctx context.Context, req *pb.UpdateMemberInfoRequest) (*pb.Member, error)
+	UpdateMemberPassword(ctx context.Context, req *pb.UpdatePasswordRequest) (*pb.UpdatePasswordResponse, error)
+	ValidateToken(ctx context.Context, req *pb.ValidateTokenRequest) (*pb.ValidateTokenResponse, error)
+}
+
+func NewHandler(service Service) *Handler {
 	return &Handler{
-		Service: service,
+		service: service,
 	}
 }
 
 // LoginMember implements the LoginMember gRPC method
 func (s *Handler) LoginMember(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
-	return s.Service.LoginMember(ctx, req)
+	return s.service.LoginMember(ctx, req)
 }
 
 // GetMember implements the GetMember gRPC method
 func (s *Handler) GetMember(ctx context.Context, req *pb.GetMemberRequest) (*pb.Member, error) {
-	return s.Service.GetMember(ctx, req)
+	return s.service.GetMember(ctx, req)
 }
 
 // CreateMember implements the CreateMember gRPC method
 func (s *Handler) CreateMember(ctx context.Context, req *pb.CreateMemberRequest) (*pb.Member, error) {
-	return s.Service.CreateMember(ctx, req)
+	return s.service.CreateMember(ctx, req)
 }
 
 // UpdateMemberInfo implements the UpdateMemberInfo gRPC method
 func (s *Handler) UpdateMemberInfo(ctx context.Context, req *pb.UpdateMemberInfoRequest) (*pb.Member, error) {
-	return s.Service.UpdateMemberInfo(ctx, req)
+	return s.service.UpdateMemberInfo(ctx, req)
 }
 
 // UpdateMemberPassword implements the UpdateMemberPassword gRPC method
 func (s *Handler) UpdateMemberPassword(ctx context.Context, req *pb.UpdatePasswordRequest) (*pb.UpdatePasswordResponse, error) {
-	return s.Service.UpdateMemberPassword(ctx, req)
+	return s.service.UpdateMemberPassword(ctx, req)
 }
 
 // ValidateToken implements the ValidateToken gRPC method
 func (s *Handler) ValidateToken(ctx context.Context, req *pb.ValidateTokenRequest) (*pb.ValidateTokenResponse, error) {
-	return s.Service.ValidateToken(ctx, req)
+	return s.service.ValidateToken(ctx, req)
 }

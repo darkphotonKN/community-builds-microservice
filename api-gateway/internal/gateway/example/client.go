@@ -59,9 +59,7 @@ func (c *Client) CreateExample(ctx context.Context, req *pb.CreateExampleRequest
 	client := pb.NewExampleServiceClient(conn)
 
 	// create client to interface with through service discovery connection
-	exampleItem, err := client.CreateExample(ctx, &pb.CreateExampleRequest{
-		Name: req.Name,
-	})
+	exampleItem, err := client.CreateExample(ctx, req)
 
 	fmt.Printf("Creating example %+v through gateway after service discovery\n", exampleItem)
 
