@@ -2,6 +2,7 @@ package member
 
 import (
 	"context"
+	"fmt"
 
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/auth"
 )
@@ -35,6 +36,7 @@ func (s *Handler) GetMember(ctx context.Context, req *pb.GetMemberRequest) (*pb.
 }
 
 func (s *Handler) CreateMember(ctx context.Context, req *pb.CreateMemberRequest) (*pb.Member, error) {
+	fmt.Printf("Creating member through auth-service, request: %+v\n", req)
 	return s.service.CreateMember(ctx, req)
 }
 

@@ -20,7 +20,7 @@ import (
 
 var (
 	// grpc
-	serviceName = "examples"
+	serviceName = "auth"
 	grpcAddr    = commonhelpers.GetEnvString("GRPC_EXAMPLE_ADDR", "7010")
 	consulAddr  = commonhelpers.GetEnvString("CONSUL_ADDR", "localhost:8510")
 
