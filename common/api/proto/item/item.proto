@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package itemgrpc;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "./proto;itemgrpc";
+
+service ItemService {
+  rpc CreateItem(CreateItemRequest) returns (CreateItemResponse) {}
+  rpc GetItems(GetItemsRequest) returns (GetItemsResponse) {}
+  rpc GenerateUniqueItems(google.protobuf.Empty) returns (GenerateUniqueItemsResponse) {}
+}
+
+message Item {
+  string category = 1;
+  string class = 2;
+  string type = 3;
+  string name = 4;
+  string imageURL = 5;
+  // repeated Item items = 6;
+}
+
+message CreateItemRequest {
+  string category = 1;
+  string class = 2;
+  string type = 3;
+  string name = 4;
+  string imageURL = 5;
+  // repeated Item items = 6;
+}
+
+message CreateItemResponse {
+  string message = 1;
+}
+
+message GetItemsRequest {
+}
+
+message GetItemsResponse {
+  string category = 1;
+  string class = 2;
+  string type = 3;
+  string name = 4;
+  string imageURL = 5;
+}
+
+message GenerateUniqueItemsResponse {
+  string message = 1;
+}
