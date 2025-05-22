@@ -1,7 +1,7 @@
 package validation
 
 import (
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/item"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/item"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/rating"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/skill"
 	"github.com/go-playground/validator/v10"
