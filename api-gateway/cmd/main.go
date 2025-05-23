@@ -62,7 +62,7 @@ func main() {
 	defer registry.Deregister(ctx, instanceID, serviceName)
 
 	// --- router setup ---
-	router := config.SetupRouter(registry)
+	router := config.SetupRouter(registry, db)
 
 	// -- custom validators --
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {

@@ -16,12 +16,13 @@ import (
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/jmoiron/sqlx"
 )
 
 /**
 * Sets up API prefix route and all routers.
 **/
-func SetupRouter(registry discovery.Registry) *gin.Engine {
+func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	router := gin.Default()
 
 	// NOTE: debugging middleware
@@ -71,7 +72,7 @@ func SetupRouter(registry discovery.Registry) *gin.Engine {
 	**********************/
 
 	// --- CLASS AND ASCENDANCY ---
-	classRepo := class.NewClassRepository(DB)
+	classRepo := class.NewClassRepository(db)
 	classService := class.NewClassService(classRepo)
 	classHandler := class.NewClassHandler(classService)
 
@@ -81,7 +82,7 @@ func SetupRouter(registry discovery.Registry) *gin.Engine {
 	// --- SKILL ---
 
 	// -- Skill Setup --
-	skillRepo := skill.NewSkillRepository(DB)
+	skillRepo := skill.NewSkillRepository(db)
 	skillService := skill.NewSkillService(skillRepo)
 	skillHandler := skill.NewSkillHandler(skillService)
 
@@ -98,7 +99,7 @@ func SetupRouter(registry discovery.Registry) *gin.Engine {
 	// --- ITEM ---
 
 	// -- Item Setup --
-	itemRepo := item.NewItemRepository(DB)
+	itemRepo := item.NewItemRepository(db)
 	itemService := item.NewItemService(itemRepo, skillService)
 	itemHandler := item.NewItemHandler(itemService)
 
@@ -122,7 +123,7 @@ func SetupRouter(registry discovery.Registry) *gin.Engine {
 	// --- BUILD ---
 
 	// -- Build Setup --
-	buildRepo := build.NewBuildRepository(DB)
+	buildRepo := build.NewBuildRepository(db)
 	buildService := build.NewBuildService(buildRepo, skillService)
 	buildHandler := build.NewBuildHandler(buildService)
 
@@ -148,7 +149,7 @@ func SetupRouter(registry discovery.Registry) *gin.Engine {
 	// --- TAG ---
 
 	// -- Tag Setup --
-	tagRepo := tag.NewTagRepository(DB)
+	tagRepo := tag.NewTagRepository(db)
 	tagService := tag.NewTagService(tagRepo)
 	tagHandler := tag.NewTagHandler(tagService)
 
@@ -164,7 +165,7 @@ func SetupRouter(registry discovery.Registry) *gin.Engine {
 	// --- Article ---
 
 	// -- Article Setup --
-	articleRepo := article.NewArticleRepository(DB)
+	articleRepo := article.NewArticleRepository(db)
 	articleService := article.NewArticleService(articleRepo)
 	articleHandler := article.NewArticleHandler(articleService)
 
@@ -172,6 +173,7 @@ func SetupRouter(registry discovery.Registry) *gin.Engine {
 	articleRoutes := api.Group("/article")
 
 	articleRoutes.GET("", articleHandler.GetArticlesHandler)
+
 	// Protected Routes
 	articleRoutes.Use(auth.AuthMiddleware())
 	articleRoutes.POST("", articleHandler.CreateArticleHandler)
@@ -180,7 +182,7 @@ func SetupRouter(registry discovery.Registry) *gin.Engine {
 	// -- RATING --
 
 	// --- Rating Setup ---
-	ratingRepo := rating.NewRatingRepository(DB)
+	ratingRepo := rating.NewRatingRepository(db)
 	ratingService := rating.NewRatingService(ratingRepo, buildService)
 	ratingHandler := rating.NewRatingHandler(ratingService)
 
