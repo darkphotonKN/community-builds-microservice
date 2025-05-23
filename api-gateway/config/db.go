@@ -22,9 +22,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// NOTE: for global db access, do not remove
-var DB *sqlx.DB
-
 /**
 * Sets up the Database connection and provides its access as a singleton to
 * the entire application.
@@ -56,9 +53,7 @@ func InitDB() *sqlx.DB {
 	// seed default
 	SeedDefaults(db)
 
-	// set global instance for the database
-	DB = db
-	return DB
+	return db
 }
 
 func runMigrations(db *sqlx.DB) error {
