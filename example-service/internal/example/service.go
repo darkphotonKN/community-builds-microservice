@@ -8,6 +8,8 @@ import (
 	commonconstants "github.com/darkphotonKN/community-builds-microservice/common/constants"
 	"github.com/google/uuid"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type service struct {
@@ -25,6 +27,11 @@ func NewService(repo Repository, ch *amqp.Channel) Service {
 }
 
 func (s *service) CreateExample(ctx context.Context, req *pb.CreateExampleRequest) (*pb.Example, error) {
+	// validation and error handling
+	if req.Name == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "Name field is required")
+	}
+
 	// format to fit model for db tags
 	createExample := &ExampleCreate{
 		Name: req.Name,

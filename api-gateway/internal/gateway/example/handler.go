@@ -26,7 +26,6 @@ func (h *Handler) CreateExample(c *gin.Context) {
 		return
 	}
 
-	// Call the service
 	example, err := h.client.CreateExample(c.Request.Context(), request)
 
 	if err != nil {
