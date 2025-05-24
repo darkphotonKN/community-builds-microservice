@@ -56,6 +56,7 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	exampleRoutes.POST("", exampleHandler.CreateExample)
 
 	// --- AUTH & MEMBERS MICROSERVICE ---
+
 	// -- Member Setup --
 	authClient := authService.NewClient(registry)
 	authHandler := authService.NewHandler(authClient)
@@ -66,6 +67,7 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	// Public Routes
 	memberRoutes.GET("/:id", authHandler.GetMemberByIdHandler)
 	memberRoutes.POST("/signup", authHandler.CreateMemberHandler)
+	memberRoutes.POST("/signin", authHandler.LoginMemberHandler)
 
 	/*********************
 	* LEGACY MONOLITH APIS

@@ -262,4 +262,3 @@ func (s *service) CreateDefaultMembers(members []CreateDefaultMember) error {
 
 	return s.Repo.CreateDefaultMembers(hashedPwMembers)
 }
-

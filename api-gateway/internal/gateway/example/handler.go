@@ -5,6 +5,8 @@ import (
 
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/example"
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Handler struct {
@@ -26,8 +28,35 @@ func (h *Handler) CreateExample(c *gin.Context) {
 
 	// Call the service
 	example, err := h.client.CreateExample(c.Request.Context(), request)
+
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		status, ok := status.FromError(err)
+
+		if !ok {
+			// not a gRPC status error
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"statusCode": http.StatusInternalServerError,
+				"message":    "Internal server error",
+			})
+
+			return
+		}
+
+		// map grpc error codes to http codes
+		httpStatus := http.StatusInternalServerError
+		switch status.Code() {
+		case codes.InvalidArgument:
+			httpStatus = http.StatusBadRequest
+		case codes.Unauthenticated:
+			httpStatus = http.StatusUnauthorized
+		case codes.NotFound:
+			httpStatus = http.StatusNotFound
+		}
+
+		c.JSON(httpStatus, gin.H{
+			"statusCode": httpStatus,
+			"message":    status.Message(),
+		})
 		return
 	}
 

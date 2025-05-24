@@ -1,14 +1,14 @@
 package auth
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/utils/errorutils"
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/auth"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Handler struct {
@@ -114,18 +114,32 @@ func (h *Handler) LoginMemberHandler(c *gin.Context) {
 	response, err := h.client.LoginMember(c.Request.Context(), &req)
 
 	if err != nil {
-		// Check for unauthorized error specifically
-		if errors.Is(err, errorutils.ErrUnauthorized) {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"statusCode": http.StatusUnauthorized,
-				"message":    errorutils.ErrUnauthorized.Error(),
+		status, ok := status.FromError(err)
+
+		if !ok {
+			// not a gRPC status error
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"statusCode": http.StatusInternalServerError,
+				"message":    "Internal server error",
 			})
+
 			return
 		}
 
-		c.JSON(http.StatusBadRequest, gin.H{
-			"statusCode": http.StatusBadRequest,
-			"message":    fmt.Sprintf("Error logging in: %s", err),
+		// map grpc error codes to http codes
+		httpStatus := http.StatusInternalServerError
+		switch status.Code() {
+		case codes.InvalidArgument:
+			httpStatus = http.StatusBadRequest
+		case codes.Unauthenticated:
+			httpStatus = http.StatusUnauthorized
+		case codes.NotFound:
+			httpStatus = http.StatusNotFound
+		}
+
+		c.JSON(httpStatus, gin.H{
+			"statusCode": httpStatus,
+			"message":    status.Message(),
 		})
 		return
 	}
@@ -186,4 +200,3 @@ func (h *Handler) ValidateTokenHandler(c *gin.Context) {
 		"memberId":   response.MemberId,
 	})
 }
-

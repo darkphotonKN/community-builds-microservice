@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"time"
 
 	"log"
 	"os"
@@ -20,6 +21,11 @@ import (
 	// Importing for side effects - Dont Remove
 	// This IS being used!
 	_ "github.com/lib/pq"
+)
+
+const (
+	maxOpenConnections = 25
+	maxIdleConnections = 5
 )
 
 /**
@@ -43,7 +49,12 @@ func InitDB() *sqlx.DB {
 		log.Fatalf("Failed to connect to the database: %v", err)
 	}
 
-	fmt.Printf("\nConnected to the database successfully.\n\n")
+	fmt.Printf("Connected to database with connection pool: MaxOpen=%d, MaxIdle=%d\n", maxOpenConnections, maxIdleConnections)
+
+	db.SetMaxOpenConns(maxOpenConnections) // Max 25 concurrent connections
+	db.SetMaxIdleConns(maxIdleConnections) // Keep 5 connections alive when idle
+	db.SetConnMaxLifetime(5 * time.Minute) // Recycle connections every 5 minutes
+	db.SetConnMaxIdleTime(1 * time.Minute) // Close idle connections after 1 minute
 
 	// Run migrations
 	if err := runMigrations(db); err != nil {
@@ -67,6 +78,7 @@ func runMigrations(db *sqlx.DB) error {
 		"postgres",
 		driver,
 	)
+
 	if err != nil {
 		return fmt.Errorf("could not create migration instance: %v", err)
 	}
