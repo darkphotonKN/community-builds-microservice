@@ -65,9 +65,12 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	memberRoutes := api.Group("/member")
 
 	// Public Routes
-	memberRoutes.GET("/:id", authHandler.GetMemberByIdHandler)
 	memberRoutes.POST("/signup", authHandler.CreateMemberHandler)
 	memberRoutes.POST("/signin", authHandler.LoginMemberHandler)
+
+	// Private Routes
+	memberRoutes.Use(auth.AuthMiddleware())
+	memberRoutes.GET("", authHandler.GetMemberByIdHandler)
 
 	/*********************
 	* LEGACY MONOLITH APIS

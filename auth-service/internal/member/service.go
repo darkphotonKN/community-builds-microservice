@@ -90,34 +90,31 @@ func (s *service) CreateMember(ctx context.Context, req *pb.CreateMemberRequest)
 }
 
 func (s *service) LoginMember(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
-	// Verify credentials
 	member, err := s.Repo.GetMemberByEmail(req.Email)
 	if err != nil {
 		return nil, fmt.Errorf("could not find member with provided email: %w", err)
 	}
 
-	// Compare the stored hashed password with the provided password
 	if err = bcrypt.CompareHashAndPassword([]byte(member.Password), []byte(req.Password)); err != nil {
 		return nil, commonconstants.ErrUnauthorized
 	}
 
-	// Generate tokens
+	// generate tokens
 	accessExpiryTime := time.Minute * 60
 	refreshExpiryTime := time.Hour * 24 * 7
 
-	// Generate access token
 	accessToken, err := auth.GenerateJWT(*member, commonconstants.Access, accessExpiryTime)
 	if err != nil {
 		return nil, fmt.Errorf("error generating access token: %w", err)
 	}
 
-	// Generate refresh token
 	refreshToken, err := auth.GenerateJWT(*member, commonconstants.Refresh, refreshExpiryTime)
 	if err != nil {
 		return nil, fmt.Errorf("error generating refresh token: %w", err)
 	}
 
-	// Create the response
+	fmt.Println("generated tokens:", accessToken)
+
 	return &pb.LoginResponse{
 		AccessToken:      accessToken,
 		RefreshToken:     refreshToken,

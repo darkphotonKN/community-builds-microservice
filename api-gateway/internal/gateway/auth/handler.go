@@ -152,12 +152,11 @@ func (h *Handler) LoginMemberHandler(c *gin.Context) {
 }
 
 func (h *Handler) GetMemberByIdHandler(c *gin.Context) {
-	// Get ID from path parameter
-	idParam := c.Param("id")
+	userId, _ := c.Get("userId")
 
 	// Create the request
 	req := &pb.GetMemberRequest{
-		Id: idParam,
+		Id: userId.(string),
 	}
 
 	// Call the service
