@@ -152,11 +152,13 @@ func (h *Handler) LoginMemberHandler(c *gin.Context) {
 }
 
 func (h *Handler) GetMemberByIdHandler(c *gin.Context) {
-	userId, _ := c.Get("userId")
+	userIdStr, _ := c.Get("userIdStr")
+
+	// convert to string to match protobuf type
 
 	// Create the request
 	req := &pb.GetMemberRequest{
-		Id: userId.(string),
+		Id: userIdStr.(string),
 	}
 
 	// Call the service

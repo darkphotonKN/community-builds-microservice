@@ -49,7 +49,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		userIdStr := claims["sub"].(string)
 
-		// Parse userId as UUID
+		// parse userId as UUID
 		userId, err := uuid.Parse(userIdStr)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"statusCode": http.StatusUnauthorized, "error": "Member ID was not correctly parsed as a uuid."})
@@ -59,6 +59,9 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		// store userId in the context for usage in the actual API handlers
 		c.Set("userId", userId)
+
+		// store string version for cleaner transfer to external microservices via grpc
+		c.Set("userIdStr", userIdStr)
 
 		// passdown the flow to next hanlder
 		c.Next()
