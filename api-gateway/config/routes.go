@@ -71,6 +71,8 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	// Private Routes
 	memberRoutes.Use(auth.AuthMiddleware())
 	memberRoutes.GET("", authHandler.GetMemberByIdHandler)
+	memberRoutes.PATCH("/update-password", authHandler.UpdatePasswordMemberHandler)
+	memberRoutes.PATCH("/update-info", authHandler.UpdateInfoMemberHandler)
 
 	/*********************
 	* LEGACY MONOLITH APIS
