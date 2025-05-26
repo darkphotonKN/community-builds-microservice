@@ -10,15 +10,54 @@ service ItemService {
   rpc CreateItem(CreateItemRequest) returns (CreateItemResponse) {}
   rpc GetItems(GetItemsRequest) returns (GetItemsResponse) {}
   rpc GenerateUniqueItems(google.protobuf.Empty) returns (GenerateUniqueItemsResponse) {}
+  rpc UpdateItem(UpdateItemRequest) returns (UpdateItemResponse) {}
 }
 
 message Item {
-  string category = 1;
-  string class = 2;
-  string type = 3;
-  string name = 4;
-  string imageURL = 5;
-  // repeated Item items = 6;
+  optional string id = 1;
+  string memberId = 2;
+  string baseItemId = 3;
+  string imageUrl = 4;
+  string category = 5;
+  string class = 6;
+  string name = 7;
+  string type = 8;
+  string description = 9;
+  bool uniqueItem = 10;
+  string slot = 11;
+  
+  // armor
+  optional string requiredLevel = 12;
+  optional string requiredStrength = 13;
+  optional string requiredDexterity = 14;
+  optional string requiredIntelligence = 15;
+  
+  	// armor
+  optional string armour = 16;
+  optional string energyShield = 17;
+  optional string evasion = 18;
+  optional string block = 19;
+  optional string ward = 20;
+  // weapon
+  optional string damage = 21;
+  optional string APS = 22;
+  optional string crit = 23;
+  optional string PDPS = 24;
+  optional string EDPS = 25;
+  optional string DPS = 26;
+  // poison
+  optional string life = 27;
+  optional string mana = 28;
+  optional string duration = 29;
+  optional string usage = 30;
+  optional string capacity = 31;
+
+  optional string additional = 32;
+  optional string implicit = 33;
+  optional string stats = 34;
+
+	optional string createdAt = 36; 
+  optional string updatedAt = 37;
 }
 
 message CreateItemRequest {
@@ -35,16 +74,27 @@ message CreateItemResponse {
 }
 
 message GetItemsRequest {
+ string slot = 1;
 }
 
 message GetItemsResponse {
+  string message = 1;
+  repeated Item items = 2; // array of items
+}
+
+message GenerateUniqueItemsResponse {
+  string message = 1;
+}
+
+message UpdateItemRequest {
   string category = 1;
   string class = 2;
   string type = 3;
   string name = 4;
   string imageURL = 5;
+  string id = 6;
 }
 
-message GenerateUniqueItemsResponse {
+message UpdateItemResponse {
   string message = 1;
 }
