@@ -23,6 +23,7 @@ const (
 	ItemService_CreateItem_FullMethodName          = "/itemgrpc.ItemService/CreateItem"
 	ItemService_GetItems_FullMethodName            = "/itemgrpc.ItemService/GetItems"
 	ItemService_GenerateUniqueItems_FullMethodName = "/itemgrpc.ItemService/GenerateUniqueItems"
+	ItemService_UpdateItem_FullMethodName          = "/itemgrpc.ItemService/UpdateItem"
 )
 
 // ItemServiceClient is the client API for ItemService service.
@@ -32,6 +33,7 @@ type ItemServiceClient interface {
 	CreateItem(ctx context.Context, in *CreateItemRequest, opts ...grpc.CallOption) (*CreateItemResponse, error)
 	GetItems(ctx context.Context, in *GetItemsRequest, opts ...grpc.CallOption) (*GetItemsResponse, error)
 	GenerateUniqueItems(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GenerateUniqueItemsResponse, error)
+	UpdateItem(ctx context.Context, in *UpdateItemRequest, opts ...grpc.CallOption) (*UpdateItemResponse, error)
 }
 
 type itemServiceClient struct {
@@ -72,6 +74,16 @@ func (c *itemServiceClient) GenerateUniqueItems(ctx context.Context, in *emptypb
 	return out, nil
 }
 
+func (c *itemServiceClient) UpdateItem(ctx context.Context, in *UpdateItemRequest, opts ...grpc.CallOption) (*UpdateItemResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateItemResponse)
+	err := c.cc.Invoke(ctx, ItemService_UpdateItem_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ItemServiceServer is the server API for ItemService service.
 // All implementations must embed UnimplementedItemServiceServer
 // for forward compatibility.
@@ -79,6 +91,7 @@ type ItemServiceServer interface {
 	CreateItem(context.Context, *CreateItemRequest) (*CreateItemResponse, error)
 	GetItems(context.Context, *GetItemsRequest) (*GetItemsResponse, error)
 	GenerateUniqueItems(context.Context, *emptypb.Empty) (*GenerateUniqueItemsResponse, error)
+	UpdateItem(context.Context, *UpdateItemRequest) (*UpdateItemResponse, error)
 	mustEmbedUnimplementedItemServiceServer()
 }
 
@@ -97,6 +110,9 @@ func (UnimplementedItemServiceServer) GetItems(context.Context, *GetItemsRequest
 }
 func (UnimplementedItemServiceServer) GenerateUniqueItems(context.Context, *emptypb.Empty) (*GenerateUniqueItemsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GenerateUniqueItems not implemented")
+}
+func (UnimplementedItemServiceServer) UpdateItem(context.Context, *UpdateItemRequest) (*UpdateItemResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateItem not implemented")
 }
 func (UnimplementedItemServiceServer) mustEmbedUnimplementedItemServiceServer() {}
 func (UnimplementedItemServiceServer) testEmbeddedByValue()                     {}
@@ -173,6 +189,24 @@ func _ItemService_GenerateUniqueItems_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ItemService_UpdateItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ItemServiceServer).UpdateItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ItemService_UpdateItem_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ItemServiceServer).UpdateItem(ctx, req.(*UpdateItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ItemService_ServiceDesc is the grpc.ServiceDesc for ItemService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -191,6 +225,10 @@ var ItemService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GenerateUniqueItems",
 			Handler:    _ItemService_GenerateUniqueItems_Handler,
+		},
+		{
+			MethodName: "UpdateItem",
+			Handler:    _ItemService_UpdateItem_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
