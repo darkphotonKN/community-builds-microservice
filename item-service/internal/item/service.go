@@ -14,9 +14,12 @@ import (
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/item"
 	"github.com/darkphotonKN/community-builds-microservice/items-service/internal/models"
 	"github.com/darkphotonKN/community-builds-microservice/items-service/internal/utils/dbutils"
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type service struct {
@@ -37,6 +40,7 @@ type Repository interface {
 	AddUniqueItems(tx *sqlx.Tx, items *[]models.Item) error
 	AddBaseItems(tx *sqlx.Tx, items *[]models.BaseItem) error
 	AddItemMods(tx *sqlx.Tx, items *[]models.ItemMod) error
+	UpdateItemById(id uuid.UUID, updateItemReq UpdateItemReq) (*models.Item, error)
 }
 
 // mq version
@@ -56,10 +60,33 @@ type Repository interface {
 func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
-
-func (s *service) CreateItem(ctx context.Context, req *pb.CreateItemRequest) (*pb.CreateItemResponse, error) {
+func (s *service) GetItemsService(ctx context.Context, req *pb.GetItemsRequest) (*pb.GetItemsResponse, error) {
+	// todo: handler
+	return nil, nil
+}
+func (s *service) CreateItemService(ctx context.Context, req *pb.CreateItemRequest) (*pb.CreateItemResponse, error) {
 
 	err := s.repo.CreateItem(&CreateItemRequest{
+		Category: req.Category,
+		Class:    req.Class,
+		Type:     req.Type,
+		Name:     req.Name,
+		ImageURL: req.ImageURL,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return nil, nil
+}
+
+func (s *service) UpdateItemService(ctx context.Context, req *pb.UpdateItemRequest) (*pb.UpdateItemResponse, error) {
+	id, err := uuid.Parse(req.Id)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "無效的 ID 格式: %v", err)
+	}
+
+	_, err = s.repo.UpdateItemById(id, UpdateItemReq{
+		Id:       id,
 		Category: req.Category,
 		Class:    req.Class,
 		Type:     req.Type,

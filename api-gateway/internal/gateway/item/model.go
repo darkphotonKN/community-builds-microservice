@@ -7,6 +7,9 @@ import (
 	"github.com/google/uuid"
 )
 
+type GetItemsRequest struct {
+	Type string `json:"type"`
+}
 type CreateItemRequest struct {
 	Category string `json:"category" binding:"required" db:"category"`
 	Class    string `json:"class" binding:"required" db:"class"`
@@ -32,5 +35,6 @@ type CreateRareItemReq struct {
 
 type ItemClient interface {
 	CreateItem(ctx context.Context, req *pb.CreateItemRequest) (*pb.CreateItemResponse, error)
-	GetItems(ctx context.Context, req *pb.CreateItemRequest) (*pb.CreateItemResponse, error)
+	UpdateItem(ctx context.Context, req *pb.UpdateItemRequest) (*pb.UpdateItemResponse, error)
+	GetItems(ctx context.Context, req *pb.GetItemsRequest) (*pb.GetItemsResponse, error)
 }
