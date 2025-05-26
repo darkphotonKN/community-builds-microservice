@@ -6,7 +6,6 @@ import (
 
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/auth"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
