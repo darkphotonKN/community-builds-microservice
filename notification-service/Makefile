@@ -12,10 +12,10 @@ DB_STRING=postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?
 MIGRATE_COMMAND = migrate -path $(MIGRATIONS_PATH) -database "postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable"
 
 build:
-	go build -o bin/example-service cmd/example-service/main.go
+	go build -o bin/notification-service cmd/server/main.go
 
 run:
-	go run cmd/example-service/main.go
+	go run cmd/server/main.go
 
 dev: 
 	@air
@@ -63,12 +63,3 @@ migrate-create:
 	migrate create -ext sql -dir ./migrations -seq $(NAME)
 
 .PHONY: run test migrate-up migrate-down migrate-status migrate-down-to migrate-reset migrate-create
-
-
-
-
-
-
-
-
-
