@@ -47,6 +47,45 @@ func (h *ItemHandler) CreateItemHandler(c *gin.Context) {
 
 }
 
+func (h *ItemHandler) GetItemsHandler(c *gin.Context) {
+	slot := c.Query("slot")
+
+	// Convert REST request to gRPC request
+	grpcReq := &pb.GetItemsRequest{
+		Slot: slot,
+	}
+	item, err := h.Client.GetItems(c.Request.Context(), grpcReq)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to create item: %s", err.Error())})
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusCreated, "message": "Successfully created item.", "item": item})
+
+}
+
+func (h *ItemHandler) UpdateItemHandler(c *gin.Context) {
+	var createItemReq CreateItemRequest
+	if err := c.ShouldBindJSON(&createItemReq); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON: %s", err)})
+		return
+	}
+	// Convert REST request to gRPC request
+	grpcReq := &pb.UpdateItemRequest{
+		Name:     createItemReq.Name,
+		Category: createItemReq.Category,
+		Class:    createItemReq.Class,
+		Type:     createItemReq.Type,
+		ImageURL: createItemReq.ImageURL,
+	}
+	item, err := h.Client.UpdateItem(c.Request.Context(), grpcReq)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to create item: %s", err.Error())})
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusCreated, "message": "Successfully created item.", "item": item})
+
+}
+
 // // --- ADMIN HANDLERS ---
 // func (h *ItemHandler) CreateItemHandler(c *gin.Context) {
 // 	var createItemReq CreateItemRequest
