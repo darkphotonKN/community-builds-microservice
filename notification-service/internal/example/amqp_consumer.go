@@ -1,17 +1,26 @@
 package example
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 
 	commonconstants "github.com/darkphotonKN/community-builds-microservice/common/constants"
+	"github.com/google/uuid"
 	amqp "github.com/rabbitmq/amqp091-go"
+
+	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/example"
 )
 
 type consumer struct {
-	service   Service
+	service   ConsumerService
 	publishCh *amqp.Channel
+}
+
+type ConsumerService interface {
+	CreateExample(ctx context.Context, example *pb.CreateExampleRequest) (*pb.Example, error)
+	GetExample(ctx context.Context, id uuid.UUID) (*pb.Example, error)
 }
 
 func NewConsumer(service Service, ch *amqp.Channel) *consumer {

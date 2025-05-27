@@ -11,8 +11,9 @@ import (
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery/consul"
 	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
-	// "github.com/darkphotonKN/community-builds-microservice/notification-service/config"
+	"github.com/darkphotonKN/community-builds-microservice/notification-service/config"
 	"github.com/darkphotonKN/community-builds-microservice/notification-service/internal/example"
+	"github.com/darkphotonKN/community-builds-microservice/notification-service/internal/notification"
 	_ "github.com/joho/godotenv/autoload"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
@@ -34,9 +35,8 @@ var (
 func main() {
 	// --- database setup ---
 
-	// TODO: removed DB for now, can re-add back later if needed
-	// db := config.InitDB()
-	// defer db.Close()
+	db := config.InitDB()
+	defer db.Close()
 
 	// --- service discovery setup ---
 
@@ -88,15 +88,10 @@ func main() {
 		ch.Close()
 	}()
 
-	// TODO: removed DB for now, can re-add back later if needed
-	// repo := example.NewRepository(db)
-	service := example.NewService(nil, ch)
-	handler := example.NewHandler(service)
-	consumer := example.NewConsumer(service, ch)
-	// start goroutine and listen to events from message broker
+	repo := notification.NewRepository(db)
+	service := notification.NewService(repo, ch)
+	consumer := notification.NewConsumer(service, ch)
 	consumer.Listen()
-
-	pb.RegisterExampleServiceServer(grpcServer, handler)
 
 	log.Printf("grpc Notification Server started on PORT: %s\n", grpcAddr)
 
@@ -104,4 +99,3 @@ func main() {
 		log.Fatal("Can't connect to grpc server. Error:", err.Error())
 	}
 }
-
