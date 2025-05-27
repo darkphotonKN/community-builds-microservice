@@ -10,7 +10,6 @@ import (
 	authService "github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/auth"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/example"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/item"
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/item"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/rating"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/skill"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/tag"
@@ -119,7 +118,7 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	// Protected Routes
 	// itemRoutes.Use(auth.AuthMiddleware())
 
-	// itemRoutes.GET("", itemHandler.GetItemsHandler)
+	itemRoutes.GET("", itemHandler.GetItemsHandler)
 	itemRoutes.POST("", itemHandler.CreateItemHandler)
 	itemRoutes.PATCH("", itemHandler.UpdateItemHandler)
 	// itemRoutes.PATCH("/:id", itemHandler.UpdateItemsHandler)

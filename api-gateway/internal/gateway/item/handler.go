@@ -25,6 +25,8 @@ func NewHandler(client ItemClient) *ItemHandler {
 }
 
 func (h *ItemHandler) CreateItemHandler(c *gin.Context) {
+	userIdStr, _ := c.Get("userIdStr")
+
 	var createItemReq CreateItemRequest
 	if err := c.ShouldBindJSON(&createItemReq); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON: %s", err)})
@@ -32,6 +34,7 @@ func (h *ItemHandler) CreateItemHandler(c *gin.Context) {
 	}
 	// Convert REST request to gRPC request
 	grpcReq := &pb.CreateItemRequest{
+		Id:       userIdStr.(string),
 		Name:     createItemReq.Name,
 		Category: createItemReq.Category,
 		Class:    createItemReq.Class,
@@ -64,13 +67,15 @@ func (h *ItemHandler) GetItemsHandler(c *gin.Context) {
 }
 
 func (h *ItemHandler) UpdateItemHandler(c *gin.Context) {
-	var createItemReq CreateItemRequest
+	userIdStr, _ := c.Get("userIdStr")
+	var createItemReq UpdateItemReq
 	if err := c.ShouldBindJSON(&createItemReq); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON: %s", err)})
 		return
 	}
 	// Convert REST request to gRPC request
 	grpcReq := &pb.UpdateItemRequest{
+		Id:       userIdStr.(string),
 		Name:     createItemReq.Name,
 		Category: createItemReq.Category,
 		Class:    createItemReq.Class,

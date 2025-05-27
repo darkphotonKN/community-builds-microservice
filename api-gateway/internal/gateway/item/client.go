@@ -90,6 +90,7 @@ func (c *Client) GetItems(ctx context.Context, req *pb.GetItemsRequest) (*pb.Get
 
 	client := pb.NewItemServiceClient(conn)
 
+	fmt.Println("req.Slot:", req.Slot)
 	// create client to interface with through service discovery connection
 	items, err := client.GetItems(ctx, &pb.GetItemsRequest{
 		Slot: req.Slot,

@@ -3,8 +3,10 @@ package item
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/darkphotonKN/community-builds-microservice/items-service/internal/models"
+	"github.com/darkphotonKN/community-builds-microservice/items-service/internal/utils/errorutils"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
@@ -88,10 +90,52 @@ func (r *repository) UpdateItemById(id uuid.UUID, updateItemReq UpdateItemReq) (
 	return &item, nil
 }
 
-// func (r *repository) GenerateUniqueItems() error {
+func (r *repository) GetItems(slot string) (*[]models.Item, error) {
+	var items []models.Item
 
-// 	return nil
-// }
+	query := `
+	SELECT 
+		id,
+		image_url, 
+		name, 
+		category, 
+		type, 
+		slot, 
+		unique_item, 
+		class, 
+		stats,
+		required_level,
+		required_intelligence,
+		required_strength,
+		required_dexterity,
+		damage,
+		crit,
+		aps,
+		dps,
+		implicit,
+		armour,
+		evasion,
+		energy_shield,
+		ward,
+		COALESCE(description, '') AS description
+	FROM items
+	`
+	var err error
+	if slot != "" {
+		query = query + ` WHERE items.slot = $1`
+		formatSlot := strings.ToUpper(string(slot[0])) + slot[1:]
+		fmt.Println("formatSlot", formatSlot)
+		err = r.db.Select(&items, query, formatSlot)
+	} else {
+		err = r.db.Select(&items, query)
+	}
+
+	if err != nil {
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return &items, nil
+}
 
 // checking base items is exist
 func (r *repository) CheckBaseItemExist() bool {

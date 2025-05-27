@@ -53,19 +53,20 @@ message Item {
   optional string capacity = 31;
 
   optional string additional = 32;
-  optional string implicit = 33;
-  optional string stats = 34;
+  repeated string implicit = 33;
+  repeated string stats = 34;
 
 	optional string createdAt = 36; 
   optional string updatedAt = 37;
 }
 
 message CreateItemRequest {
-  string category = 1;
-  string class = 2;
-  string type = 3;
-  string name = 4;
-  string imageURL = 5;
+  string id = 1;
+  string category = 2;
+  string class = 3;
+  string type = 4;
+  string name = 5;
+  string imageURL = 6;
   // repeated Item items = 6;
 }
 
@@ -87,12 +88,12 @@ message GenerateUniqueItemsResponse {
 }
 
 message UpdateItemRequest {
-  string category = 1;
-  string class = 2;
-  string type = 3;
-  string name = 4;
-  string imageURL = 5;
-  string id = 6;
+  string id = 1;
+  string category = 2;
+  string class = 3;
+  string type = 4;
+  string name = 5;
+  string imageURL = 6;
 }
 
 message UpdateItemResponse {

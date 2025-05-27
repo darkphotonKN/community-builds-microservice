@@ -31,7 +31,7 @@ func NewHandler(service Service) *Handler {
 	return &Handler{service: service}
 }
 
-func (h *Handler) GetItemsHandler(ctx context.Context, req *pb.GetItemsRequest) (*pb.GetItemsResponse, error) {
+func (h *Handler) GetItems(ctx context.Context, req *pb.GetItemsRequest) (*pb.GetItemsResponse, error) {
 	fmt.Println("收到 gRPC 請求:", req)
 
 	result, err := h.service.GetItemsService(ctx, req)
@@ -41,7 +41,7 @@ func (h *Handler) GetItemsHandler(ctx context.Context, req *pb.GetItemsRequest) 
 	return &pb.GetItemsResponse{Message: "成功取得items", Items: result.Items}, nil
 }
 
-func (h *Handler) CreateItemHandler(ctx context.Context, req *pb.CreateItemRequest) (*pb.CreateItemResponse, error) {
+func (h *Handler) CreateItem(ctx context.Context, req *pb.CreateItemRequest) (*pb.CreateItemResponse, error) {
 	fmt.Println("收到 gRPC 請求:", req)
 
 	_, err := h.service.CreateItemService(ctx, req)
@@ -51,7 +51,7 @@ func (h *Handler) CreateItemHandler(ctx context.Context, req *pb.CreateItemReque
 	return &pb.CreateItemResponse{Message: fmt.Sprintf("成功創建item")}, nil
 }
 
-func (h *Handler) UpdateItemHandler(ctx context.Context, req *pb.UpdateItemRequest) (*pb.UpdateItemResponse, error) {
+func (h *Handler) UpdateItem(ctx context.Context, req *pb.UpdateItemRequest) (*pb.UpdateItemResponse, error) {
 	// item id to update
 
 	_, err := h.service.UpdateItemService(ctx, req)
@@ -62,12 +62,3 @@ func (h *Handler) UpdateItemHandler(ctx context.Context, req *pb.UpdateItemReque
 
 	return &pb.UpdateItemResponse{Message: fmt.Sprintf("成功創建item")}, nil
 }
-
-// func (s *Handler) GetUniqueItems(ctx context.Context, req *emptypb.Empty) (*pb.GenerateUniqueItemsResponse, error) {
-
-// 	_, err := s.service.GenerateUniqueItems(ctx)
-// 	if err != nil {
-// 		return nil, status.Errorf(codes.Internal, "創建 item 時發生錯誤: %v", err)
-// 	}
-// 	return &pb.GenerateUniqueItemsResponse{Message: fmt.Sprintf("成功抓取unique items")}, nil
-// }

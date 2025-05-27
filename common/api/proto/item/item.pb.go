@@ -54,16 +54,16 @@ type Item struct {
 	EDPS   *string `protobuf:"bytes,25,opt,name=EDPS,proto3,oneof" json:"EDPS,omitempty"`
 	DPS    *string `protobuf:"bytes,26,opt,name=DPS,proto3,oneof" json:"DPS,omitempty"`
 	// poison
-	Life          *string `protobuf:"bytes,27,opt,name=life,proto3,oneof" json:"life,omitempty"`
-	Mana          *string `protobuf:"bytes,28,opt,name=mana,proto3,oneof" json:"mana,omitempty"`
-	Duration      *string `protobuf:"bytes,29,opt,name=duration,proto3,oneof" json:"duration,omitempty"`
-	Usage         *string `protobuf:"bytes,30,opt,name=usage,proto3,oneof" json:"usage,omitempty"`
-	Capacity      *string `protobuf:"bytes,31,opt,name=capacity,proto3,oneof" json:"capacity,omitempty"`
-	Additional    *string `protobuf:"bytes,32,opt,name=additional,proto3,oneof" json:"additional,omitempty"`
-	Implicit      *string `protobuf:"bytes,33,opt,name=implicit,proto3,oneof" json:"implicit,omitempty"`
-	Stats         *string `protobuf:"bytes,34,opt,name=stats,proto3,oneof" json:"stats,omitempty"`
-	CreatedAt     *string `protobuf:"bytes,36,opt,name=createdAt,proto3,oneof" json:"createdAt,omitempty"`
-	UpdatedAt     *string `protobuf:"bytes,37,opt,name=updatedAt,proto3,oneof" json:"updatedAt,omitempty"`
+	Life          *string  `protobuf:"bytes,27,opt,name=life,proto3,oneof" json:"life,omitempty"`
+	Mana          *string  `protobuf:"bytes,28,opt,name=mana,proto3,oneof" json:"mana,omitempty"`
+	Duration      *string  `protobuf:"bytes,29,opt,name=duration,proto3,oneof" json:"duration,omitempty"`
+	Usage         *string  `protobuf:"bytes,30,opt,name=usage,proto3,oneof" json:"usage,omitempty"`
+	Capacity      *string  `protobuf:"bytes,31,opt,name=capacity,proto3,oneof" json:"capacity,omitempty"`
+	Additional    *string  `protobuf:"bytes,32,opt,name=additional,proto3,oneof" json:"additional,omitempty"`
+	Implicit      []string `protobuf:"bytes,33,rep,name=implicit,proto3" json:"implicit,omitempty"`
+	Stats         []string `protobuf:"bytes,34,rep,name=stats,proto3" json:"stats,omitempty"`
+	CreatedAt     *string  `protobuf:"bytes,36,opt,name=createdAt,proto3,oneof" json:"createdAt,omitempty"`
+	UpdatedAt     *string  `protobuf:"bytes,37,opt,name=updatedAt,proto3,oneof" json:"updatedAt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -322,18 +322,18 @@ func (x *Item) GetAdditional() string {
 	return ""
 }
 
-func (x *Item) GetImplicit() string {
-	if x != nil && x.Implicit != nil {
-		return *x.Implicit
+func (x *Item) GetImplicit() []string {
+	if x != nil {
+		return x.Implicit
 	}
-	return ""
+	return nil
 }
 
-func (x *Item) GetStats() string {
-	if x != nil && x.Stats != nil {
-		return *x.Stats
+func (x *Item) GetStats() []string {
+	if x != nil {
+		return x.Stats
 	}
-	return ""
+	return nil
 }
 
 func (x *Item) GetCreatedAt() string {
@@ -352,11 +352,12 @@ func (x *Item) GetUpdatedAt() string {
 
 type CreateItemRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Category      string                 `protobuf:"bytes,1,opt,name=category,proto3" json:"category,omitempty"`
-	Class         string                 `protobuf:"bytes,2,opt,name=class,proto3" json:"class,omitempty"`
-	Type          string                 `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
-	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	ImageURL      string                 `protobuf:"bytes,5,opt,name=imageURL,proto3" json:"imageURL,omitempty"` // repeated Item items = 6;
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Category      string                 `protobuf:"bytes,2,opt,name=category,proto3" json:"category,omitempty"`
+	Class         string                 `protobuf:"bytes,3,opt,name=class,proto3" json:"class,omitempty"`
+	Type          string                 `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`
+	Name          string                 `protobuf:"bytes,5,opt,name=name,proto3" json:"name,omitempty"`
+	ImageURL      string                 `protobuf:"bytes,6,opt,name=imageURL,proto3" json:"imageURL,omitempty"` // repeated Item items = 6;
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -389,6 +390,13 @@ func (x *CreateItemRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use CreateItemRequest.ProtoReflect.Descriptor instead.
 func (*CreateItemRequest) Descriptor() ([]byte, []int) {
 	return file_api_proto_item_item_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *CreateItemRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
 }
 
 func (x *CreateItemRequest) GetCategory() string {
@@ -612,12 +620,12 @@ func (x *GenerateUniqueItemsResponse) GetMessage() string {
 
 type UpdateItemRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Category      string                 `protobuf:"bytes,1,opt,name=category,proto3" json:"category,omitempty"`
-	Class         string                 `protobuf:"bytes,2,opt,name=class,proto3" json:"class,omitempty"`
-	Type          string                 `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
-	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	ImageURL      string                 `protobuf:"bytes,5,opt,name=imageURL,proto3" json:"imageURL,omitempty"`
-	Id            string                 `protobuf:"bytes,6,opt,name=id,proto3" json:"id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Category      string                 `protobuf:"bytes,2,opt,name=category,proto3" json:"category,omitempty"`
+	Class         string                 `protobuf:"bytes,3,opt,name=class,proto3" json:"class,omitempty"`
+	Type          string                 `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`
+	Name          string                 `protobuf:"bytes,5,opt,name=name,proto3" json:"name,omitempty"`
+	ImageURL      string                 `protobuf:"bytes,6,opt,name=imageURL,proto3" json:"imageURL,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -652,6 +660,13 @@ func (*UpdateItemRequest) Descriptor() ([]byte, []int) {
 	return file_api_proto_item_item_proto_rawDescGZIP(), []int{6}
 }
 
+func (x *UpdateItemRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
 func (x *UpdateItemRequest) GetCategory() string {
 	if x != nil {
 		return x.Category
@@ -683,13 +698,6 @@ func (x *UpdateItemRequest) GetName() string {
 func (x *UpdateItemRequest) GetImageURL() string {
 	if x != nil {
 		return x.ImageURL
-	}
-	return ""
-}
-
-func (x *UpdateItemRequest) GetId() string {
-	if x != nil {
-		return x.Id
 	}
 	return ""
 }
@@ -742,7 +750,8 @@ var File_api_proto_item_item_proto protoreflect.FileDescriptor
 
 const file_api_proto_item_item_proto_rawDesc = "" +
 	"\n" +
-	"\x19api/proto/item/item.proto\x12\bitemgrpc\x1a\x1bgoogle/protobuf/empty.proto\"\x96\v\n" +
+	"\x19api/proto/item/item.proto\x12\bitemgrpc\x1a\x1bgoogle/protobuf/empty.proto\"\xf5\n" +
+	"\n" +
 	"\x04Item\x12\x13\n" +
 	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x88\x01\x01\x12\x1a\n" +
 	"\bmemberId\x18\x02 \x01(\tR\bmemberId\x12\x1e\n" +
@@ -783,11 +792,11 @@ const file_api_proto_item_item_proto_rawDesc = "" +
 	"\bcapacity\x18\x1f \x01(\tH\x14R\bcapacity\x88\x01\x01\x12#\n" +
 	"\n" +
 	"additional\x18  \x01(\tH\x15R\n" +
-	"additional\x88\x01\x01\x12\x1f\n" +
-	"\bimplicit\x18! \x01(\tH\x16R\bimplicit\x88\x01\x01\x12\x19\n" +
-	"\x05stats\x18\" \x01(\tH\x17R\x05stats\x88\x01\x01\x12!\n" +
-	"\tcreatedAt\x18$ \x01(\tH\x18R\tcreatedAt\x88\x01\x01\x12!\n" +
-	"\tupdatedAt\x18% \x01(\tH\x19R\tupdatedAt\x88\x01\x01B\x05\n" +
+	"additional\x88\x01\x01\x12\x1a\n" +
+	"\bimplicit\x18! \x03(\tR\bimplicit\x12\x14\n" +
+	"\x05stats\x18\" \x03(\tR\x05stats\x12!\n" +
+	"\tcreatedAt\x18$ \x01(\tH\x16R\tcreatedAt\x88\x01\x01\x12!\n" +
+	"\tupdatedAt\x18% \x01(\tH\x17R\tupdatedAt\x88\x01\x01B\x05\n" +
 	"\x03_idB\x10\n" +
 	"\x0e_requiredLevelB\x13\n" +
 	"\x11_requiredStrengthB\x14\n" +
@@ -810,19 +819,18 @@ const file_api_proto_item_item_proto_rawDesc = "" +
 	"\t_durationB\b\n" +
 	"\x06_usageB\v\n" +
 	"\t_capacityB\r\n" +
-	"\v_additionalB\v\n" +
-	"\t_implicitB\b\n" +
-	"\x06_statsB\f\n" +
+	"\v_additionalB\f\n" +
 	"\n" +
 	"_createdAtB\f\n" +
 	"\n" +
-	"_updatedAt\"\x89\x01\n" +
-	"\x11CreateItemRequest\x12\x1a\n" +
-	"\bcategory\x18\x01 \x01(\tR\bcategory\x12\x14\n" +
-	"\x05class\x18\x02 \x01(\tR\x05class\x12\x12\n" +
-	"\x04type\x18\x03 \x01(\tR\x04type\x12\x12\n" +
-	"\x04name\x18\x04 \x01(\tR\x04name\x12\x1a\n" +
-	"\bimageURL\x18\x05 \x01(\tR\bimageURL\".\n" +
+	"_updatedAt\"\x99\x01\n" +
+	"\x11CreateItemRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\bcategory\x18\x02 \x01(\tR\bcategory\x12\x14\n" +
+	"\x05class\x18\x03 \x01(\tR\x05class\x12\x12\n" +
+	"\x04type\x18\x04 \x01(\tR\x04type\x12\x12\n" +
+	"\x04name\x18\x05 \x01(\tR\x04name\x12\x1a\n" +
+	"\bimageURL\x18\x06 \x01(\tR\bimageURL\".\n" +
 	"\x12CreateItemResponse\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage\"%\n" +
 	"\x0fGetItemsRequest\x12\x12\n" +
@@ -832,13 +840,13 @@ const file_api_proto_item_item_proto_rawDesc = "" +
 	"\x05items\x18\x02 \x03(\v2\x0e.itemgrpc.ItemR\x05items\"7\n" +
 	"\x1bGenerateUniqueItemsResponse\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage\"\x99\x01\n" +
-	"\x11UpdateItemRequest\x12\x1a\n" +
-	"\bcategory\x18\x01 \x01(\tR\bcategory\x12\x14\n" +
-	"\x05class\x18\x02 \x01(\tR\x05class\x12\x12\n" +
-	"\x04type\x18\x03 \x01(\tR\x04type\x12\x12\n" +
-	"\x04name\x18\x04 \x01(\tR\x04name\x12\x1a\n" +
-	"\bimageURL\x18\x05 \x01(\tR\bimageURL\x12\x0e\n" +
-	"\x02id\x18\x06 \x01(\tR\x02id\".\n" +
+	"\x11UpdateItemRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\bcategory\x18\x02 \x01(\tR\bcategory\x12\x14\n" +
+	"\x05class\x18\x03 \x01(\tR\x05class\x12\x12\n" +
+	"\x04type\x18\x04 \x01(\tR\x04type\x12\x12\n" +
+	"\x04name\x18\x05 \x01(\tR\x04name\x12\x1a\n" +
+	"\bimageURL\x18\x06 \x01(\tR\bimageURL\".\n" +
 	"\x12UpdateItemResponse\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage2\xc0\x02\n" +
 	"\vItemService\x12I\n" +
