@@ -15,7 +15,7 @@ type consumer struct {
 }
 
 type Service interface {
-	Create(notification *NotificationCreate) (*Notification, error)
+	Create(notification *MemberCreatedNotification) (*Notification, error)
 }
 
 func NewConsumer(service Service, ch *amqp.Channel) *consumer {
@@ -59,9 +59,13 @@ func (c *consumer) memberSignedUpEventListener() {
 
 		err := json.Unmarshal(msg.Body, &memberSignedUp)
 		if err != nil {
-			fmt.Printf("Error when unmarshalling exampl event created body: %s\n", err.Error())
+			fmt.Printf("Error when unmarshalling member.signedup event body: %s\n", err.Error())
 		}
 
 		fmt.Printf("\nsuccessfully received event message: %+v\n\n", memberSignedUp)
+		// create event
+		c.service.Create(&MemberCreatedNotification{
+			MemberID: memberSignedUp.UserID,
+		})
 	}
 }
