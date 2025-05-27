@@ -16,7 +16,7 @@ func NewRepository(db *sqlx.DB) Repository {
 	return &repository{db: db}
 }
 
-func (r *repository) Create(notification *NotificationCreate) (*Notification, error) {
+func (r *repository) Create(notification *CreateNotification) (*Notification, error) {
 	now := time.Now()
 	notificationModel := &Notification{
 		ID:        uuid.New(),

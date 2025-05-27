@@ -6,13 +6,11 @@ import (
 	"net"
 	"time"
 
-	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/example"
 	"github.com/darkphotonKN/community-builds-microservice/common/broker"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery/consul"
 	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
 	"github.com/darkphotonKN/community-builds-microservice/notification-service/config"
-	"github.com/darkphotonKN/community-builds-microservice/notification-service/internal/example"
 	"github.com/darkphotonKN/community-builds-microservice/notification-service/internal/notification"
 	_ "github.com/joho/godotenv/autoload"
 	_ "github.com/lib/pq"

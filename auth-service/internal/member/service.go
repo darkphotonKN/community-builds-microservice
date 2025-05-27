@@ -80,6 +80,20 @@ func (s *service) CreateMember(ctx context.Context, req *pb.CreateMemberRequest)
 		return nil, err
 	}
 
+	// publish to message broker
+	err = s.publishCh.PublishWithContext(
+		ctx,
+		commonconstants.ExampleCreatedEvent,
+		"",
+		false,
+		false,
+		amqp.Publishing{
+			ContentType: "application/json",
+			Body:        marshalledExample,
+			// persist message
+			DeliveryMode: amqp.Persistent,
+		})
+
 	// Get the created member
 	member, err := s.Repo.GetById(memberId)
 	if err != nil {

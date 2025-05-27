@@ -18,7 +18,15 @@ type Notification struct {
 	CreatedAt time.Time  `json:"created_at" db:"created_at"`
 }
 
-type NotificationCreate struct {
+type MemberCreatedNotification struct {
+	MemberID string     `json:"member_id" db:"member_id"`
+	Type     string     `json:"type" db:"type"`
+	Title    string     `json:"title" db:"title"`
+	Message  string     `json:"message" db:"message"`
+	SourceID *uuid.UUID `json:"source_id" db:"source_id"`
+}
+
+type CreateNotification struct {
 	MemberID uuid.UUID  `json:"member_id" db:"member_id"`
 	Type     string     `json:"type" db:"type"`
 	Title    string     `json:"title" db:"title"`
