@@ -29,6 +29,7 @@ func InitDB() *sqlx.DB {
 		os.Getenv("DB_PORT"),
 		os.Getenv("DB_NAME"),
 	)
+	fmt.Println("constructed DSN:", dsn)
 
 	// pass the db connection string to connect to our database
 	db, err := sqlx.Connect("postgres", dsn)
