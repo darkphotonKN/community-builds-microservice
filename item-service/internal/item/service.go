@@ -12,8 +12,8 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/chromedp/chromedp"
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/item"
-	"github.com/darkphotonKN/community-builds-microservice/items-service/internal/models"
-	"github.com/darkphotonKN/community-builds-microservice/items-service/internal/utils/dbutils"
+	"github.com/darkphotonKN/community-builds-microservice/item-service/internal/models"
+	"github.com/darkphotonKN/community-builds-microservice/item-service/internal/utils/dbutils"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"golang.org/x/text/cases"
@@ -26,15 +26,11 @@ type service struct {
 	repo Repository
 }
 
-// type Service struct {
-// 	pb.UnimplementedItemServiceServer
-// 	Repository *ItemRepository
-// 	// MqService *mq.MQService
-// }
-
 type Repository interface {
 	GetItems(slot string) (*[]models.Item, error)
 	CreateItem(createItem *CreateItemRequest) error
+	CreateRareItem(createRareItem *CreateRareItemReq) error
+	CreateRareItemToList(createRareItemReq *CreateRareItemReq) error
 	CheckBaseItemExist() bool
 	CheckUniqueItemExist() bool
 	CheckItemModExist() bool
@@ -44,20 +40,6 @@ type Repository interface {
 	UpdateItemById(id uuid.UUID, updateItemReq UpdateItemReq) (*models.Item, error)
 }
 
-// mq version
-//
-//	func NewItemService(mqService *mq.MQService) *FileService {
-//		log.Printf("mqService 是否為 nil: %v", mqService == nil)
-//		return &ItemService{
-//			MqService: mqService,
-//		}
-//	}
-// func NewItemService(repository *ItemRepository) *Service {
-// 	return &Service{
-// 		Repository: repository,
-// 	}
-// }
-
 func toPtr[T any](v T) *T {
 	return &v
 }
@@ -66,7 +48,7 @@ func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
 func (s *service) GetItemsService(ctx context.Context, req *pb.GetItemsRequest) (*pb.GetItemsResponse, error) {
-	// todo: handler
+
 	items, err := s.repo.GetItems(req.Slot)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "取得 items 時發生錯誤: %v", err)
@@ -130,9 +112,9 @@ func (s *service) CreateItemService(ctx context.Context, req *pb.CreateItemReque
 		ImageURL: req.ImageURL,
 	})
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.Internal, "創建 item 時發生錯誤: %v", err)
 	}
-	return nil, nil
+	return &pb.CreateItemResponse{Message: fmt.Sprintf("成功創建item")}, nil
 }
 
 func (s *service) UpdateItemService(ctx context.Context, req *pb.UpdateItemRequest) (*pb.UpdateItemResponse, error) {
@@ -150,12 +132,48 @@ func (s *service) UpdateItemService(ctx context.Context, req *pb.UpdateItemReque
 		ImageURL: req.ImageURL,
 	})
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.Internal, "更新 item 時發生錯誤: %v", err)
 	}
 
-	return nil, nil
+	return &pb.UpdateItemResponse{Message: fmt.Sprintf("成功更新item")}, nil
 }
 
+func (s *service) CreateRareItemService(ctx context.Context, req *pb.CreateRareItemRequest) (*pb.CreateRareItemResponse, error) {
+	memberId, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "無效的 ID 格式: %v", err)
+	}
+
+	if req.BaseItemId == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "BaseItemId 不能為空")
+	}
+
+	baseItemId, err := uuid.Parse(req.BaseItemId)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "無效的 BaseItemId 格式: %v", err)
+	}
+
+	item := CreateRareItemReq{
+		MemberId:   memberId,
+		BaseItemId: baseItemId,
+		Name:       req.Name,
+		Stats:      req.Stats,
+	}
+
+	// create rare item to member list for customize or normal list
+	if req.ToList {
+		err = s.repo.CreateRareItemToList(&item)
+
+	} else {
+		err = s.repo.CreateRareItem(&item)
+	}
+
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "創建稀有物品時發生錯誤: %v", err)
+	}
+
+	return &pb.CreateRareItemResponse{Message: "成功創建稀有物品"}, nil
+}
 func (s *service) InitCrawling(db *sqlx.DB) error {
 
 	s.CrawlingAndAddUniqueItemsService(db)

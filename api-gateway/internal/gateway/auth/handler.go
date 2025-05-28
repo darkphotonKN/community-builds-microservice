@@ -153,7 +153,7 @@ func (h *Handler) LoginMemberHandler(c *gin.Context) {
 
 func (h *Handler) GetMemberByIdHandler(c *gin.Context) {
 	userIdStr, _ := c.Get("userIdStr")
-
+	fmt.Println("userIdStr:", userIdStr)
 	// convert to string to match protobuf type
 
 	// Create the request

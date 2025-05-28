@@ -6,6 +6,8 @@ import (
 
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/item"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	// pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/item"
 )
 
@@ -99,4 +101,37 @@ func (c *Client) GetItems(ctx context.Context, req *pb.GetItemsRequest) (*pb.Get
 	fmt.Printf("Get items %+v through gateway after service discovery\n", items)
 
 	return items, nil
+}
+
+func (c *Client) CreateRareItem(ctx context.Context, req *pb.CreateRareItemRequest) (*pb.CreateRareItemResponse, error) {
+
+	// connection instance created through service discovery first
+	// searches for the service registered as "orders"
+	conn, err := discovery.ServiceConnection(ctx, serviceName, c.registry)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to item service: %w", err)
+	}
+	defer conn.Close()
+
+	client := pb.NewItemServiceClient(conn)
+
+	// create client to interface with through service discovery connection
+	res, err := client.CreateRareItem(ctx, req)
+
+	if err != nil {
+		st, _ := status.FromError(err)
+		switch st.Code() {
+		case codes.InvalidArgument:
+			return nil, fmt.Errorf("invalid input: %w", err)
+		case codes.NotFound:
+			return nil, fmt.Errorf("item not found: %w", err)
+		default:
+			return nil, fmt.Errorf("grpc error: %w", err)
+		}
+	}
+
+	fmt.Printf("Get items %+v through gateway after service discovery\n", res)
+
+	return res, nil
 }

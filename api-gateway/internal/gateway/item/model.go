@@ -37,4 +37,5 @@ type ItemClient interface {
 	CreateItem(ctx context.Context, req *pb.CreateItemRequest) (*pb.CreateItemResponse, error)
 	UpdateItem(ctx context.Context, req *pb.UpdateItemRequest) (*pb.UpdateItemResponse, error)
 	GetItems(ctx context.Context, req *pb.GetItemsRequest) (*pb.GetItemsResponse, error)
+	CreateRareItem(ctx context.Context, req *pb.CreateRareItemRequest) (*pb.CreateRareItemResponse, error)
 }

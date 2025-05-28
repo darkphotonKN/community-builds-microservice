@@ -107,7 +107,6 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 
 	itemClient := item.NewClient(registry)
 	itemHandler := item.NewHandler(itemClient)
-	fmt.Println("Item handler", itemHandler)
 	// itemRepo := item.NewItemRepository(DB)
 	// itemService := item.NewItemService(itemRepo, skillService)
 	// itemHandler := item.NewItemHandler(itemService)
@@ -116,11 +115,11 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	itemRoutes := api.Group("/item")
 
 	// Protected Routes
-	// itemRoutes.Use(auth.AuthMiddleware())
-
+	itemRoutes.Use(auth.AuthMiddleware())
 	itemRoutes.GET("", itemHandler.GetItemsHandler)
 	itemRoutes.POST("", itemHandler.CreateItemHandler)
 	itemRoutes.PATCH("", itemHandler.UpdateItemHandler)
+	itemRoutes.POST("/rare-item", itemHandler.CreateRareItemHandler)
 	// itemRoutes.PATCH("/:id", itemHandler.UpdateItemsHandler)
 	// itemRoutes.POST("/rare-item", itemHandler.CreateRareItemHandler)
 

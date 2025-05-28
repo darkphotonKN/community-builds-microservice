@@ -11,6 +11,7 @@ service ItemService {
   rpc GetItems(GetItemsRequest) returns (GetItemsResponse) {}
   rpc GenerateUniqueItems(google.protobuf.Empty) returns (GenerateUniqueItemsResponse) {}
   rpc UpdateItem(UpdateItemRequest) returns (UpdateItemResponse) {}
+  rpc CreateRareItem(CreateRareItemRequest) returns (CreateRareItemResponse) {}
 }
 
 message Item {
@@ -97,5 +98,19 @@ message UpdateItemRequest {
 }
 
 message UpdateItemResponse {
+  string message = 1;
+}
+
+message CreateRareItemRequest {
+  string userId = 1;
+  string baseItemId = 2;
+  string name = 3;
+  string class = 4;
+  repeated string stats = 5;
+  bool toList = 6; // whether to add the item to the user's item list
+}
+
+
+message CreateRareItemResponse {
   string message = 1;
 }

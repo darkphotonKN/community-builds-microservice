@@ -21,7 +21,7 @@ import (
 var (
 	// grpc
 	serviceName = "auth"
-	grpcAddr    = commonhelpers.GetEnvString("GRPC_EXAMPLE_ADDR", "7010")
+	grpcAddr    = commonhelpers.GetEnvString("GRPC_AUTH_SERVICE_ADDR", "7003")
 	consulAddr  = commonhelpers.GetEnvString("CONSUL_ADDR", "localhost:8510")
 
 	// rabbit mq

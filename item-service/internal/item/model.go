@@ -20,8 +20,8 @@ type UpdateItemReq struct {
 }
 
 type CreateRareItemReq struct {
+	MemberId   uuid.UUID `json:"memberId" db:"member_id"`
 	BaseItemId uuid.UUID `json:"baseItemId" db:"base_item_id"`
-	ToList     bool      `json:"toList"`
 	Name       string    `json:"name" db:"name"`
 	Stats      []string  `json:"stats" db:"stats"`
 }

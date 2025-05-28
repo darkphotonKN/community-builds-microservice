@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/darkphotonKN/community-builds-microservice/items-service/internal/models"
-	"github.com/darkphotonKN/community-builds-microservice/items-service/internal/utils/errorutils"
+	"github.com/darkphotonKN/community-builds-microservice/item-service/internal/models"
+	"github.com/darkphotonKN/community-builds-microservice/item-service/internal/utils/errorutils"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
@@ -135,6 +135,231 @@ func (r *repository) GetItems(slot string) (*[]models.Item, error) {
 	}
 
 	return &items, nil
+}
+
+func (r *repository) GetBaseItemById(id uuid.UUID) (*models.BaseItem, error) {
+	fmt.Println("base id", id)
+	var baseItem models.BaseItem
+	query := `
+    SELECT *
+    FROM base_items 
+    WHERE id = $1
+    `
+	// var rawImplicits []byte
+	err := r.db.Get(&baseItem, query, id)
+
+	if err != nil {
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	// if err := json.Unmarshal(rawImplicits, &baseItem.Implicit); err != nil {
+	// 	return nil, fmt.Errorf("failed to unmarshal implicit: %w", err)
+	// }
+	return &baseItem, nil
+}
+
+func (r *repository) CreateRareItem(createRareItem *CreateRareItemReq) error {
+	baseItem, err := r.GetBaseItemById(createRareItem.BaseItemId)
+
+	if err != nil {
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	query := `
+		INSERT INTO items(
+		base_item_id,
+		image_url, 
+		name, 
+		category, 
+		type, 
+		slot, 
+		unique_item, 
+		class, 
+		stats,
+		required_level,
+		required_intelligence,
+		required_strength,
+		required_dexterity,
+		damage,
+		crit,
+		aps,
+		dps,
+		implicit,
+		armour,
+		evasion,
+		energy_shield,
+		ward
+		)
+		VALUES(
+		:base_item_id,
+		:image_url, 
+		:name, 
+		:category, 
+		:type, 
+		:slot, 
+		:unique_item, 
+		:class, 
+		:stats,
+		:required_level,
+		:required_intelligence,
+		:required_strength,
+		:required_dexterity,
+		:damage,
+		:crit,
+		:aps,
+		:dps,
+		:implicit,
+		:armour,
+		:evasion,
+		:energy_shield,
+		:ward
+		)
+		RETURNING id;
+	`
+
+	payload := map[string]interface{}{
+		"base_item_id":          createRareItem.BaseItemId,
+		"image_url":             baseItem.ImageUrl,
+		"name":                  baseItem.Name,
+		"category":              baseItem.Category,
+		"type":                  baseItem.Type,
+		"slot":                  baseItem.Slot,
+		"unique_item":           false,
+		"class":                 baseItem.Class,
+		"stats":                 pq.StringArray(createRareItem.Stats),
+		"required_level":        baseItem.RequiredLevel,
+		"required_intelligence": baseItem.RequiredIntelligence,
+		"required_strength":     baseItem.RequiredStrength,
+		"required_dexterity":    baseItem.RequiredDexterity,
+		"damage":                baseItem.Damage,
+		"crit":                  baseItem.Crit,
+		"aps":                   baseItem.APS,
+		"dps":                   baseItem.DPS,
+		"implicit":              pq.StringArray(baseItem.Implicit),
+		"armour":                baseItem.Armour,
+		"evasion":               baseItem.Evasion,
+		"energy_shield":         baseItem.EnergyShield,
+		"ward":                  baseItem.Ward,
+	}
+	rows, createErr := r.db.NamedQuery(query, payload)
+	var lastInsertID uuid.UUID
+
+	if rows.Next() {
+		err := rows.Scan(&lastInsertID)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	if createErr != nil {
+		return errorutils.AnalyzeDBErr(createErr)
+	}
+
+	return nil
+}
+
+func (r *repository) CreateRareItemToList(createRareItemReq *CreateRareItemReq) error {
+	baseItem, err := r.GetBaseItemById(createRareItemReq.BaseItemId)
+
+	if err != nil {
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	query := `
+		INSERT INTO items(
+		member_id, 
+		base_item_id,
+		image_url, 
+		name, 
+		category, 
+		type, 
+		slot, 
+		unique_item, 
+		class, 
+		stats,
+		required_level,
+		required_intelligence,
+		required_strength,
+		required_dexterity,
+		damage,
+		crit,
+		aps,
+		dps,
+		implicit,
+		armour,
+		evasion,
+		energy_shield,
+		ward
+		)
+		VALUES(
+		:member_id, 
+		:base_item_id,
+		:image_url, 
+		:name, 
+		:category, 
+		:type, 
+		:slot, 
+		:unique_item, 
+		:class, 
+		:stats,
+		:required_level,
+		:required_intelligence,
+		:required_strength,
+		:required_dexterity,
+		:damage,
+		:crit,
+		:aps,
+		:dps,
+		:implicit,
+		:armour,
+		:evasion,
+		:energy_shield,
+		:ward
+		)
+		RETURNING id;
+	`
+	payload := map[string]interface{}{
+		"member_id":             createRareItemReq.MemberId,
+		"base_item_id":          createRareItemReq.BaseItemId,
+		"image_url":             baseItem.ImageUrl,
+		"name":                  baseItem.Name,
+		"category":              baseItem.Category,
+		"type":                  baseItem.Type,
+		"slot":                  baseItem.Slot,
+		"unique_item":           false,
+		"class":                 baseItem.Class,
+		"stats":                 pq.StringArray(createRareItemReq.Stats),
+		"required_level":        baseItem.RequiredLevel,
+		"required_intelligence": baseItem.RequiredIntelligence,
+		"required_strength":     baseItem.RequiredStrength,
+		"required_dexterity":    baseItem.RequiredDexterity,
+		"damage":                baseItem.Damage,
+		"crit":                  baseItem.Crit,
+		"aps":                   baseItem.APS,
+		"dps":                   baseItem.DPS,
+		"implicit":              pq.StringArray(baseItem.Implicit),
+		"armour":                baseItem.Armour,
+		"evasion":               baseItem.Evasion,
+		"energy_shield":         baseItem.EnergyShield,
+		"ward":                  baseItem.Ward,
+	}
+	rows, createErr := r.db.NamedQuery(query, payload)
+	var lastInsertID uuid.UUID
+
+	if rows.Next() {
+		err := rows.Scan(&lastInsertID)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	if createErr != nil {
+		return errorutils.AnalyzeDBErr(createErr)
+	}
+
+	return nil
 }
 
 // checking base items is exist

@@ -1,11 +1,7 @@
 package item
 
 import (
-	"fmt"
-
 	"golang.org/x/net/context"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	// "google.golang.org/protobuf/types/known/emptypb"
 
@@ -23,8 +19,7 @@ type Service interface {
 	GetItemsService(ctx context.Context, req *pb.GetItemsRequest) (*pb.GetItemsResponse, error)
 	CreateItemService(ctx context.Context, req *pb.CreateItemRequest) (*pb.CreateItemResponse, error)
 	UpdateItemService(ctx context.Context, req *pb.UpdateItemRequest) (*pb.UpdateItemResponse, error)
-	// GenerateUniqueItems(ctx context.Context) (*pb.GenerateUniqueItemsResponse, error)
-	// GetItems(ctx context.Context, id uuid.UUID) (*pb.CreateItemResponse, error)
+	CreateRareItemService(ctx context.Context, req *pb.CreateRareItemRequest) (*pb.CreateRareItemResponse, error)
 }
 
 func NewHandler(service Service) *Handler {
@@ -32,33 +27,17 @@ func NewHandler(service Service) *Handler {
 }
 
 func (h *Handler) GetItems(ctx context.Context, req *pb.GetItemsRequest) (*pb.GetItemsResponse, error) {
-	fmt.Println("收到 gRPC 請求:", req)
-
-	result, err := h.service.GetItemsService(ctx, req)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "創建 item 時發生錯誤: %v", err)
-	}
-	return &pb.GetItemsResponse{Message: "成功取得items", Items: result.Items}, nil
+	return h.service.GetItemsService(ctx, req)
 }
 
 func (h *Handler) CreateItem(ctx context.Context, req *pb.CreateItemRequest) (*pb.CreateItemResponse, error) {
-	fmt.Println("收到 gRPC 請求:", req)
-
-	_, err := h.service.CreateItemService(ctx, req)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "創建 item 時發生錯誤: %v", err)
-	}
-	return &pb.CreateItemResponse{Message: fmt.Sprintf("成功創建item")}, nil
+	return h.service.CreateItemService(ctx, req)
 }
 
 func (h *Handler) UpdateItem(ctx context.Context, req *pb.UpdateItemRequest) (*pb.UpdateItemResponse, error) {
-	// item id to update
+	return h.service.UpdateItemService(ctx, req)
+}
 
-	_, err := h.service.UpdateItemService(ctx, req)
-
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "更新 item 時發生錯誤: %v", err)
-	}
-
-	return &pb.UpdateItemResponse{Message: fmt.Sprintf("成功創建item")}, nil
+func (h *Handler) CreateRareItem(ctx context.Context, req *pb.CreateRareItemRequest) (*pb.CreateRareItemResponse, error) {
+	return h.service.CreateRareItemService(ctx, req)
 }

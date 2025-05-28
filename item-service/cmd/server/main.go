@@ -11,7 +11,7 @@ import (
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery/consul"
 	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
 	"github.com/darkphotonKN/community-builds-microservice/example-service/config"
-	"github.com/darkphotonKN/community-builds-microservice/items-service/internal/item"
+	"github.com/darkphotonKN/community-builds-microservice/item-service/internal/item"
 	_ "github.com/joho/godotenv/autoload"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
@@ -114,7 +114,7 @@ func main() {
 // 	"fmt"
 
 // 	"github.com/darkphotonKN/community-builds-microservice/items-service/config"
-// 	"github.com/darkphotonKN/community-builds-microservice/items-service/internal/item"
+// 	"github.com/darkphotonKN/community-builds-microservice/item-service/internal/item"
 
 // 	// "log"
 // 	"net/http"

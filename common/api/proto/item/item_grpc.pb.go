@@ -24,6 +24,7 @@ const (
 	ItemService_GetItems_FullMethodName            = "/itemgrpc.ItemService/GetItems"
 	ItemService_GenerateUniqueItems_FullMethodName = "/itemgrpc.ItemService/GenerateUniqueItems"
 	ItemService_UpdateItem_FullMethodName          = "/itemgrpc.ItemService/UpdateItem"
+	ItemService_CreateRareItem_FullMethodName      = "/itemgrpc.ItemService/CreateRareItem"
 )
 
 // ItemServiceClient is the client API for ItemService service.
@@ -34,6 +35,7 @@ type ItemServiceClient interface {
 	GetItems(ctx context.Context, in *GetItemsRequest, opts ...grpc.CallOption) (*GetItemsResponse, error)
 	GenerateUniqueItems(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GenerateUniqueItemsResponse, error)
 	UpdateItem(ctx context.Context, in *UpdateItemRequest, opts ...grpc.CallOption) (*UpdateItemResponse, error)
+	CreateRareItem(ctx context.Context, in *CreateRareItemRequest, opts ...grpc.CallOption) (*CreateRareItemResponse, error)
 }
 
 type itemServiceClient struct {
@@ -84,6 +86,16 @@ func (c *itemServiceClient) UpdateItem(ctx context.Context, in *UpdateItemReques
 	return out, nil
 }
 
+func (c *itemServiceClient) CreateRareItem(ctx context.Context, in *CreateRareItemRequest, opts ...grpc.CallOption) (*CreateRareItemResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateRareItemResponse)
+	err := c.cc.Invoke(ctx, ItemService_CreateRareItem_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ItemServiceServer is the server API for ItemService service.
 // All implementations must embed UnimplementedItemServiceServer
 // for forward compatibility.
@@ -92,6 +104,7 @@ type ItemServiceServer interface {
 	GetItems(context.Context, *GetItemsRequest) (*GetItemsResponse, error)
 	GenerateUniqueItems(context.Context, *emptypb.Empty) (*GenerateUniqueItemsResponse, error)
 	UpdateItem(context.Context, *UpdateItemRequest) (*UpdateItemResponse, error)
+	CreateRareItem(context.Context, *CreateRareItemRequest) (*CreateRareItemResponse, error)
 	mustEmbedUnimplementedItemServiceServer()
 }
 
@@ -113,6 +126,9 @@ func (UnimplementedItemServiceServer) GenerateUniqueItems(context.Context, *empt
 }
 func (UnimplementedItemServiceServer) UpdateItem(context.Context, *UpdateItemRequest) (*UpdateItemResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateItem not implemented")
+}
+func (UnimplementedItemServiceServer) CreateRareItem(context.Context, *CreateRareItemRequest) (*CreateRareItemResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateRareItem not implemented")
 }
 func (UnimplementedItemServiceServer) mustEmbedUnimplementedItemServiceServer() {}
 func (UnimplementedItemServiceServer) testEmbeddedByValue()                     {}
@@ -207,6 +223,24 @@ func _ItemService_UpdateItem_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ItemService_CreateRareItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateRareItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ItemServiceServer).CreateRareItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ItemService_CreateRareItem_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ItemServiceServer).CreateRareItem(ctx, req.(*CreateRareItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ItemService_ServiceDesc is the grpc.ServiceDesc for ItemService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -229,6 +263,10 @@ var ItemService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateItem",
 			Handler:    _ItemService_UpdateItem_Handler,
+		},
+		{
+			MethodName: "CreateRareItem",
+			Handler:    _ItemService_CreateRareItem_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

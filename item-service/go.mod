@@ -1,4 +1,4 @@
-module github.com/darkphotonKN/community-builds-microservice/items-service
+module github.com/darkphotonKN/community-builds-microservice/item-service
 
 go 1.24.2
 
