@@ -2,6 +2,7 @@ package member
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
@@ -81,15 +82,28 @@ func (s *service) CreateMember(ctx context.Context, req *pb.CreateMemberRequest)
 	}
 
 	// publish to message broker
+	payload := commonconstants.MemberSignedUpEventPayload{
+		UserID:     memberId.String(),
+		Name:       req.Name,
+		Email:      req.Email,
+		SignedUpAt: "", // TODO: update this to legit date
+	}
+
+	marshalledPayload, err := json.Marshal(payload)
+
+	if err != nil {
+		return nil, err
+	}
+
 	err = s.publishCh.PublishWithContext(
 		ctx,
-		commonconstants.ExampleCreatedEvent,
+		commonconstants.MemberSignedUpEvent,
 		"",
 		false,
 		false,
 		amqp.Publishing{
 			ContentType: "application/json",
-			Body:        marshalledExample,
+			Body:        marshalledPayload,
 			// persist message
 			DeliveryMode: amqp.Persistent,
 		})
