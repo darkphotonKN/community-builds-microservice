@@ -4,3 +4,4 @@ gen:
 		api/proto/common/common.proto \
 		api/proto/example/example.proto \
 		api/proto/auth/auth.proto \
+		api/proto/item/item.proto \

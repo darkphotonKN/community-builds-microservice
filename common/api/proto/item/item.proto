@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+package itemgrpc;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "./proto;itemgrpc";
+
+service ItemService {
+  rpc CreateItem(CreateItemRequest) returns (CreateItemResponse) {}
+  rpc GetItems(GetItemsRequest) returns (GetItemsResponse) {}
+  rpc GenerateUniqueItems(google.protobuf.Empty) returns (GenerateUniqueItemsResponse) {}
+  rpc UpdateItem(UpdateItemRequest) returns (UpdateItemResponse) {}
+  rpc CreateRareItem(CreateRareItemRequest) returns (CreateRareItemResponse) {}
+}
+
+message Item {
+  optional string id = 1;
+  string memberId = 2;
+  string baseItemId = 3;
+  string imageUrl = 4;
+  string category = 5;
+  string class = 6;
+  string name = 7;
+  string type = 8;
+  string description = 9;
+  bool uniqueItem = 10;
+  string slot = 11;
+  
+  // armor
+  optional string requiredLevel = 12;
+  optional string requiredStrength = 13;
+  optional string requiredDexterity = 14;
+  optional string requiredIntelligence = 15;
+  
+  	// armor
+  optional string armour = 16;
+  optional string energyShield = 17;
+  optional string evasion = 18;
+  optional string block = 19;
+  optional string ward = 20;
+  // weapon
+  optional string damage = 21;
+  optional string APS = 22;
+  optional string crit = 23;
+  optional string PDPS = 24;
+  optional string EDPS = 25;
+  optional string DPS = 26;
+  // poison
+  optional string life = 27;
+  optional string mana = 28;
+  optional string duration = 29;
+  optional string usage = 30;
+  optional string capacity = 31;
+
+  optional string additional = 32;
+  repeated string implicit = 33;
+  repeated string stats = 34;
+
+	optional string createdAt = 36; 
+  optional string updatedAt = 37;
+}
+
+message CreateItemRequest {
+  string id = 1;
+  string category = 2;
+  string class = 3;
+  string type = 4;
+  string name = 5;
+  string imageURL = 6;
+  // repeated Item items = 6;
+}
+
+message CreateItemResponse {
+  string message = 1;
+}
+
+message GetItemsRequest {
+ string slot = 1;
+}
+
+message GetItemsResponse {
+  string message = 1;
+  repeated Item items = 2; // array of items
+}
+
+message GenerateUniqueItemsResponse {
+  string message = 1;
+}
+
+message UpdateItemRequest {
+  string id = 1;
+  string category = 2;
+  string class = 3;
+  string type = 4;
+  string name = 5;
+  string imageURL = 6;
+}
+
+message UpdateItemResponse {
+  string message = 1;
+}
+
+message CreateRareItemRequest {
+  string userId = 1;
+  string baseItemId = 2;
+  string name = 3;
+  string class = 4;
+  repeated string stats = 5;
+  bool toList = 6; // whether to add the item to the user's item list
+}
+
+
+message CreateRareItemResponse {
+  string message = 1;
+}

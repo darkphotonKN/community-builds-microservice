@@ -1,9 +1,7 @@
 package validation
 
 import (
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/item"
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/rating"
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/skill"
+	"github.com/darkphotonKN/community-builds-microservice/item-service/internal/item"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -22,19 +20,5 @@ func RegisterValidators(v *validator.Validate) {
 	v.RegisterValidation("type", func(fl validator.FieldLevel) bool {
 		return item.IsValidType(fl.Field().String())
 	})
-
-	// --- Skill ---
-	v.RegisterValidation("skillType",
-		func(fl validator.FieldLevel) bool {
-			return skill.IsValidType(fl.Field().String())
-		},
-	)
-
-	// --- Rating ---
-	v.RegisterValidation("ratingCategory",
-		func(fl validator.FieldLevel) bool {
-			return rating.IsValidCategoryType(fl.Field().String())
-		},
-	)
 
 }

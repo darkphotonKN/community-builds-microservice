@@ -9,7 +9,7 @@ import (
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/class"
 	authService "github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/auth"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/example"
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/item"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/item"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/rating"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/skill"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/tag"
@@ -106,9 +106,12 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	// --- ITEM ---
 
 	// -- Item Setup --
-	itemRepo := item.NewItemRepository(db)
-	itemService := item.NewItemService(itemRepo, skillService)
-	itemHandler := item.NewItemHandler(itemService)
+
+	itemClient := item.NewClient(registry)
+	itemHandler := item.NewHandler(itemClient)
+	// itemRepo := item.NewItemRepository(DB)
+	// itemService := item.NewItemService(itemRepo, skillService)
+	// itemHandler := item.NewItemHandler(itemService)
 
 	// -- Item Routes --
 	itemRoutes := api.Group("/item")
@@ -117,15 +120,17 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	itemRoutes.Use(auth.AuthMiddleware())
 	itemRoutes.GET("", itemHandler.GetItemsHandler)
 	itemRoutes.POST("", itemHandler.CreateItemHandler)
-	itemRoutes.PATCH("/:id", itemHandler.UpdateItemsHandler)
+	itemRoutes.PATCH("", itemHandler.UpdateItemHandler)
 	itemRoutes.POST("/rare-item", itemHandler.CreateRareItemHandler)
+	// itemRoutes.PATCH("/:id", itemHandler.UpdateItemsHandler)
+	// itemRoutes.POST("/rare-item", itemHandler.CreateRareItemHandler)
 
-	itemRoutes.GET("/base-items", itemHandler.GetBaseItemsHandler)
-	itemRoutes.GET("/item-mods", itemHandler.GetItemModsHandler)
-	itemRoutes.GET("/member-rare-item", itemHandler.GetMemberRareItemHandler)
+	// itemRoutes.GET("/base-items", itemHandler.GetBaseItemsHandler)
+	// itemRoutes.GET("/item-mods", itemHandler.GetItemModsHandler)
+	// itemRoutes.GET("/member-rare-item", itemHandler.GetMemberRareItemHandler)
 
-	// base-item, items. skills,
-	itemRoutes.GET("/all-data", itemHandler.GetAllDataHandler)
+	// // base-item, items. skills,
+	// itemRoutes.GET("/all-data", itemHandler.GetAllDataHandler)
 
 	// --- BUILD ---
 

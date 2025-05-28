@@ -5,114 +5,211 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"sort"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/chromedp/chromedp"
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/models"
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/skill"
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/utils/dbutils"
+	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/item"
+	"github.com/darkphotonKN/community-builds-microservice/item-service/internal/models"
+	"github.com/darkphotonKN/community-builds-microservice/item-service/internal/utils/dbutils"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-type ItemService struct {
-	SkillService *skill.SkillService
-	Repo         *ItemRepository
+type service struct {
+	repo Repository
 }
 
-func NewItemService(repo *ItemRepository, skillService *skill.SkillService) *ItemService {
-	return &ItemService{
-		Repo:         repo,
-		SkillService: skillService,
+type Repository interface {
+	GetItems(slot string) (*[]models.Item, error)
+	CreateItem(createItem *CreateItemRequest) error
+	CreateRareItem(createRareItem *CreateRareItemReq) error
+	CreateRareItemToList(createRareItemReq *CreateRareItemReq) error
+	CheckBaseItemExist() bool
+	CheckUniqueItemExist() bool
+	CheckItemModExist() bool
+	AddUniqueItems(tx *sqlx.Tx, items *[]models.Item) error
+	AddBaseItems(tx *sqlx.Tx, items *[]models.BaseItem) error
+	AddItemMods(tx *sqlx.Tx, items *[]models.ItemMod) error
+	UpdateItemById(id uuid.UUID, updateItemReq UpdateItemReq) (*models.Item, error)
+}
+
+func toPtr[T any](v T) *T {
+	return &v
+}
+
+func NewService(repo Repository) Service {
+	return &service{repo: repo}
+}
+func (s *service) GetItemsService(ctx context.Context, req *pb.GetItemsRequest) (*pb.GetItemsResponse, error) {
+
+	items, err := s.repo.GetItems(req.Slot)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "取得 items 時發生錯誤: %v", err)
 	}
-}
 
-func (s *ItemService) CreateItemService(createItemReq CreateItemRequest) error {
-	return s.Repo.CreateItem(createItemReq)
-}
+	var pbItems []*pb.Item
 
-func (s *ItemService) AddItemToBuildService(memberId uuid.UUID, item CreateItemRequest) error {
-	return s.Repo.CreateItem(item)
-}
-
-func (s *ItemService) GetItemsService(slot string) (*[]models.Item, error) {
-	return s.Repo.GetItems(slot)
-}
-
-func (s *ItemService) GetBaseItemsService() (*[]models.BaseItem, error) {
-	return s.Repo.GetBaseItems()
-}
-
-func (s *ItemService) GetItemModsService() (*[]models.ItemMod, error) {
-	return s.Repo.GetItemMods()
-}
-
-func (s *ItemService) GetMemberRareItemsService(id uuid.UUID) (*[]models.Item, error) {
-	return s.Repo.GetMemberRareItems(id)
-}
-
-func (s *ItemService) GetAllDataService(id uuid.UUID) (*[]interface{}, error) {
-	baseItems, _ := s.Repo.GetBaseItems()
-	items, _ := s.Repo.GetItems("")
-	skills, _ := s.SkillService.GetSkillsService()
-
-	result := make([]interface{}, 0)
-
-	for _, item := range *baseItems {
-		result = append(result, item)
-	}
 	for _, item := range *items {
-		result = append(result, item)
+		pbItems = append(pbItems, &pb.Item{
+			Id:                   toPtr(item.ID.String()),
+			MemberId:             item.MemberID.String(),
+			BaseItemId:           item.BaseItemId.String(),
+			ImageUrl:             item.ImageUrl,
+			Category:             item.Category,
+			Class:                item.Class,
+			Name:                 item.Name,
+			Type:                 item.Type,
+			Description:          item.Description,
+			UniqueItem:           item.UniqueItem,
+			Slot:                 item.Slot,
+			RequiredLevel:        toPtr(item.RequiredLevel),
+			RequiredStrength:     toPtr(item.RequiredStrength),
+			RequiredDexterity:    toPtr(item.RequiredDexterity),
+			RequiredIntelligence: toPtr(item.RequiredIntelligence),
+			Armour:               toPtr(item.Armour),
+			EnergyShield:         toPtr(item.EnergyShield),
+			Evasion:              toPtr(item.Evasion),
+			Block:                toPtr(item.Block),
+			Ward:                 toPtr(item.Ward),
+			Damage:               toPtr(item.Damage),
+			APS:                  toPtr(item.APS),
+			Crit:                 toPtr(item.Crit),
+			PDPS:                 toPtr(item.PDPS),
+			EDPS:                 toPtr(item.EDPS),
+			DPS:                  toPtr(item.DPS),
+			Life:                 toPtr(item.Life),
+			Mana:                 toPtr(item.Mana),
+			Duration:             toPtr(item.Duration),
+			Usage:                toPtr(item.Usage),
+			Capacity:             toPtr(item.Capacity),
+			Additional:           toPtr(item.Additional),
+			Stats:                item.Stats,
+			Implicit:             item.Implicit,
+			CreatedAt:            toPtr(item.CreatedAt.Format(time.RFC3339)),
+			UpdatedAt:            toPtr(item.UpdatedAt.Format(time.RFC3339)),
+		})
 	}
-	for _, item := range *skills {
-		result = append(result, item)
 
-	}
+	return &pb.GetItemsResponse{
+		Message: "成功取得items",
+		Items:   pbItems,
+	}, nil
+}
+func (s *service) CreateItemService(ctx context.Context, req *pb.CreateItemRequest) (*pb.CreateItemResponse, error) {
 
-	sort.Slice(result, func(i, j int) bool {
-		var nameI, nameJ string
-
-		switch v := result[i].(type) {
-		case models.Item:
-			nameI = v.Name
-		case models.BaseItem:
-			nameI = v.Name
-		case models.Skill:
-			nameI = v.Name
-		}
-		switch v := result[j].(type) {
-		case models.Item:
-			nameJ = v.Name
-		case models.BaseItem:
-			nameJ = v.Name
-		case models.Skill:
-			nameJ = v.Name
-		}
-
-		return nameI < nameJ
+	err := s.repo.CreateItem(&CreateItemRequest{
+		Category: req.Category,
+		Class:    req.Class,
+		Type:     req.Type,
+		Name:     req.Name,
+		ImageURL: req.ImageURL,
 	})
-
-	return &result, nil
-}
-
-func (s *ItemService) UpdateItemsService(id uuid.UUID, updateItemReq UpdateItemReq) (*models.Item, error) {
-	return s.Repo.UpdateItemById(id, updateItemReq)
-}
-
-func (s *ItemService) GetBaseItemByIdService(id uuid.UUID) (*models.BaseItem, error) {
-	return s.Repo.GetBaseItemById(id)
-}
-
-func (s *ItemService) CreateRareItemService(id uuid.UUID, createRareItemReq CreateRareItemReq) (*uuid.UUID, error) {
-	if createRareItemReq.ToList {
-		return s.Repo.CreateRareItemToList(id, createRareItemReq)
-	} else {
-		return s.Repo.CreateRareItem(createRareItemReq)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "創建 item 時發生錯誤: %v", err)
 	}
+	return &pb.CreateItemResponse{Message: fmt.Sprintf("成功創建item")}, nil
+}
+
+func (s *service) UpdateItemService(ctx context.Context, req *pb.UpdateItemRequest) (*pb.UpdateItemResponse, error) {
+	id, err := uuid.Parse(req.Id)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "無效的 ID 格式: %v", err)
+	}
+
+	_, err = s.repo.UpdateItemById(id, UpdateItemReq{
+		Id:       id,
+		Category: req.Category,
+		Class:    req.Class,
+		Type:     req.Type,
+		Name:     req.Name,
+		ImageURL: req.ImageURL,
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "更新 item 時發生錯誤: %v", err)
+	}
+
+	return &pb.UpdateItemResponse{Message: fmt.Sprintf("成功更新item")}, nil
+}
+
+func (s *service) CreateRareItemService(ctx context.Context, req *pb.CreateRareItemRequest) (*pb.CreateRareItemResponse, error) {
+	memberId, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "無效的 ID 格式: %v", err)
+	}
+
+	if req.BaseItemId == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "BaseItemId 不能為空")
+	}
+
+	baseItemId, err := uuid.Parse(req.BaseItemId)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "無效的 BaseItemId 格式: %v", err)
+	}
+
+	item := CreateRareItemReq{
+		MemberId:   memberId,
+		BaseItemId: baseItemId,
+		Name:       req.Name,
+		Stats:      req.Stats,
+	}
+
+	// create rare item to member list for customize or normal list
+	if req.ToList {
+		err = s.repo.CreateRareItemToList(&item)
+
+	} else {
+		err = s.repo.CreateRareItem(&item)
+	}
+
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "創建稀有物品時發生錯誤: %v", err)
+	}
+
+	return &pb.CreateRareItemResponse{Message: "成功創建稀有物品"}, nil
+}
+func (s *service) InitCrawling(db *sqlx.DB) error {
+
+	s.CrawlingAndAddUniqueItemsService(db)
+	s.CrawlingAndAddBaseItemsService(db)
+	s.CrawlingAndAddItemModsService(db)
+	return nil
+}
+
+func formatCategory(category string) string {
+	// Replace underscores with spaces
+	category = strings.ReplaceAll(category, "_", " ")
+
+	// Use cases.Title for title-casing each word
+	caser := cases.Title(language.English)
+	words := strings.Fields(category)
+	for i, word := range words {
+		words[i] = caser.String(word)
+	}
+
+	// Join the words back into a single string
+	return strings.Join(words, " ")
+}
+
+func checkStr(items []string, text string) int {
+
+	strIndex := -1
+	for index, item := range items {
+		// fmt.Println("item:", item, "text:", text)
+
+		if strings.Contains(item, text) {
+			// fmt.Printf("Found a match in: %s\n", item)
+			strIndex = index
+			break
+		}
+	}
+	return strIndex
 }
 
 func getCategoryItem(category string, itemsCh chan models.Item, wg *sync.WaitGroup) {
@@ -140,87 +237,88 @@ func getCategoryItem(category string, itemsCh chan models.Item, wg *sync.WaitGro
 		table.Find("th").Each(func(thIndex int, item *goquery.Selection) {
 			// text := item.Text()
 			fmt.Println("item:", item.Text())
-			titleAttr, _ := item.Find("abbr").Attr("title")
+			titleSpanAttr, _ := item.Find("span").Attr("title")
+			titleAbbrAttr, _ := item.Find("abbr").Attr("title")
 			// fmt.Println("Href:", attr)
 
-			if strings.Contains(titleAttr, "Required level") {
+			if strings.Contains(titleAbbrAttr, "Required level") || strings.Contains(titleSpanAttr, "Required level") {
 				// fmt.Println("包含子字串:", "strength")
 				currentItemThs = append(currentItemThs, "RequiredLevel")
 			}
-			if strings.Contains(titleAttr, "Required strength") {
+			if strings.Contains(titleAbbrAttr, "Required strength") || strings.Contains(titleSpanAttr, "Required strength") {
 				// fmt.Println("包含子字串:", "strength")
 				currentItemThs = append(currentItemThs, "Strength")
 			}
 
-			if strings.Contains(titleAttr, "Required dexterity") {
+			if strings.Contains(titleAbbrAttr, "Required dexterity") || strings.Contains(titleSpanAttr, "Required dexterity") {
 				// fmt.Println("包含子字串:", "dexterity")
 				currentItemThs = append(currentItemThs, "Dexterity")
 			}
 
-			if strings.Contains(titleAttr, "Required intelligence") {
+			if strings.Contains(titleAbbrAttr, "Required intelligence") || strings.Contains(titleSpanAttr, "Required intelligence") {
 				// fmt.Println("包含子字串:", "intelligence")
 				currentItemThs = append(currentItemThs, "Intelligence")
 			}
 
-			if strings.Contains(titleAttr, "Armour") {
+			if strings.Contains(titleAbbrAttr, "Armour") || strings.Contains(titleSpanAttr, "Armour") {
 				// fmt.Println("包含子字串:", "Armour")
 				currentItemThs = append(currentItemThs, "Armour")
 			}
 
-			if strings.Contains(titleAttr, "Energy shield") {
+			if strings.Contains(titleAbbrAttr, "Energy shield") || strings.Contains(titleSpanAttr, "Energy shield") {
 				// fmt.Println("包含子字串:", "Energy shield")
 				currentItemThs = append(currentItemThs, "EnergyShield")
 			}
 
-			if strings.Contains(titleAttr, "Evasion rating") {
+			if strings.Contains(titleAbbrAttr, "Evasion rating") || strings.Contains(titleSpanAttr, "Evasion rating") {
 				// fmt.Println("包含子字串:", "Evasion rating")
 				currentItemThs = append(currentItemThs, "Evasion")
 			}
 
-			if strings.Contains(titleAttr, "Chance to block") {
+			if strings.Contains(titleAbbrAttr, "Chance to block") || strings.Contains(titleSpanAttr, "Chance to block") {
 				// fmt.Println("包含子字串:", "Armour")
 				currentItemThs = append(currentItemThs, "Block")
 			}
 
-			if strings.Contains(titleAttr, "Ward") {
+			if strings.Contains(titleAbbrAttr, "Ward") || strings.Contains(titleSpanAttr, "Ward") {
 				currentItemThs = append(currentItemThs, "Ward")
 			}
 			// weapon
-			if strings.Contains(titleAttr, "Colour coded damage") {
+			if strings.Contains(item.Text(), "Damage") {
 				currentItemThs = append(currentItemThs, "Damage")
 			}
-			if strings.Contains(titleAttr, "Attacks per second") {
+			if strings.Contains(titleAbbrAttr, "Attacks per second") || strings.Contains(titleSpanAttr, "Attacks per second") {
 				currentItemThs = append(currentItemThs, "APS")
 			}
-			if strings.Contains(titleAttr, "Local weapon critical strike chance") {
+			if strings.Contains(titleAbbrAttr, "Local weapon critical strike chance") || strings.Contains(titleSpanAttr, "Local weapon critical strike chance") {
 				currentItemThs = append(currentItemThs, "Crit")
 			}
-			if strings.Contains(titleAttr, "physical damage per second") {
+			if strings.Contains(titleAbbrAttr, "physical damage per second") || strings.Contains(titleSpanAttr, "physical damage per second") {
 				currentItemThs = append(currentItemThs, "pDPS")
 			}
-			if strings.Contains(titleAttr, "elemental damage") {
+			if strings.Contains(titleAbbrAttr, "elemental damage") || strings.Contains(titleSpanAttr, "elemental damage") {
 				currentItemThs = append(currentItemThs, "eDPS")
 			}
-			if strings.Contains(titleAttr, "total damage") {
+			if strings.Contains(titleAbbrAttr, "Damage per second from all damage types") || strings.Contains(titleSpanAttr, "Damage per second from all damage types") {
 				currentItemThs = append(currentItemThs, "DPS")
 			}
 			// flask
-			if strings.Contains(titleAttr, "Life regenerated over the flask duration") {
+			if strings.Contains(titleAbbrAttr, "Life regenerated over the flask duration") || strings.Contains(titleSpanAttr, "Life regenerated over the flask duration") {
 				currentItemThs = append(currentItemThs, "Life")
 			}
 
-			if strings.Contains(titleAttr, "Mana regenerated over the flask duration") {
+			if strings.Contains(titleAbbrAttr, "Mana regenerated over the flask duration") || strings.Contains(titleSpanAttr, "Mana regenerated over the flask duration") {
 				currentItemThs = append(currentItemThs, "Mana")
 			}
 
-			if strings.Contains(item.Text(), "Duration") {
+			if strings.Contains(item.Text(), "Duration") || strings.Contains(titleAbbrAttr, "Flask effect duration") || strings.Contains(titleSpanAttr, "Flask effect duration") {
 				currentItemThs = append(currentItemThs, "Duration")
 			}
 
-			if strings.Contains(titleAttr, "Number of charges consumed on use") {
+			if strings.Contains(titleAbbrAttr, "Number of charges consumed on use") || strings.Contains(titleSpanAttr, "Number of charges consumed on use") {
 				currentItemThs = append(currentItemThs, "Usage")
 			}
-			if strings.Contains(titleAttr, "Maximum number of flask charges held") {
+			if strings.Contains(titleAbbrAttr, "Maximum number of flask charges held") || strings.Contains(titleSpanAttr, "Maximum number of flask charges held") {
 				currentItemThs = append(currentItemThs, "Capacity")
 			}
 			if strings.Contains(item.Text(), "Stats") {
@@ -230,6 +328,7 @@ func getCategoryItem(category string, itemsCh chan models.Item, wg *sync.WaitGro
 				currentItemThs = append(currentItemThs, "Additional")
 			}
 		})
+		fmt.Println("currentItemThs:", currentItemThs)
 		table.Find("tbody tr").Each(func(trIndex int, tr *goquery.Selection) {
 			wg.Add(1)
 			go getItem(currentItemThs, trIndex, tr, itemsCh, wg, category)
@@ -352,7 +451,9 @@ func getItem(currentItemThs []string, index int, tr *goquery.Selection, itemsCh 
 		}
 		// common
 		if columnIndex := checkStr(currentItemThs, "Stats"); columnIndex == tdIndex {
+			// fmt.Println("td.Text()", td.Text())
 			content, _ := td.Html()
+			// fmt.Println("content", content)
 			lines := strings.Split(content, "<br/>")
 
 			// 移除空行並修剪空白
@@ -410,10 +511,10 @@ func getItem(currentItemThs []string, index int, tr *goquery.Selection, itemsCh 
 
 }
 
-func (s *ItemService) CrawlingAndAddUniqueItemsService() error {
-	return dbutils.ExecTx(s.Repo.DB, func(tx *sqlx.Tx) error {
+func (s *service) CrawlingAndAddUniqueItemsService(db *sqlx.DB) error {
+	return dbutils.ExecTx(db, func(tx *sqlx.Tx) error {
 
-		isExist := s.Repo.CheckUniqueItemExist()
+		isExist := s.repo.CheckUniqueItemExist()
 		if isExist {
 			fmt.Println("Items already exist, skipping unique item crawling.")
 			return nil
@@ -466,7 +567,7 @@ func (s *ItemService) CrawlingAndAddUniqueItemsService() error {
 			items = append(items, itemCh)
 		}
 
-		err := s.Repo.AddUniqueItems(tx, &items)
+		err := s.repo.AddUniqueItems(tx, &items)
 		if err != nil {
 			return err
 		}
@@ -476,10 +577,10 @@ func (s *ItemService) CrawlingAndAddUniqueItemsService() error {
 }
 
 // base items
-func (s *ItemService) CrawlingAndAddBaseItemsService() error {
-	return dbutils.ExecTx(s.Repo.DB, func(tx *sqlx.Tx) error {
+func (s *service) CrawlingAndAddBaseItemsService(db *sqlx.DB) error {
+	return dbutils.ExecTx(db, func(tx *sqlx.Tx) error {
 
-		isExist := s.Repo.CheckBaseItemExist()
+		isExist := s.repo.CheckBaseItemExist()
 		if isExist {
 			fmt.Println("base Items already exist, skipping base item crawling.")
 			return nil
@@ -501,7 +602,7 @@ func (s *ItemService) CrawlingAndAddBaseItemsService() error {
 		for itemCh := range itemsCh {
 			items = append(items, itemCh)
 		}
-		err := s.Repo.AddBaseItems(tx, &items)
+		err := s.repo.AddBaseItems(tx, &items)
 		if err != nil {
 			return err
 		}
@@ -673,10 +774,10 @@ func getBaseItemTable(equipType string, table *goquery.Selection, itemsCh chan m
 }
 
 // base items
-func (s *ItemService) CrawlingAndAddItemModsService() error {
-	return dbutils.ExecTx(s.Repo.DB, func(tx *sqlx.Tx) error {
+func (s *service) CrawlingAndAddItemModsService(db *sqlx.DB) error {
+	return dbutils.ExecTx(db, func(tx *sqlx.Tx) error {
 
-		isExist := s.Repo.CheckItemModExist()
+		isExist := s.repo.CheckItemModExist()
 		if isExist {
 			fmt.Println("Item mods already exist, skipping item mods crawling.")
 			return nil
@@ -698,7 +799,7 @@ func (s *ItemService) CrawlingAndAddItemModsService() error {
 			items = append(items, itemCh)
 		}
 
-		err := s.Repo.AddItemMods(tx, &items)
+		err := s.repo.AddItemMods(tx, &items)
 		if err != nil {
 			return err
 		}

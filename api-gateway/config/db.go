@@ -9,7 +9,6 @@ import (
 
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/class"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/constants"
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/item"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/member"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/skill"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/tag"
@@ -139,9 +138,9 @@ func SeedDefaults(db *sqlx.DB) {
 
 	fmt.Printf("Successfully created all default active and support skills.\n\n")
 
-	itemRepo := item.NewItemRepository(db)
-	itemService := item.NewItemService(itemRepo, skillService)
-	itemService.CrawlingAndAddUniqueItemsService()
-	itemService.CrawlingAndAddBaseItemsService()
-	itemService.CrawlingAndAddItemModsService()
+	// itemRepo := item.NewItemRepository(db)
+	// itemService := item.NewItemService(itemRepo, skillService)
+	// itemService.CrawlingAndAddUniqueItemsService()
+	// itemService.CrawlingAndAddBaseItemsService()
+	// itemService.CrawlingAndAddItemModsService()
 }
