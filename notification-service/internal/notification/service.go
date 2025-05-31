@@ -3,10 +3,9 @@ package notification
 import (
 	"fmt"
 
+	"github.com/darkphotonKN/community-builds-microservice/notification-service/internal/constants"
 	"github.com/google/uuid"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type service struct {
@@ -23,11 +22,6 @@ func NewService(repo Repository, ch *amqp.Channel) Service {
 }
 
 func (s *service) Create(memberCreated *MemberCreatedNotification) (*Notification, error) {
-	// validation and error handling TODO: missing fields
-	if memberCreated.Title == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "Name field is required")
-	}
-
 	// validate id is a legit uuid
 	id, err := uuid.Parse(memberCreated.MemberID)
 
@@ -38,14 +32,14 @@ func (s *service) Create(memberCreated *MemberCreatedNotification) (*Notificatio
 	// map it to notifications table entity
 	createNotification := &CreateNotification{
 		MemberID: id,
-		Type:     memberCreated.Type,
+		Type:     constants.TypeWelcome,
 		Title:    memberCreated.Title,
 		Message:  memberCreated.Message,
-		SourceID: memberCreated.SourceID,
 	}
 
 	newNotification, err := s.repo.Create(createNotification)
 	if err != nil {
+		fmt.Printf("Error when attempting to create notification: %s\n", err.Error())
 		return nil, err
 	}
 
@@ -53,4 +47,3 @@ func (s *service) Create(memberCreated *MemberCreatedNotification) (*Notificatio
 
 	return newNotification, nil
 }
-

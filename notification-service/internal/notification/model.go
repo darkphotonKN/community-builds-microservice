@@ -20,7 +20,6 @@ type Notification struct {
 
 type MemberCreatedNotification struct {
 	MemberID string     `json:"member_id" db:"member_id"`
-	Type     string     `json:"type" db:"type"`
 	Title    string     `json:"title" db:"title"`
 	Message  string     `json:"message" db:"message"`
 	SourceID *uuid.UUID `json:"source_id" db:"source_id"`
@@ -33,4 +32,3 @@ type CreateNotification struct {
 	Message  string     `json:"message" db:"message"`
 	SourceID *uuid.UUID `json:"source_id" db:"source_id"`
 }
-

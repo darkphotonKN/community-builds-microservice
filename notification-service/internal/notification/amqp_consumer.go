@@ -37,7 +37,7 @@ func (c *consumer) memberSignedUpEventListener() {
 		log.Fatal(err)
 	}
 
-	// bind to the exchange that will publish ExampleCreateEvent events
+	// bind to the exchange that will publish MemberSignedUpEvents events
 	err = c.publishCh.QueueBind(
 		queue.Name,
 		"",
@@ -63,9 +63,16 @@ func (c *consumer) memberSignedUpEventListener() {
 		}
 
 		fmt.Printf("\nsuccessfully received event message: %+v\n\n", memberSignedUp)
-		// create event
-		c.service.Create(&MemberCreatedNotification{
+
+		_, err = c.service.Create(&MemberCreatedNotification{
 			MemberID: memberSignedUp.UserID,
+			Title:    "Member.Signedup",
+			Message:  "You succesffully join path of community. Welcome!",
+			SourceID: nil,
 		})
+
+		if err != nil {
+			log.Printf("Error when attempting to call create method from notification service: %s\n", err)
+		}
 	}
 }

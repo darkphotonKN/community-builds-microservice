@@ -28,7 +28,17 @@ func Connect(user, pass, host, port string) (*amqp.Channel, func() error) {
 		log.Fatal(err)
 	}
 
+	// --- Declare All Exchanges ---
+
+	// -- example service --
 	err = ch.ExchangeDeclare(commonconstants.ExampleCreatedEvent, "fanout", true, false, false, false, nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// -- auth service --
+	err = ch.ExchangeDeclare(commonconstants.MemberSignedUpEvent, "fanout", true, false, false, false, nil)
 
 	if err != nil {
 		log.Fatal(err)
