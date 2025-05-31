@@ -24,8 +24,8 @@ var (
 	consulAddr  = commonhelpers.GetEnvString("CONSUL_ADDR", "localhost:8510")
 
 	// rabbit mq
-	amqpUser     = commonhelpers.GetEnvString("RABBITMQ_USER", "guest")
-	amqpPassword = commonhelpers.GetEnvString("RABBITMQ_PASS", "guest")
+	amqpUser     = commonhelpers.GetEnvString("RABBITMQ_USER", "communitybuilds")
+	amqpPassword = commonhelpers.GetEnvString("RABBITMQ_PASS", "communitybuilds")
 	amqpHost     = commonhelpers.GetEnvString("RABBITMQ_HOST", "localhost")
 	amqpPort     = commonhelpers.GetEnvString("RABBITMQ_PORT", "5672")
 )

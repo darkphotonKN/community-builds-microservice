@@ -55,36 +55,3 @@ func IsConstraintViolation(err error) bool {
 	}
 	return strings.Contains(err.Error(), "violates check constraint")
 }
-
-type User struct {
-	name       string
-	email      string
-	permission int
-}
-
-func Test(user User) {
-}
-
-func Test2() {
-
-	users := make([]User, 10)
-	for index := range users {
-		users
-
-	}
-
-	user := User{
-		name:       "sadasdjk",
-		email:      "sadasdjk",
-		permission: 0,
-	}
-
-	userTwo := User{
-		name:       "sadasdjk",
-		email:      "sadasdjk",
-		permission: 1,
-	}
-
-	Test(user)
-
-}
