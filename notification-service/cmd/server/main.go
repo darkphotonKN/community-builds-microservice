@@ -81,6 +81,8 @@ func main() {
 	// --- message broker - rabbit mq ---
 	ch, close := broker.Connect(amqpUser, amqpPassword, amqpHost, amqpPort)
 
+	// declare exchanges
+	config.DeclareExchanges(ch)
 	defer func() {
 		close()
 		ch.Close()

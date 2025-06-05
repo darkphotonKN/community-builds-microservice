@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 
-	commonconstants "github.com/darkphotonKN/community-builds-microservice/common/constants"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -28,11 +27,29 @@ func Connect(user, pass, host, port string) (*amqp.Channel, func() error) {
 		log.Fatal(err)
 	}
 
-	err = ch.ExchangeDeclare(commonconstants.ExampleCreatedEvent, "fanout", true, false, false, false, nil)
-
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	return ch, ch.Close
+}
+
+func DeclareExchange(ch *amqp.Channel, exchangeName, exchangeType string) error {
+	err := ch.ExchangeDeclare(
+		exchangeName, // name
+		exchangeType, // type
+		true,         // durable
+		false,        // auto-deleted
+		false,        // internal
+		false,        // no-wait
+		nil,          // arguments
+	)
+
+	if err != nil {
+		log.Fatal("Failed to declare exchange: %v", exchangeName)
+		return err
+	}
+
+	log.Printf("Declared exchange: %v", exchangeName)
+	return nil
 }
