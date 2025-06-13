@@ -9,4 +9,4 @@ DROP INDEX IF EXISTS idx_notifications_type;
 DROP TABLE IF EXISTS notifications;
 
 -- Drop extension (be careful - other services might use it)
--- DROP EXTENSION IF EXISTS "uuid-ossp";
+DROP EXTENSION IF EXISTS "uuid-ossp";
