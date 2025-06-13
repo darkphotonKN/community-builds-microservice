@@ -19,6 +19,12 @@ func NewConsumer(service Service, ch *amqp.Channel) *consumer {
 }
 
 func (c *consumer) Listen() {
+	go c.exampleCreatedEventListener()
+
+	fmt.Println("Notification consumer started - listening for create example events.")
+}
+
+func (c *consumer) exampleCreatedEventListener() {
 	queueName := fmt.Sprintf("example.%s", commonconstants.ExampleCreatedEvent)
 
 	// declare our unique queue that listens and waits for ExampleCreatedEvent to be published from example service

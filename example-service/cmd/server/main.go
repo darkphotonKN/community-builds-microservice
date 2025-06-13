@@ -8,6 +8,7 @@ import (
 
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/example"
 	"github.com/darkphotonKN/community-builds-microservice/common/broker"
+	commonconstants "github.com/darkphotonKN/community-builds-microservice/common/constants"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery/consul"
 	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
@@ -81,6 +82,8 @@ func main() {
 
 	// --- message broker - rabbit mq ---
 	ch, close := broker.Connect(amqpUser, amqpPassword, amqpHost, amqpPort)
+
+	broker.DeclareExchange(ch, commonconstants.ExampleCreatedEvent, "fanout")
 
 	defer func() {
 		close()
