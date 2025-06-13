@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package notification;
+
+option go_package = "github.com/darkphotonKN/community-builds-microservice/common/api/proto/notification";
+
+import "google/protobuf/timestamp.proto";
+
+service ExampleService {
+  // get list of notifications for user
+  rpc GetNotifications(GetNotificationRequest) returns (Notifications) {}
+}
+
+message Notifications {
+  repeated Notification data = 1;
+}
+
+message Notification {
+  string id = 1;
+  string name = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+// Request message for getting an example by ID
+message GetExampleRequest {
+  string id = 1;
+} 
