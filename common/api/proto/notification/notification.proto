@@ -8,7 +8,7 @@ import "google/protobuf/timestamp.proto";
 
 service ExampleService {
   // get list of notifications for user
-  rpc GetNotifications(GetNotificationRequest) returns (Notifications) {}
+  rpc GetNotificationsResponse(GetNotificationsRequest) returns (Notifications) {}
 }
 
 message Notifications {
@@ -17,12 +17,19 @@ message Notifications {
 
 message Notification {
   string id = 1;
-  string name = 2;
-  google.protobuf.Timestamp created_at = 3;
-  google.protobuf.Timestamp updated_at = 4;
+  string memberId = 2;
+  string type = 3;
+  string title = 4;
+  string message = 5;
+  bool read = 6;
+  bool emailSent = 7;
+  string sourceId = 8;
+  google.protobuf.Timestamp created_at = 9;
 }
 
 // Request message for getting an example by ID
-message GetExampleRequest {
-  string id = 1;
+message GetNotificationsRequest {
+  string memberId = 1;
+  int32 limit = 2;        
+  int32 offset = 3;      
 } 

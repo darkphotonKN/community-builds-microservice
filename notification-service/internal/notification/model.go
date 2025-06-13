@@ -33,4 +33,3 @@ type CreateNotification struct {
 	Message  string     `json:"message" db:"message"`
 	SourceID *uuid.UUID `json:"source_id" db:"source_id"`
 }
-
