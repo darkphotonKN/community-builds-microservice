@@ -73,3 +73,6 @@ api-docs/
 # Local configuration overrides
 *.local.yaml
 *.local.yml
+
+
+.claude

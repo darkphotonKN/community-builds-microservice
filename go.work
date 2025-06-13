@@ -6,5 +6,6 @@ use (
 	./common
 	./item-service
 	./notification-service
+	./analytics-service
 	./example-service
 )
