@@ -15,12 +15,14 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
+
+	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/notification"
 )
 
 var (
 	// grpc
 	serviceName = "notifications"
-	grpcAddr    = commonhelpers.GetEnvString("PORT", "7009")
+	grpcAddr    = commonhelpers.GetEnvString("GRPC_AUTH_ADDR", "7009")
 	consulAddr  = commonhelpers.GetEnvString("CONSUL_ADDR", "localhost:8510")
 
 	// rabbit mq
@@ -94,8 +96,9 @@ func main() {
 	consumer := notification.NewConsumer(service, ch)
 	consumer.Listen()
 
-	log.Printf("grpc Notification Server started on PORT: %s\n", grpcAddr)
+	pb.RegisterNotificationServiceServer(grpcServer, handler)
 
+	log.Printf("grpc Notification Server started on PORT: %s\n", grpcAddr)
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatal("Can't connect to grpc server. Error:", err.Error())
 	}
