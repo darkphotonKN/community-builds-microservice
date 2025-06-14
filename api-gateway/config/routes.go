@@ -84,6 +84,9 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	// -- Notification Routes --
 	notificationRoutes := api.Group("/notification")
 
+	// Public Routes
+	// -- none --
+
 	// Private Routes
 	notificationRoutes.Use(auth.AuthMiddleware())
 	notificationRoutes.GET("/id", notificationHandler.GetNotificationsByMemberIdHandler)
