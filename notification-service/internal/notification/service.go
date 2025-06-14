@@ -56,6 +56,6 @@ func (s *service) Create(memberCreated *MemberCreatedNotification) (*Notificatio
 	return newNotification, nil
 }
 
-func (s *service) getAllByMemberId(ctx context.Context, request *pb.GetNotificationsRequest) (*pb.GetNotificationsResponse, error) {
+func (s *service) GetAllByMemberId(ctx context.Context, request *pb.GetNotificationsRequest) (*pb.GetNotificationsResponse, error) {
 	return nil, nil
 }

@@ -10,11 +10,11 @@ import (
 )
 
 type consumer struct {
-	service   EventConsumer
+	service   EventConsumerService
 	publishCh *amqp.Channel
 }
 
-func NewConsumer(service EventConsumer, ch *amqp.Channel) *consumer {
+func NewConsumer(service EventConsumerService, ch *amqp.Channel) *consumer {
 	return &consumer{service: service, publishCh: ch}
 }
 

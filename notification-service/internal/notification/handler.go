@@ -8,13 +8,13 @@ import (
 
 type Handler struct {
 	pb.UnimplementedNotificationServiceServer
-	service ServiceNot
+	service QueryHandlerService
 }
 
 func (h *Handler) getNotifications(ctx context.Context, request *pb.GetNotificationsRequest) (*pb.GetNotificationsResponse, error) {
-	return h.service.getAllByMemberId(ctx, request)
+	return h.service.GetAllByMemberId(ctx, request)
 }
 
-func NewHandler(service ServiceNot) *Handler {
+func NewHandler(service QueryHandlerService) *Handler {
 	return &Handler{service: service}
 }

@@ -14,11 +14,13 @@ type Reader interface {
 	GetAllByMemberId(ctx context.Context, request *pb.GetNotificationsRequest) (*pb.GetNotificationsResponse, error)
 }
 
-type EventConsumer interface {
+// for consumer
+type EventConsumerService interface {
 	Creator
 }
 
-type QueryHandler interface {
+// for handler
+type QueryHandlerService interface {
 	Reader
 }
 
