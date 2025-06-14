@@ -11,7 +11,7 @@ type Handler struct {
 	service QueryHandlerService
 }
 
-func (h *Handler) getNotifications(ctx context.Context, request *pb.GetNotificationsRequest) (*pb.GetNotificationsResponse, error) {
+func (h *Handler) GetNotifications(ctx context.Context, request *pb.GetNotificationsRequest) (*pb.GetNotificationsResponse, error) {
 	return h.service.GetAllByMemberId(ctx, request)
 }
 

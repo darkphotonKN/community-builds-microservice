@@ -10,6 +10,7 @@ import (
 	authService "github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/auth"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/example"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/item"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/notification"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/rating"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/skill"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/tag"
@@ -73,6 +74,19 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	memberRoutes.GET("", authHandler.GetMemberByIdHandler)
 	memberRoutes.PATCH("/update-password", authHandler.UpdatePasswordMemberHandler)
 	memberRoutes.PATCH("/update-info", authHandler.UpdateInfoMemberHandler)
+
+	// --- NOTIFICATIONS MICROSERVICE ---
+
+	// -- Notification Setup --
+	notificationClient := notification.NewClient(registry)
+	notificationHandler := notification.NewHandler(notificationClient)
+
+	// -- Notification Routes --
+	notificationRoutes := api.Group("/notification")
+
+	// Private Routes
+	notificationRoutes.Use(auth.AuthMiddleware())
+	notificationRoutes.GET("/id", notificationHandler.GetNotificationsByMemberIdHandler)
 
 	/*********************
 	* LEGACY MONOLITH APIS
