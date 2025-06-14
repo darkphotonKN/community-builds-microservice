@@ -1,8 +1,10 @@
 package notification
 
 import (
+	"context"
 	"fmt"
 
+	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/notification"
 	"github.com/google/uuid"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"google.golang.org/grpc/codes"
@@ -18,7 +20,7 @@ type Repository interface {
 	Create(notification *CreateNotification) (*Notification, error)
 }
 
-func NewService(repo Repository, ch *amqp.Channel) Service {
+func NewService(repo Repository, ch *amqp.Channel) *service {
 	return &service{repo: repo, publishCh: ch}
 }
 
@@ -54,3 +56,6 @@ func (s *service) Create(memberCreated *MemberCreatedNotification) (*Notificatio
 	return newNotification, nil
 }
 
+func (s *service) getAllByMemberId(ctx context.Context, request *pb.GetNotificationsRequest) (*pb.GetNotificationsResponse, error) {
+	return nil, nil
+}

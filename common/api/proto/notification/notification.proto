@@ -6,12 +6,12 @@ option go_package = "github.com/darkphotonKN/community-builds-microservice/commo
 
 import "google/protobuf/timestamp.proto";
 
-service ExampleService {
+service NotificationService {
   // get list of notifications for user
-  rpc GetNotificationsResponse(GetNotificationsRequest) returns (Notifications) {}
+  rpc GetNotifications(GetNotificationsRequest) returns (GetNotificationsResponse) {}
 }
 
-message Notifications {
+message GetNotificationsResponse {
   repeated Notification data = 1;
 }
 

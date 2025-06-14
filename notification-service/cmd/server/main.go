@@ -90,6 +90,7 @@ func main() {
 
 	repo := notification.NewRepository(db)
 	service := notification.NewService(repo, ch)
+	handler := notification.NewHandler(service)
 	consumer := notification.NewConsumer(service, ch)
 	consumer.Listen()
 

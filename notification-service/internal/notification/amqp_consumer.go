@@ -10,15 +10,11 @@ import (
 )
 
 type consumer struct {
-	service   Service
+	service   EventConsumer
 	publishCh *amqp.Channel
 }
 
-type Service interface {
-	Create(notification *MemberCreatedNotification) (*Notification, error)
-}
-
-func NewConsumer(service Service, ch *amqp.Channel) *consumer {
+func NewConsumer(service EventConsumer, ch *amqp.Channel) *consumer {
 	return &consumer{service: service, publishCh: ch}
 }
 
