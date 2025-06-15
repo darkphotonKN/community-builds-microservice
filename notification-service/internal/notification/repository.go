@@ -1,7 +1,11 @@
 package notification
 
 import (
+	"context"
+	"fmt"
 	"time"
+
+	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/notification"
 
 	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
 	"github.com/google/uuid"
@@ -12,7 +16,7 @@ type repository struct {
 	db *sqlx.DB
 }
 
-func NewRepository(db *sqlx.DB) Repository {
+func NewRepository(db *sqlx.DB) *repository {
 	return &repository{db: db}
 }
 
@@ -56,3 +60,21 @@ func (r *repository) Create(notification *CreateNotification) (*Notification, er
 	return notificationModel, nil
 }
 
+func (r *repository) GetAll(ctx context.Context, request *QueryNotifications) (*pb.GetNotificationsResponse, error) {
+
+	query := `
+	SELECT 
+		id,
+		member_id,
+		type,
+		title,
+		message,
+		read,
+		email_sent,
+		source_id,
+		created_at
+	FROM notifications
+	`
+	fmt.Println(query)
+	return nil, nil
+}

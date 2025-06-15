@@ -57,5 +57,6 @@ func (r *repository) GetByID(id uuid.UUID) (*Example, error) {
 	if err != nil {
 		return nil, commonhelpers.AnalyzeDBErr(err)
 	}
+
 	return &example, nil
 }

@@ -33,3 +33,9 @@ type CreateNotification struct {
 	Message  string     `json:"message" db:"message"`
 	SourceID *uuid.UUID `json:"source_id" db:"source_id"`
 }
+
+type QueryNotifications struct {
+	MemberID uuid.UUID `json:"member_id" db:"member_id"`
+	Limit    *int32    `json:"limit" db:"member_id"`
+	Offset   *int32    `json:"offset" db:"member_id"`
+}

@@ -35,4 +35,3 @@ func (c *Client) GetNotifications(ctx context.Context, req *pb.GetNotificationsR
 	response, err := client.GetNotifications(ctx, req)
 	return response, err
 }
-
