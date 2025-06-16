@@ -33,7 +33,7 @@ func (h *Handler) GetNotificationsByMemberIdHandler(c *gin.Context) {
 	limitStr := c.DefaultQuery("limit", "20")
 	offsetStr := c.DefaultQuery("offset", "0")
 
-	limit, err := strconv.Atoi(limitStr)
+	limitInt64, err := strconv.ParseInt(limitStr, 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"statusCode": http.StatusBadRequest,
@@ -41,8 +41,9 @@ func (h *Handler) GetNotificationsByMemberIdHandler(c *gin.Context) {
 		})
 		return
 	}
+	limit := int32(limitInt64)
 
-	offset, err := strconv.Atoi(offsetStr)
+	offsetInt64, err := strconv.ParseInt(offsetStr, 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"statusCode": http.StatusBadRequest,
@@ -50,11 +51,12 @@ func (h *Handler) GetNotificationsByMemberIdHandler(c *gin.Context) {
 		})
 		return
 	}
+	offset := int32(offsetInt64)
 
 	req := &pb.GetNotificationsRequest{
 		MemberId: userIdStr.(string),
-		Limit:    int32(limit),
-		Offset:   int32(offset),
+		Limit:    &limit,
+		Offset:   &offset,
 	}
 
 	response, err := h.client.GetNotifications(c.Request.Context(), req)
@@ -90,4 +92,3 @@ func (h *Handler) GetNotificationsByMemberIdHandler(c *gin.Context) {
 		"result":     response.Data,
 	})
 }
-

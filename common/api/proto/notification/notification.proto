@@ -30,6 +30,6 @@ message Notification {
 // Request message for getting an example by ID
 message GetNotificationsRequest {
   string memberId = 1;
-  int32 limit = 2;        
-  int32 offset = 3;      
+  optional int32 limit = 2;        
+  optional int32 offset = 3;      
 } 

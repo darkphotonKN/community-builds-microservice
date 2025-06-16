@@ -45,8 +45,7 @@ func (r *repository) Create(notification *CreateNotification) (*Notification, er
 		notificationModel.ID,
 		notificationModel.MemberID,
 		notificationModel.Type,
-		notificationModel.Title,
-		notificationModel.Message,
+		notificationModel.Title, notificationModel.Message,
 		notificationModel.Read,
 		notificationModel.EmailSent,
 		notificationModel.SourceID,
@@ -60,7 +59,7 @@ func (r *repository) Create(notification *CreateNotification) (*Notification, er
 	return notificationModel, nil
 }
 
-func (r *repository) GetAll(ctx context.Context, request *QueryNotifications) (*pb.GetNotificationsResponse, error) {
+func (r *repository) GetAll(ctx context.Context, request *QueryNotifications) (*[]Notification, error) {
 
 	query := `
 	SELECT 
@@ -74,7 +73,26 @@ func (r *repository) GetAll(ctx context.Context, request *QueryNotifications) (*
 		source_id,
 		created_at
 	FROM notifications
+	WHERE member_id = $1
 	`
-	fmt.Println(query)
-	return nil, nil
+
+	if request.Limit != nil {
+		query += "\nlimit $1"
+	}
+
+	if request.Offset != nil {
+		query += "\nAND offset = $1"
+	}
+
+	fmt.Println("final constructed query:", query)
+
+	var notifications []Notification
+
+	err := r.db.Select(&notifications, query, request.Limit, request.Offset)
+
+	if err != nil {
+		return nil, commonhelpers.AnalyzeDBErr(err)
+	}
+
+	return &notifications, nil
 }

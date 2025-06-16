@@ -18,7 +18,7 @@ type service struct {
 
 type Repository interface {
 	Create(notification *CreateNotification) (*Notification, error)
-	GetAll(ctx context.Context, request *QueryNotifications) (*pb.GetNotificationsResponse, error)
+	GetAll(ctx context.Context, request *QueryNotifications) (*[]Notification, error)
 }
 
 func NewService(repo Repository, ch *amqp.Channel) *service {
@@ -57,11 +57,16 @@ func (s *service) Create(memberCreated *MemberCreatedNotification) (*Notificatio
 	return newNotification, nil
 }
 
-func (s *service) GetAllByMemberId(ctx context.Context, request *QueryNotifications) (*pb.GetNotificationsResponse, error) {
+func (s *service) GetAllByMemberId(ctx context.Context, request *pb.GetNotificationsRequest) (*pb.GetNotificationsResponse, error) {
+	// parse uuid
+	memberUUID, err := uuid.Parse(request.MemberId)
+	if err != nil {
+		return nil, err
+	}
 
 	// convert to DB appropriate format
 	query := &QueryNotifications{
-		MemberID: request.MemberID,
+		MemberID: memberUUID,
 	}
 
 	// validate and default limit and offset
