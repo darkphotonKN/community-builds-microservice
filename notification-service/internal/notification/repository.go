@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/notification"
-
 	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -59,7 +57,7 @@ func (r *repository) Create(notification *CreateNotification) (*Notification, er
 	return notificationModel, nil
 }
 
-func (r *repository) GetAll(ctx context.Context, request *QueryNotifications) (*[]Notification, error) {
+func (r *repository) GetAll(ctx context.Context, request *QueryNotifications) ([]Notification, error) {
 
 	query := `
 	SELECT 
@@ -74,25 +72,36 @@ func (r *repository) GetAll(ctx context.Context, request *QueryNotifications) (*
 		created_at
 	FROM notifications
 	WHERE member_id = $1
+	ORDER BY created_at DESC
 	`
+	paramCount := 1
+
+	params := []interface{}{request.MemberID}
 
 	if request.Limit != nil {
-		query += "\nlimit $1"
+		paramCount++
+		params = append(params, *request.Limit)
+
+		query += "\nLIMIT $2"
 	}
 
 	if request.Offset != nil {
-		query += "\nAND offset = $1"
+		paramCount++
+		params = append(params, *request.Offset)
+
+		query += fmt.Sprintf("\nOFFSET $%d", paramCount)
 	}
 
 	fmt.Println("final constructed query:", query)
+	fmt.Println("parameters:", params)
 
 	var notifications []Notification
 
-	err := r.db.Select(&notifications, query, request.Limit, request.Offset)
+	err := r.db.Select(&notifications, query, params...)
 
 	if err != nil {
 		return nil, commonhelpers.AnalyzeDBErr(err)
 	}
 
-	return &notifications, nil
+	return notifications, nil
 }

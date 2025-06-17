@@ -82,7 +82,7 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	notificationHandler := notification.NewHandler(notificationClient)
 
 	// -- Notification Routes --
-	notificationRoutes := api.Group("/notification")
+	notificationRoutes := api.Group("/notifications")
 
 	// Public Routes
 	// -- none --

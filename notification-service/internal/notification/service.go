@@ -9,6 +9,7 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type service struct {
@@ -18,7 +19,7 @@ type service struct {
 
 type Repository interface {
 	Create(notification *CreateNotification) (*Notification, error)
-	GetAll(ctx context.Context, request *QueryNotifications) (*[]Notification, error)
+	GetAll(ctx context.Context, request *QueryNotifications) ([]Notification, error)
 }
 
 func NewService(repo Repository, ch *amqp.Channel) *service {
@@ -85,5 +86,32 @@ func (s *service) GetAllByMemberId(ctx context.Context, request *pb.GetNotificat
 		query.Limit = query.Limit
 	}
 
-	return s.repo.GetAll(ctx, query)
+	notifications, err := s.repo.GetAll(ctx, query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// convert back to grpc typje
+	notificationsData := make([]*pb.Notification, len(notifications))
+
+	for index, notification := range notifications {
+		notificationsData[index] = &pb.Notification{
+			Id:        notification.ID.String(),
+			MemberId:  notification.MemberID.String(),
+			Type:      notification.Type,
+			Title:     notification.Title,
+			Message:   notification.Message,
+			Read:      notification.Read,
+			EmailSent: notification.EmailSent,
+			SourceId:  notification.SourceID.String(),
+			CreatedAt: timestamppb.New(notification.CreatedAt),
+		}
+	}
+
+	notificationsResponse := &pb.GetNotificationsResponse{
+		Data: notificationsData,
+	}
+
+	return notificationsResponse, nil
 }
