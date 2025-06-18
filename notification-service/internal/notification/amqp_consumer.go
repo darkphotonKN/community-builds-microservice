@@ -24,6 +24,11 @@ func (c *consumer) Listen() {
 	fmt.Println("Notification consumer started - listening for member signup events.")
 }
 
+/**
+* Member Sign-Up Events Listener
+* Handles:
+* - Member sign ups welcome notificiations
+**/
 func (c *consumer) memberSignedUpEventListener() {
 	queueName := fmt.Sprintf("notification.%s", commonconstants.MemberSignedUpEvent)
 
@@ -59,9 +64,28 @@ func (c *consumer) memberSignedUpEventListener() {
 		}
 
 		fmt.Printf("\nsuccessfully received event message: %+v\n\n", memberSignedUp)
-		// create event
-		c.service.Create(&MemberCreatedNotification{
+
+		// get the correct notification template
+		template, err := c.service.GetNotificationTemplate(NotificationWelcome)
+
+		if err != nil {
+			fmt.Println("Failed on getting notification template. Error:", err)
+			continue
+		}
+
+		// create event TODO: sourceID missing
+		notification, err := c.service.Create(&MemberCreatedNotification{
+			Title:    template.Title,
+			Message:  template.Message,
+			Type:     string(template.Type),
 			MemberID: memberSignedUp.UserID,
 		})
+
+		if err != nil {
+			fmt.Println("Failed to create notification, err:", err)
+			continue
+		}
+
+		fmt.Printf("Notification created:\nid: %s\nType: %s\nTitle: %s\nMessage: %s\n", notification.ID, notification.Type, notification.Title, notification.Message)
 	}
 }

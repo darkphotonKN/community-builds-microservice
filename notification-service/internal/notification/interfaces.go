@@ -8,6 +8,7 @@ import (
 
 type Creator interface {
 	Create(notification *MemberCreatedNotification) (*Notification, error)
+	GetNotificationTemplate(notificationType NotificationType) (*NotificationTemplate, error)
 }
 
 type Reader interface {
