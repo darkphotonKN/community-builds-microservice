@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math"
+	"time"
 
 	commonconstants "github.com/darkphotonKN/community-builds-microservice/common/constants"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -73,13 +75,29 @@ func (c *consumer) memberSignedUpEventListener() {
 			continue
 		}
 
-		// create event TODO: sourceID missing
-		notification, err := c.service.Create(&MemberCreatedNotification{
-			Title:    template.Title,
-			Message:  template.Message,
-			Type:     string(template.Type),
-			MemberID: memberSignedUp.UserID,
-		})
+		var notification *Notification
+
+		for i := 0; i < 3; i++ {
+			// create event TODO: sourceID missing, add later
+			notification, err = c.service.Create(&MemberCreatedNotification{
+				Title:    template.Title,
+				Message:  template.Message,
+				Type:     string(template.Type),
+				MemberID: memberSignedUp.UserID,
+			})
+
+			// retry on error
+			if err != nil {
+				fmt.Printf("Failed to create notification on %d try, err: %s", i+1, err.Error())
+
+				// progressive delay / back-off before retrying
+				time.Sleep(time.Duration(math.Pow(2, float64(i))) * time.Second)
+				continue
+			}
+
+			// otherwise exit
+			break
+		}
 
 		if err != nil {
 			fmt.Println("Failed to create notification, err:", err)
