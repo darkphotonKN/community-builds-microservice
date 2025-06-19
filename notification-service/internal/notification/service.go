@@ -107,8 +107,11 @@ func (s *service) GetAllByMemberId(ctx context.Context, request *pb.GetNotificat
 			Message:   notification.Message,
 			Read:      notification.Read,
 			EmailSent: notification.EmailSent,
-			SourceId:  notification.SourceID.String(),
 			CreatedAt: timestamppb.New(notification.CreatedAt),
+		}
+
+		if notification.SourceID != nil {
+			notificationsData[index].SourceId = notification.SourceID.String()
 		}
 	}
 

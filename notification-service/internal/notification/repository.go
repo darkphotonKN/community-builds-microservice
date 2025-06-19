@@ -79,6 +79,7 @@ func (r *repository) GetAll(ctx context.Context, request *QueryNotifications) ([
 	params := []interface{}{request.MemberID}
 
 	if request.Limit != nil {
+		fmt.Printf("Checking Limit: %d", request.Limit)
 		paramCount++
 		params = append(params, *request.Limit)
 
@@ -86,6 +87,7 @@ func (r *repository) GetAll(ctx context.Context, request *QueryNotifications) ([
 	}
 
 	if request.Offset != nil {
+		fmt.Printf("Checking Offset: %d", request.Offset)
 		paramCount++
 		params = append(params, *request.Offset)
 
