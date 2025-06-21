@@ -16,6 +16,7 @@ type consumer struct {
 
 type Service interface {
 	Create(activity *MemberActivityEventMessage) (*Analytics, error)
+	GetEventName(eventType EventType) (EventName, error)
 }
 
 func NewConsumer(service Service, ch *amqp.Channel) *consumer {
@@ -64,11 +65,18 @@ func (c *consumer) memberSignedUpEventListener() {
 
 		fmt.Printf("\nsuccessfully received event message: %+v\n\n", memberSignedUp)
 
+		eventName, err := c.service.GetEventName(EventTypeMemberActivity)
+
+		if err != nil {
+			fmt.Printf("Error when attempting to get event name: %s\n", err)
+			continue
+		}
+
 		// create analytics event
 		c.service.Create(&MemberActivityEventMessage{
 			MemberID:  memberSignedUp.UserID,
-			EventType: "member_activity",
-			EventName: "member_signup",
+			EventType: EventTypeMemberActivity,
+			EventName: eventName,
 			Data:      fmt.Sprintf(`{"member_id":"%s"}`, memberSignedUp.UserID),
 		})
 	}

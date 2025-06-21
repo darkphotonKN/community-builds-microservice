@@ -23,8 +23,14 @@ const (
 * Message Broker Event Payloads
 **/
 
-// MemberSignedUpEventPayload
-// Published by auth-service, consumed by notification-service
+/**
+* MemberSignedUpEventPayload
+*
+* Published by auth-service.
+* Consumed by:
+* - notification-service
+* - analytics-service
+**/
 type MemberSignedUpEventPayload struct {
 	UserID     string `json:"userId"`
 	Name       string `json:"name"`

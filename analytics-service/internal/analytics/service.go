@@ -80,14 +80,9 @@ func (s *service) Create(memberActivity *MemberActivityEventMessage) (*Analytics
 	}
 
 	// map it to analytics table entity
-	createAnalytics := &CreateAnalytics{
+	createAnalytics := &CreateMemberActivityEvent{
 		MemberID:  id,
 		EventType: memberActivity.EventType,
-		EventName: memberActivity.EventName,
-		Data:      memberActivity.Data,
-		SessionID: memberActivity.SessionID,
-		IPAddress: "", // TODO: extract from context
-		UserAgent: "", // TODO: extract from context
 	}
 
 	newAnalytics, err := s.repo.Create(createAnalytics)
@@ -98,4 +93,30 @@ func (s *service) Create(memberActivity *MemberActivityEventMessage) (*Analytics
 	fmt.Println("analytics was created:", newAnalytics)
 
 	return newAnalytics, nil
+}
+
+type EventType string
+
+const (
+	EventTypeMemberActivity EventType = "member_activity"
+)
+
+type EventName string
+
+const (
+	EventNameMemberActivity EventName = "member_signup"
+)
+
+func (s *service) GetEventName(eventType EventType) (EventName, error) {
+	eventMap := map[EventType]EventName{
+		EventTypeMemberActivity: EventNameMemberActivity,
+	}
+
+	eventName, exists := eventMap[eventType]
+
+	if exists {
+		return eventName, nil
+	}
+
+	return "", fmt.Errorf("Incorrent event type provided.")
 }
