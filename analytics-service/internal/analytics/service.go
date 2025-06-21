@@ -61,62 +61,79 @@ type service struct {
 }
 
 type Repository interface {
-	Create(analytics *CreateAnalytics) (*Analytics, error)
+	Create(analytics *Analytics) (*Analytics, error)
 }
 
 func NewService(repo Repository, ch *amqp.Channel) Service {
 	return &service{repo: repo, publishCh: ch}
 }
 
-func (s *service) Create(memberActivity *MemberActivityEventMessage) (*Analytics, error) {
-	if memberActivity.EventName == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "Event name field is required")
+func (s *service) Create(createAnalytics *CreateAnalytics) (*Analytics, error) {
+	// validate activity
+	eventType, err := s.GetEventType(createAnalytics.ActivityType)
+
+	if err != nil {
+		fmt.Printf("Error when attempting to validate activity: %s. Event type matches this activity", createAnalytics.ActivityType)
+		return nil, status.Errorf(codes.InvalidArgument, "Error when attempting to get event name: %s"+err.Error())
 	}
 
-	id, err := uuid.Parse(memberActivity.MemberID)
+	id, err := uuid.Parse(createAnalytics.MemberID)
 
 	if err != nil {
 		return nil, err
 	}
 
 	// map it to analytics table entity
-	createAnalytics := &CreateMemberActivityEvent{
-		MemberID:  id,
-		EventType: memberActivity.EventType,
+	newAnalytics := &Analytics{
+		MemberID:     id,
+		EventType:    string(eventType),
+		ActivityType: string(createAnalytics.ActivityType),
+		Data:         createAnalytics.Data,
 	}
 
-	newAnalytics, err := s.repo.Create(createAnalytics)
+	analytics, err := s.repo.Create(newAnalytics)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Println("analytics was created:", newAnalytics)
+	fmt.Println("analytics was created:", analytics)
 
-	return newAnalytics, nil
+	return analytics, nil
 }
 
 type EventType string
 
 const (
-	EventTypeMemberActivity EventType = "member_activity"
+	EventTypeMember EventType = "member_event"
+	EventTypeBuild  EventType = "build_event"
 )
 
-type EventName string
+type ActivityType string
 
 const (
-	EventNameMemberActivity EventName = "member_signup"
+	ActivityTypeMemberCreated  ActivityType = "member_created_activity"
+	ActivityTypeMemberLoggedOn ActivityType = "member_logged_on_activity"
+	ActivityTypeBuildViewed    ActivityType = "build_viewed_activity"
 )
 
-func (s *service) GetEventName(eventType EventType) (EventName, error) {
-	eventMap := map[EventType]EventName{
-		EventTypeMemberActivity: EventNameMemberActivity,
+/**
+* Gets event type and validates if an activity is under a certain event type.
+**/
+func (s *service) GetEventType(activityType ActivityType) (EventType, error) {
+	eventMap := map[ActivityType]EventType{
+		// member
+		ActivityTypeMemberCreated:  EventTypeMember,
+		ActivityTypeMemberLoggedOn: EventTypeMember,
+
+		// build
+		ActivityTypeBuildViewed: EventTypeBuild,
 	}
 
-	eventName, exists := eventMap[eventType]
+	event, exists := eventMap[activityType]
 
-	if exists {
-		return eventName, nil
+	if !exists {
+		return "", fmt.Errorf("Activity %s doesn't exist under any event.", activityType)
 	}
 
-	return "", fmt.Errorf("Incorrent event type provided.")
+	return event, nil
 }

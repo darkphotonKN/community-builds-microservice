@@ -31,7 +31,6 @@ type DailyMemberStats struct {
 type MemberActivityEventMessage struct {
 	MemberID  string     `json:"member_id"`
 	EventType EventType  `json:"event_type"`
-	EventName EventName  `json:"event_name"`
 	Data      string     `json:"data"`
 	SessionID *uuid.UUID `json:"session_id"`
 }
@@ -44,23 +43,22 @@ type CreateMemberActivityEvent struct {
 
 // Keep the legacy types for compatibility - DO NOT MODIFY
 type Analytics struct {
-	ID        uuid.UUID  `json:"id" db:"id"`
-	MemberID  uuid.UUID  `json:"member_id" db:"member_id"`
-	EventType string     `json:"event_type" db:"event_type"`
-	EventName string     `json:"event_name" db:"event_name"`
-	Data      string     `json:"data" db:"data"`
-	SessionID *uuid.UUID `json:"session_id" db:"session_id"`
-	IPAddress string     `json:"ip_address" db:"ip_address"`
-	UserAgent string     `json:"user_agent" db:"user_agent"`
-	CreatedAt time.Time  `json:"created_at" db:"created_at"`
+	ID           uuid.UUID  `json:"id" db:"id"`
+	MemberID     uuid.UUID  `json:"member_id" db:"member_id"`
+	EventType    string     `json:"event_type" db:"event_type"`
+	ActivityType string     `json:"activity_type" db:"activity_type"`
+	Data         string     `json:"data" db:"data"`
+	SessionID    *uuid.UUID `json:"session_id" db:"session_id"`
+	IPAddress    string     `json:"ip_address" db:"ip_address"`
+	UserAgent    string     `json:"user_agent" db:"user_agent"`
+	CreatedAt    time.Time  `json:"created_at" db:"created_at"`
 }
 
 type CreateAnalytics struct {
-	MemberID  uuid.UUID  `json:"member_id" db:"member_id"`
-	EventType string     `json:"event_type" db:"event_type"`
-	EventName string     `json:"event_name" db:"event_name"`
-	Data      string     `json:"data" db:"data"`
-	SessionID *uuid.UUID `json:"session_id" db:"session_id"`
-	IPAddress string     `json:"ip_address" db:"ip_address"`
-	UserAgent string     `json:"user_agent" db:"user_agent"`
+	MemberID     string       `json:"member_id"`
+	ActivityType ActivityType `json:"activity_type"`
+	Data         string       `json:"data"`
+	SessionID    *uuid.UUID   `json:"session_id"`
+	IPAddress    string       `json:"ip_address"`
+	UserAgent    string       `json:"user_agent"`
 }
