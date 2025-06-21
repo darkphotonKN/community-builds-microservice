@@ -13,39 +13,39 @@ import (
 User Stories:
 As a Product Owner:
 
-I want to see how many users signed up this week so I can track growth
-I want to know how many users are active daily so I can measure engagement
-I want to see which days users are most active so I can plan feature releases
-I want to track user retention - do users come back after 1 week, 1 month?
+I want to see how many members signed up this week so I can track growth
+I want to know how many members are active daily so I can measure engagement
+I want to see which days members are most active so I can plan feature releases
+I want to track member retention - do members come back after 1 week, 1 month?
 
 As a Community Manager:
 
 I want to see signup trends over time so I can correlate with marketing efforts
-I want to know when users are most active so I can schedule announcements
-I want to identify power users (login frequently) vs casual users
+I want to know when members are most active so I can schedule announcements
+I want to identify power members (login frequently) vs casual members
 
 As a Developer:
 
 I want to track login success vs failure rates to monitor system health
-I want to see geographic patterns of where users are signing up from
-I want to know which features trigger the most user activity
+I want to see geographic patterns of where members are signing up from
+I want to know which features trigger the most member activity
 
 Event Flow Stories:
-"User Logs In" Story:
+"Member Logs In" Story:
 
-User enters credentials in frontend
+Member enters credentials in frontend
 Auth service validates login
-Auth service publishes "user logged in" event
-Analytics service captures login time, user ID, location
-Analytics service updates "daily active users" counter
-Dashboard shows real-time active user count
+Auth service publishes "member logged in" event
+Analytics service captures login time, member ID, location
+Analytics service updates "daily active members" counter
+Dashboard shows real-time active member count
 
-"Track User Retention" Story:
+"Track Member Retention" Story:
 
-User signs up (existing event you have)
-Analytics service marks user as "new user"
-Analytics service tracks when same user logs in again
-Calculate: "Did user return within 7 days?"
+Member signs up (existing event you have)
+Analytics service marks member as "new member"
+Analytics service tracks when same member logs in again
+Calculate: "Did member return within 7 days?"
 Display retention rates on admin dashboard
 
 "Popular Times" Story:
@@ -68,13 +68,11 @@ func NewService(repo Repository, ch *amqp.Channel) Service {
 	return &service{repo: repo, publishCh: ch}
 }
 
-func (s *service) Create(memberActivity *MemberActivityEvent) (*Analytics, error) {
-	// validation and error handling TODO: missing fields
+func (s *service) Create(memberActivity *MemberActivityEventMessage) (*Analytics, error) {
 	if memberActivity.EventName == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "Event name field is required")
 	}
 
-	// validate id is a legit uuid
 	id, err := uuid.Parse(memberActivity.MemberID)
 
 	if err != nil {

@@ -15,7 +15,7 @@ type consumer struct {
 }
 
 type Service interface {
-	Create(activity *MemberActivityEvent) (*Analytics, error)
+	Create(activity *MemberActivityEventMessage) (*Analytics, error)
 }
 
 func NewConsumer(service Service, ch *amqp.Channel) *consumer {
@@ -37,7 +37,7 @@ func (c *consumer) memberSignedUpEventListener() {
 		log.Fatal(err)
 	}
 
-	// bind to the exchange that will publish ExampleCreateEvent events
+	// bind to the exchange that will publish member.signedup events
 	err = c.publishCh.QueueBind(
 		queue.Name,
 		"",
@@ -65,11 +65,11 @@ func (c *consumer) memberSignedUpEventListener() {
 		fmt.Printf("\nsuccessfully received event message: %+v\n\n", memberSignedUp)
 
 		// create analytics event
-		c.service.Create(&MemberActivityEvent{
+		c.service.Create(&MemberActivityEventMessage{
 			MemberID:  memberSignedUp.UserID,
-			EventType: "user_activity",
+			EventType: "member_activity",
 			EventName: "member_signup",
-			Data:      fmt.Sprintf(`{"user_id":"%s"}`, memberSignedUp.UserID),
+			Data:      fmt.Sprintf(`{"member_id":"%s"}`, memberSignedUp.UserID),
 		})
 	}
 }
