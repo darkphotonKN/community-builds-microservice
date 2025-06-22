@@ -1,10 +1,7 @@
 package analytics
 
 import (
-	"time"
-
 	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
-	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -12,39 +9,29 @@ type repository struct {
 	db *sqlx.DB
 }
 
-func NewRepository(db *sqlx.DB) *repository {
+func NewRepository(db *sqlx.DB) Repository {
 	return &repository{db: db}
 }
 
-func (r *repository) Create(req *MemberActivityEvent) (*MemberActivityEvent, error) {
-	now := time.Now()
-	analyticsModel := &MemberActivityEvent{
-		ID:       uuid.New(),
-		MemberID: req.MemberID,
-	}
-
+func (r *repository) CreateMemberActivityEvent(memberActivityEvent *MemberActivityEvent) (*MemberActivityEvent, error) {
 	query := `
-		INSERT INTO analytics (id, member_id, event_type, event_name, data, session_id, ip_address, user_agent, created_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-		RETURNING id, member_id, event_type, event_name, data, session_id, ip_address, user_agent, created_at
+		INSERT INTO member_activity_events (member_id, activity_type, timestamp, date)
+		VALUES ($1, $2, $3, $4)
+		RETURNING id, member_id, activity_type, timestamp, date
 	`
 
+	var result MemberActivityEvent
 	err := r.db.QueryRowx(
 		query,
-		analyticsModel.ID,
-		analyticsModel.MemberID,
-		analyticsModel.EventType,
-		analyticsModel.EventName,
-		analyticsModel.Data,
-		analyticsModel.SessionID,
-		analyticsModel.IPAddress,
-		analyticsModel.UserAgent,
-		analyticsModel.CreatedAt,
-	).StructScan(analyticsModel)
+		memberActivityEvent.MemberID,
+		memberActivityEvent.ActivityType,
+		memberActivityEvent.Timestamp,
+		memberActivityEvent.Date,
+	).StructScan(&result)
 
 	if err != nil {
 		return nil, commonhelpers.AnalyzeDBErr(err)
 	}
 
-	return analyticsModel, nil
+	return &result, nil
 }
