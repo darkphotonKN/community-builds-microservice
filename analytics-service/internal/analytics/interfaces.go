@@ -1,7 +1,7 @@
 package analytics
 
 type Creator interface {
-	Create(createAnalytics *CreateAnalytics) (*Analytics, error)
+	CreateMemberActivityEvent(req *CreateMemberActivityEvent) (*MemberActivityEvent, error)
 }
 
 type ConsumerService interface {

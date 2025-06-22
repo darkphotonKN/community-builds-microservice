@@ -12,22 +12,15 @@ type repository struct {
 	db *sqlx.DB
 }
 
-func NewRepository(db *sqlx.DB) Repository {
+func NewRepository(db *sqlx.DB) *repository {
 	return &repository{db: db}
 }
 
-func (r *repository) Create(analytics *CreateAnalytics) (*Analytics, error) {
+func (r *repository) Create(req *MemberActivityEvent) (*MemberActivityEvent, error) {
 	now := time.Now()
-	analyticsModel := &Analytics{
-		ID:        uuid.New(),
-		MemberID:  analytics.MemberID,
-		EventType: analytics.EventType,
-		EventName: analytics.EventName,
-		Data:      analytics.Data,
-		SessionID: analytics.SessionID,
-		IPAddress: analytics.IPAddress,
-		UserAgent: analytics.UserAgent,
-		CreatedAt: now,
+	analyticsModel := &MemberActivityEvent{
+		ID:       uuid.New(),
+		MemberID: req.MemberID,
 	}
 
 	query := `
@@ -55,4 +48,3 @@ func (r *repository) Create(analytics *CreateAnalytics) (*Analytics, error) {
 
 	return analyticsModel, nil
 }
-

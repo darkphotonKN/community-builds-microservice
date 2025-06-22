@@ -2,11 +2,10 @@ package analytics
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 /*
@@ -61,44 +60,36 @@ type service struct {
 }
 
 type Repository interface {
-	Create(analytics *Analytics) (*Analytics, error)
+	CreateMemberActivityEvent(memberActivityEvent *MemberActivityEvent) (*MemberActivityEvent, error)
 }
 
 func NewService(repo Repository, ch *amqp.Channel) Service {
 	return &service{repo: repo, publishCh: ch}
 }
 
-func (s *service) Create(createAnalytics *CreateAnalytics) (*Analytics, error) {
-	// validate activity
-	eventType, err := s.GetEventType(createAnalytics.ActivityType)
-
-	if err != nil {
-		fmt.Printf("Error when attempting to validate activity: %s. Event type matches this activity", createAnalytics.ActivityType)
-		return nil, status.Errorf(codes.InvalidArgument, "Error when attempting to get event name: %s"+err.Error())
-	}
-
-	id, err := uuid.Parse(createAnalytics.MemberID)
+func (s *service) CreateMemberActivityEvent(req *CreateMemberActivityEvent) (*MemberActivityEvent, error) {
+	id, err := uuid.Parse(req.MemberID)
 
 	if err != nil {
 		return nil, err
 	}
 
 	// map it to analytics table entity
-	newAnalytics := &Analytics{
+	entity := &MemberActivityEvent{
 		MemberID:     id,
-		EventType:    string(eventType),
-		ActivityType: string(createAnalytics.ActivityType),
-		Data:         createAnalytics.Data,
+		ActivityType: string(req.ActivityType),
+		Timestamp:    time.Now(),
+		Date:         time.Now().Truncate(24 * time.Hour),
 	}
 
-	analytics, err := s.repo.Create(newAnalytics)
+	newMemberActivityEvent, err := s.repo.CreateMemberActivityEvent(entity)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Println("analytics was created:", analytics)
+	fmt.Println("MemberActivityEvent analytics was created:", newMemberActivityEvent)
 
-	return analytics, nil
+	return newMemberActivityEvent, nil
 }
 
 type EventType string

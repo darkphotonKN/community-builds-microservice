@@ -61,10 +61,9 @@ func (c *consumer) memberSignedUpEventListener() {
 		fmt.Printf("\nsuccessfully received event message: %+v\n\n", memberSignedUp)
 
 		// create analytics event
-		_, err := c.service.Create(&MemberActivityEventMessage{
-			MemberID:  memberSignedUp.UserID,
-			EventType: EventTypeMemberActivity,
-			Data:      fmt.Sprintf(`{"member_id":"%s"}`, memberSignedUp.UserID),
+		_, err = c.service.CreateMemberActivityEvent(&CreateMemberActivityEvent{
+			MemberID:     memberSignedUp.UserID,
+			ActivityType: ActivityTypeMemberCreated,
 		})
 	}
 }
