@@ -79,14 +79,14 @@ func (s *service) GetAllByMemberId(ctx context.Context, request *pb.GetNotificat
 		defaultQueryLimit := int32(10)
 		query.Limit = &defaultQueryLimit
 	} else {
-		query.Limit = query.Limit
+		query.Limit = request.Limit
 	}
 
 	if request.Offset == nil {
-		defaultQueryOffset := int32(10)
+		defaultQueryOffset := int32(0)
 		query.Offset = &defaultQueryOffset
 	} else {
-		query.Offset = query.Offset
+		query.Offset = request.Offset
 	}
 
 	notifications, err := s.repo.GetAll(ctx, query)

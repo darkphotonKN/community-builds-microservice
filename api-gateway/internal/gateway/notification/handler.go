@@ -1,6 +1,7 @@
 package notification
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -86,9 +87,13 @@ func (h *Handler) GetNotificationsByMemberIdHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	notificationRes := gin.H{
 		"statusCode": http.StatusOK,
 		"message":    "Successfully retrieved notifications",
 		"result":     response.Data,
-	})
+	}
+
+	fmt.Printf("\nnotificationRes before going back to FE: %+v\n\n", notificationRes)
+
+	c.JSON(http.StatusOK, notificationRes)
 }
