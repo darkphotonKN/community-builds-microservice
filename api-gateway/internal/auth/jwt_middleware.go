@@ -63,7 +63,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		// store string version for cleaner transfer to external microservices via grpc
 		c.Set("userIdStr", userIdStr)
 
-		// passdown the flow to next hanlder
+		// passdown the flow to next handler
 		c.Next()
 	}
 }

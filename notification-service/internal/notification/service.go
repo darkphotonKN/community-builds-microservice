@@ -83,10 +83,10 @@ func (s *service) GetAllByMemberId(ctx context.Context, request *pb.GetNotificat
 	}
 
 	if request.Offset == nil {
-		defaultQueryLimit := int32(10)
-		query.Limit = &defaultQueryLimit
+		defaultQueryOffset := int32(10)
+		query.Offset = &defaultQueryOffset
 	} else {
-		query.Limit = query.Limit
+		query.Offset = query.Offset
 	}
 
 	notifications, err := s.repo.GetAll(ctx, query)
@@ -95,24 +95,31 @@ func (s *service) GetAllByMemberId(ctx context.Context, request *pb.GetNotificat
 		return nil, err
 	}
 
-	// convert back to grpc typje
-	notificationsData := make([]*pb.Notification, len(notifications))
+	// convert back to grpc type
+	var notificationsData []*pb.Notification
 
-	for index, notification := range notifications {
-		notificationsData[index] = &pb.Notification{
-			Id:        notification.ID.String(),
-			MemberId:  notification.MemberID.String(),
-			Type:      notification.Type,
-			Title:     notification.Title,
-			Message:   notification.Message,
-			Read:      notification.Read,
-			EmailSent: notification.EmailSent,
-			CreatedAt: timestamppb.New(notification.CreatedAt),
+	if len(notifications) == 0 {
+		notificationsData = []*pb.Notification{} // set default empty array if result is nil
+	} else {
+		notificationsData = make([]*pb.Notification, len(notifications))
+
+		for index, notification := range notifications {
+			notificationsData[index] = &pb.Notification{
+				Id:        notification.ID.String(),
+				MemberId:  notification.MemberID.String(),
+				Type:      notification.Type,
+				Title:     notification.Title,
+				Message:   notification.Message,
+				Read:      notification.Read,
+				EmailSent: notification.EmailSent,
+				CreatedAt: timestamppb.New(notification.CreatedAt),
+			}
+
+			if notification.SourceID != nil {
+				notificationsData[index].SourceId = notification.SourceID.String()
+			}
 		}
 
-		if notification.SourceID != nil {
-			notificationsData[index].SourceId = notification.SourceID.String()
-		}
 	}
 
 	notificationsResponse := &pb.GetNotificationsResponse{
