@@ -1,6 +1,7 @@
 package notification
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -19,6 +20,19 @@ func NewHandler(client NotificationClient) *Handler {
 	return &Handler{
 		client: client,
 	}
+}
+func debugSlice(name string, slice []*pb.Notification) {
+	fmt.Printf("=== %s DEBUG ===\n", name)
+	fmt.Printf("  Value: %+v\n", slice)
+	fmt.Printf("  Is nil: %t\n", slice == nil)
+	fmt.Printf("  Length: %d\n", len(slice))
+	fmt.Printf("  Capacity: %d\n", cap(slice))
+	fmt.Printf("  Type: %T\n", slice)
+
+	// JSON representation
+	jsonBytes, _ := json.Marshal(slice)
+	fmt.Printf("  JSON: %s\n", string(jsonBytes))
+	fmt.Printf("================\n\n")
 }
 
 func (h *Handler) GetNotificationsByMemberIdHandler(c *gin.Context) {
@@ -87,6 +101,14 @@ func (h *Handler) GetNotificationsByMemberIdHandler(c *gin.Context) {
 		return
 	}
 
+	debugSlice("BEFORE response.Data", response.Data)
+
+	if len(response.Data) == 0 {
+		response.Data = make([]*pb.Notification, 0)
+
+		debugSlice("AFTER response.Data", response.Data)
+	}
+
 	notificationRes := gin.H{
 		"statusCode": http.StatusOK,
 		"message":    "Successfully retrieved notifications",
@@ -94,6 +116,5 @@ func (h *Handler) GetNotificationsByMemberIdHandler(c *gin.Context) {
 	}
 
 	fmt.Printf("\nnotificationRes before going back to FE: %+v\n\n", notificationRes)
-
 	c.JSON(http.StatusOK, notificationRes)
 }

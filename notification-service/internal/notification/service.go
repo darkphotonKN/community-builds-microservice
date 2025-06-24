@@ -2,6 +2,7 @@ package notification
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/notification"
@@ -126,7 +127,23 @@ func (s *service) GetAllByMemberId(ctx context.Context, request *pb.GetNotificat
 		Data: notificationsData,
 	}
 
+	debugSlice("After notificationResponse.Data", notificationsResponse.Data)
+
 	return notificationsResponse, nil
+}
+
+func debugSlice(name string, slice []*pb.Notification) {
+	fmt.Printf("=== %s DEBUG ===\n", name)
+	fmt.Printf("  Value: %+v\n", slice)
+	fmt.Printf("  Is nil: %t\n", slice == nil)
+	fmt.Printf("  Length: %d\n", len(slice))
+	fmt.Printf("  Capacity: %d\n", cap(slice))
+	fmt.Printf("  Type: %T\n", slice)
+
+	// JSON representation
+	jsonBytes, _ := json.Marshal(slice)
+	fmt.Printf("  JSON: %s\n", string(jsonBytes))
+	fmt.Printf("================\n\n")
 }
 
 /**
