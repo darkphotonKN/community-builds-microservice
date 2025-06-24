@@ -97,53 +97,30 @@ func (s *service) GetAllByMemberId(ctx context.Context, request *pb.GetNotificat
 	}
 
 	// convert back to grpc type
-	var notificationsData []*pb.Notification
+	notificationsData := make([]*pb.Notification, len(notifications))
 
-	if len(notifications) == 0 {
-		notificationsData = []*pb.Notification{} // set default empty array if result is nil
-	} else {
-		notificationsData = make([]*pb.Notification, len(notifications))
-
-		for index, notification := range notifications {
-			notificationsData[index] = &pb.Notification{
-				Id:        notification.ID.String(),
-				MemberId:  notification.MemberID.String(),
-				Type:      notification.Type,
-				Title:     notification.Title,
-				Message:   notification.Message,
-				Read:      notification.Read,
-				EmailSent: notification.EmailSent,
-				CreatedAt: timestamppb.New(notification.CreatedAt),
-			}
-
-			if notification.SourceID != nil {
-				notificationsData[index].SourceId = notification.SourceID.String()
-			}
+	for index, notification := range notifications {
+		notificationsData[index] = &pb.Notification{
+			Id:        notification.ID.String(),
+			MemberId:  notification.MemberID.String(),
+			Type:      notification.Type,
+			Title:     notification.Title,
+			Message:   notification.Message,
+			Read:      notification.Read,
+			EmailSent: notification.EmailSent,
+			CreatedAt: timestamppb.New(notification.CreatedAt),
 		}
 
+		if notification.SourceID != nil {
+			notificationsData[index].SourceId = notification.SourceID.String()
+		}
 	}
 
 	notificationsResponse := &pb.GetNotificationsResponse{
 		Data: notificationsData,
 	}
 
-	debugSlice("After notificationResponse.Data", notificationsResponse.Data)
-
 	return notificationsResponse, nil
-}
-
-func debugSlice(name string, slice []*pb.Notification) {
-	fmt.Printf("=== %s DEBUG ===\n", name)
-	fmt.Printf("  Value: %+v\n", slice)
-	fmt.Printf("  Is nil: %t\n", slice == nil)
-	fmt.Printf("  Length: %d\n", len(slice))
-	fmt.Printf("  Capacity: %d\n", cap(slice))
-	fmt.Printf("  Type: %T\n", slice)
-
-	// JSON representation
-	jsonBytes, _ := json.Marshal(slice)
-	fmt.Printf("  JSON: %s\n", string(jsonBytes))
-	fmt.Printf("================\n\n")
 }
 
 /**
