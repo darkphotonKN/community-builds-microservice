@@ -433,7 +433,7 @@ func (r *BuildRepository) GetBuildInfo(buildId uuid.UUID) (*BuildInfoResponse, e
 
 	// create the base of the response
 	result := BuildInfoResponse{
-		ID:          buildInfoRows[0].ID,
+		Id:          buildInfoRows[0].Id,
 		Title:       buildInfoRows[0].Title,
 		Description: buildInfoRows[0].Description,
 	}
