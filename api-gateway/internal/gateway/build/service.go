@@ -44,7 +44,7 @@ func (s *BuildService) GetCommunityBuildsService(pageNo int, pageSize int, sortO
 	buildList := make([]BuildListResponse, len(builds))
 
 	for index, build := range builds {
-		tags, err := s.Repo.GetBuildTagsForMemberById(build.ID)
+		tags, err := s.Repo.GetBuildTagsForMemberById(build.Id)
 
 		// exit prematurely with error if any tags returned an error
 		if err != nil {
@@ -52,7 +52,7 @@ func (s *BuildService) GetCommunityBuildsService(pageNo int, pageSize int, sortO
 		}
 
 		buildList[index] = BuildListResponse{
-			ID:                 build.ID,
+			Id:                 build.Id,
 			Title:              build.Title,
 			Description:        build.Description,
 			Class:              build.Class,
@@ -78,7 +78,7 @@ func (s *BuildService) GetCommunityBuildsService(pageNo int, pageSize int, sortO
 **/
 func (s *BuildService) CreateBuildService(memberId uuid.UUID, createBuildRequest CreateBuildRequest) error {
 	// confirm skill exists
-	_, err := s.SkillService.GetSkillByIdService(createBuildRequest.SkillID)
+	_, err := s.SkillService.GetSkillByIdService(createBuildRequest.SkillId)
 
 	if err != nil {
 		return fmt.Errorf("main skill id could not be found when attempting to create build for it.")
@@ -103,7 +103,7 @@ func (s *BuildService) CreateBuildService(memberId uuid.UUID, createBuildRequest
 	}
 
 	// create build tags
-	err = s.Repo.CreateBuildTags(*buildId, createBuildRequest.TagIDs)
+	err = s.Repo.CreateBuildTags(*buildId, createBuildRequest.TagIds)
 
 	if err != nil {
 		return err
@@ -167,7 +167,7 @@ func (s *BuildService) GetBuildsForMemberService(memberId uuid.UUID) (*[]BuildLi
 
 	// query and add each builds tag's
 	for index, build := range *baseBuilds {
-		tags, err := s.Repo.GetBuildTagsForMemberById(build.ID)
+		tags, err := s.Repo.GetBuildTagsForMemberById(build.Id)
 
 		// stop query pre-maturely if errored on query
 		if err != nil {
@@ -175,7 +175,7 @@ func (s *BuildService) GetBuildsForMemberService(memberId uuid.UUID) (*[]BuildLi
 		}
 
 		buildListResponse[index] = BuildListResponse{
-			ID:                 build.ID,
+			Id:                 build.Id,
 			Title:              build.Title,
 			Description:        build.Description,
 			Class:              build.Class,
@@ -270,7 +270,7 @@ func (s *BuildService) GetBuildInfoForMemberService(memberId uuid.UUID, buildId 
 
 	// return all join information (base, class, ascendancy, skills and items)
 	buildInfo := BuildInfoResponse{
-		Id:          build.Id,
+		ID:          build.Id,
 		Title:       build.Title,
 		Description: build.Description,
 		// TODO: add ascendancy and class

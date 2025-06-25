@@ -6,7 +6,7 @@
 
 # Go build artifacts
 bin/
-build/
+# build/
 dist/
 *.out
 tmp/
@@ -76,3 +76,7 @@ api-docs/
 
 
 .claude
+
+
+# macOS specific files
+.DS_Store

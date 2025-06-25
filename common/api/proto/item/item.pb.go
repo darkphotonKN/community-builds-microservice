@@ -4,7 +4,7 @@
 // 	protoc        v5.29.3
 // source: api/proto/item/item.proto
 
-package itemgrpc
+package item
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -959,15 +959,23 @@ const file_api_proto_item_item_proto_rawDesc = "" +
 	"\n" +
 	"_createdAtB\f\n" +
 	"\n" +
+<<<<<<< HEAD
 	"_updatedAt\"\xad\x01\n" +
+=======
+	"_updatedAt\"\x99\x01\n" +
+>>>>>>> b88431d (build microservice)
 	"\x11CreateItemRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\bcategory\x18\x02 \x01(\tR\bcategory\x12\x14\n" +
 	"\x05class\x18\x03 \x01(\tR\x05class\x12\x12\n" +
 	"\x04type\x18\x04 \x01(\tR\x04type\x12\x12\n" +
 	"\x04name\x18\x05 \x01(\tR\x04name\x12\x1a\n" +
+<<<<<<< HEAD
 	"\bimageURL\x18\x06 \x01(\tR\bimageURL\x12\x12\n" +
 	"\x04slot\x18\a \x01(\tR\x04slot\".\n" +
+=======
+	"\bimageURL\x18\x06 \x01(\tR\bimageURL\".\n" +
+>>>>>>> b88431d (build microservice)
 	"\x12CreateItemResponse\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage\"%\n" +
 	"\x0fGetItemsRequest\x12\x12\n" +
@@ -1004,7 +1012,11 @@ const file_api_proto_item_item_proto_rawDesc = "" +
 	"\x13GenerateUniqueItems\x12\x16.google.protobuf.Empty\x1a%.itemgrpc.GenerateUniqueItemsResponse\"\x00\x12I\n" +
 	"\n" +
 	"UpdateItem\x12\x1b.itemgrpc.UpdateItemRequest\x1a\x1c.itemgrpc.UpdateItemResponse\"\x00\x12U\n" +
+<<<<<<< HEAD
 	"\x0eCreateRareItem\x12\x1f.itemgrpc.CreateRareItemRequest\x1a .itemgrpc.CreateRareItemResponse\"\x00B\x12Z\x10./proto;itemgrpcb\x06proto3"
+=======
+	"\x0eCreateRareItem\x12\x1f.itemgrpc.CreateRareItemRequest\x1a .itemgrpc.CreateRareItemResponse\"\x00BMZKgithub.com/darkphotonKN/community-builds-microservice/common/api/proto/itemb\x06proto3"
+>>>>>>> b88431d (build microservice)
 
 var (
 	file_api_proto_item_item_proto_rawDescOnce sync.Once

@@ -4,7 +4,7 @@ package itemgrpc;
 
 import "google/protobuf/empty.proto";
 
-option go_package = "./proto;itemgrpc";
+option go_package = "github.com/darkphotonKN/community-builds-microservice/common/api/proto/item";
 
 service ItemService {
   rpc CreateItem(CreateItemRequest) returns (CreateItemResponse) {}

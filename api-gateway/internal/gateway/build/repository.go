@@ -135,7 +135,7 @@ func (r *BuildRepository) GetAllBuilds(
 
 	for index, build := range builds {
 		buildList[index] = BuildListQuery{
-			ID:                 build.ID,
+			Id:                 build.Id,
 			Title:              build.Title,
 			Description:        build.Description,
 			Class:              build.Class,
@@ -164,7 +164,7 @@ func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest Cre
 		builds(member_id, main_skill_id, class_id, title, description
 	`
 
-	if createBuildRequest.AscendancyID != uuid.Nil {
+	if createBuildRequest.AscendancyId != uuid.Nil {
 		baseQuery += ", ascendancy_id"
 	}
 
@@ -174,7 +174,7 @@ func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest Cre
 
 	finalQuery := ""
 
-	if createBuildRequest.AscendancyID != uuid.Nil {
+	if createBuildRequest.AscendancyId != uuid.Nil {
 		finalQuery = finalQuery + `, $6)
 			RETURNING id
 			`
@@ -191,10 +191,10 @@ func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest Cre
 	var buildId uuid.UUID
 
 	var err error
-	if createBuildRequest.AscendancyID != uuid.Nil {
-		err = r.DB.QueryRowx(query, memberId, createBuildRequest.SkillID, createBuildRequest.ClassID, createBuildRequest.Title, createBuildRequest.Description, createBuildRequest.AscendancyID).Scan(&buildId)
+	if createBuildRequest.AscendancyId != uuid.Nil {
+		err = r.DB.QueryRowx(query, memberId, createBuildRequest.SkillId, createBuildRequest.ClassId, createBuildRequest.Title, createBuildRequest.Description, createBuildRequest.AscendancyId).Scan(&buildId)
 	} else {
-		err = r.DB.QueryRowx(query, memberId, createBuildRequest.SkillID, createBuildRequest.ClassID, createBuildRequest.Title, createBuildRequest.Description).Scan(&buildId)
+		err = r.DB.QueryRowx(query, memberId, createBuildRequest.SkillId, createBuildRequest.ClassId, createBuildRequest.Title, createBuildRequest.Description).Scan(&buildId)
 	}
 
 	if err != nil {
@@ -206,7 +206,7 @@ func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest Cre
 
 func (r *BuildRepository) UpdateBuild(memberId uuid.UUID, buildId uuid.UUID, request UpdateBuildRequest) error {
 
-	fmt.Printf("request.SkillID :%s\n", request.SkillID)
+	fmt.Printf("request.SkillId :%s\n", request.SkillId)
 
 	query := `
 	UPDATE builds
@@ -223,9 +223,9 @@ func (r *BuildRepository) UpdateBuild(memberId uuid.UUID, buildId uuid.UUID, req
 	params := map[string]interface{}{
 		"title":         request.Title,
 		"description":   request.Description,
-		"main_skill_id": request.SkillID,
-		"class_id":      request.ClassID,
-		"ascendancy_id": request.AscendancyID,
+		"main_skill_id": request.SkillId,
+		"class_id":      request.ClassId,
+		"ascendancy_id": request.AscendancyId,
 		"build_id":      buildId,
 		"member_id":     memberId,
 	}
@@ -433,7 +433,7 @@ func (r *BuildRepository) GetBuildInfo(buildId uuid.UUID) (*BuildInfoResponse, e
 
 	// create the base of the response
 	result := BuildInfoResponse{
-		ID:          buildInfoRows[0].ID,
+		ID:          buildInfoRows[0].Id,
 		Title:       buildInfoRows[0].Title,
 		Description: buildInfoRows[0].Description,
 	}
