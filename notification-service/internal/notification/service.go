@@ -21,6 +21,7 @@ type Repository interface {
 	Create(notification *CreateNotification) (*Notification, error)
 	GetAll(ctx context.Context, request *QueryNotifications) ([]Notification, error)
 	// CreateItem(notification *CreateNotification) (*Notification, error)
+	Update(request *UpdateNotification) error
 }
 
 func NewService(repo Repository, ch *amqp.Channel) *service {
@@ -148,6 +149,22 @@ func (s *service) CreateItem(itemCreated *CreateNotification) (*Notification, er
 	fmt.Println("notification was created:", newNotification)
 
 	return newNotification, nil
+}
+
+func (s *service) ReadNotification(idStr string) error {
+
+	// validate id is a legit uuid
+	id, err := uuid.Parse(idStr)
+
+	if err != nil {
+		fmt.Println("Error occured when parsing uuid:", err)
+		return err
+	}
+
+	request := &UpdateNotification{
+		ID: id,
+	}
+	return s.repo.Update(request)
 }
 
 /**

@@ -107,3 +107,19 @@ func (r *repository) GetAll(ctx context.Context, request *QueryNotifications) ([
 
 	return notifications, nil
 }
+
+func (r *repository) Update(request *UpdateNotification) error {
+	query := `
+	UPDATE notifications(read)
+	SET read =: :read
+	WHERE id = :id
+	`
+
+	_, err := r.db.NamedExec(query, request)
+
+	if err != nil {
+		return commonhelpers.AnalyzeDBErr(err)
+	}
+
+	return nil
+}

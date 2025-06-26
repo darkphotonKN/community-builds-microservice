@@ -39,3 +39,8 @@ type QueryNotifications struct {
 	Limit    *int32    `json:"limit" db:"member_id"`
 	Offset   *int32    `json:"offset" db:"member_id"`
 }
+
+type UpdateNotification struct {
+	ID   uuid.UUID `json:"id" db:"id"`
+	Read bool      `json:"read" db:"read"`
+}
