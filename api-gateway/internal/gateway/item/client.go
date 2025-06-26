@@ -39,13 +39,7 @@ func (c *Client) CreateItem(ctx context.Context, req *pb.CreateItemRequest) (*pb
 	client := pb.NewItemServiceClient(conn)
 
 	// create client to interface with through service discovery connection
-	item, err := client.CreateItem(ctx, &pb.CreateItemRequest{
-		Name:     req.Name,
-		Category: req.Category,
-		Class:    req.Class,
-		Type:     req.Type,
-		ImageURL: req.ImageURL,
-	})
+	item, err := client.CreateItem(ctx, req)
 
 	fmt.Printf("Creating item %+v through gateway after service discovery\n", item)
 

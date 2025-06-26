@@ -36,6 +36,7 @@ func (h *ItemHandler) CreateItemHandler(c *gin.Context) {
 		Class:    createItemReq.Class,
 		Type:     createItemReq.Type,
 		ImageURL: createItemReq.ImageURL,
+		Slot:     createItemReq.Slot,
 	}
 	item, err := h.Client.CreateItem(c.Request.Context(), grpcReq)
 	if err != nil {

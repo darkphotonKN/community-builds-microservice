@@ -22,19 +22,12 @@ func NewRepository(db *sqlx.DB) Repository {
 
 func (r *repository) CreateItem(createItem *CreateItemRequest) error {
 
-	req := CreateItemRequest{
-		Category: createItem.Category,
-		Class:    createItem.Class,
-		Type:     createItem.Type,
-		Name:     createItem.Name,
-		ImageURL: createItem.ImageURL,
-	}
 	query := `
-		INSERT INTO items(name, category, class, type, image_url)
-		VALUES(:name, :category, :class, :type,  :image_url)
+		INSERT INTO items(name, category, class, type, image_url, unique_item, slot)
+		VALUES(:name, :category, :class, :type,  :image_url, :unique_item, :slot)
 	`
 
-	_, err := r.db.NamedExec(query, req)
+	_, err := r.db.NamedExec(query, createItem)
 
 	if err != nil {
 		fmt.Print("Error when creating item:", err)

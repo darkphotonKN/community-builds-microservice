@@ -2,6 +2,7 @@ package item
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,10 +13,12 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/chromedp/chromedp"
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/item"
+	commonconstants "github.com/darkphotonKN/community-builds-microservice/common/constants"
 	"github.com/darkphotonKN/community-builds-microservice/item-service/internal/models"
 	"github.com/darkphotonKN/community-builds-microservice/item-service/internal/utils/dbutils"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"google.golang.org/grpc/codes"
@@ -23,7 +26,8 @@ import (
 )
 
 type service struct {
-	repo Repository
+	Repo      Repository
+	publishCh *amqp.Channel
 }
 
 type Repository interface {
@@ -44,12 +48,16 @@ func toPtr[T any](v T) *T {
 	return &v
 }
 
-func NewService(repo Repository) Service {
-	return &service{repo: repo}
+func NewService(repo Repository, ch *amqp.Channel) *service {
+	return &service{
+		Repo:      repo,
+		publishCh: ch,
+	}
 }
+
 func (s *service) GetItemsService(ctx context.Context, req *pb.GetItemsRequest) (*pb.GetItemsResponse, error) {
 
-	items, err := s.repo.GetItems(req.Slot)
+	items, err := s.Repo.GetItems(req.Slot)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "取得 items 時發生錯誤: %v", err)
 	}
@@ -104,16 +112,46 @@ func (s *service) GetItemsService(ctx context.Context, req *pb.GetItemsRequest) 
 }
 func (s *service) CreateItemService(ctx context.Context, req *pb.CreateItemRequest) (*pb.CreateItemResponse, error) {
 
-	err := s.repo.CreateItem(&CreateItemRequest{
-		Category: req.Category,
-		Class:    req.Class,
-		Type:     req.Type,
-		Name:     req.Name,
-		ImageURL: req.ImageURL,
+	err := s.Repo.CreateItem(&CreateItemRequest{
+		Category:   req.Category,
+		Class:      req.Class,
+		Type:       req.Type,
+		Name:       req.Name,
+		ImageURL:   req.ImageURL,
+		UniqueItem: false,
+		Slot:       req.Slot,
 	})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "創建 item 時發生錯誤: %v", err)
 	}
+
+	// publish to message broker
+	payload := commonconstants.ItemCreatedItemEventPayload{
+		UserID: req.Id,
+		Name:   req.Name,
+		// Email:      req.Email,
+		SignedUpAt: "", // TODO: update this to legit date
+	}
+
+	marshalledPayload, err := json.Marshal(payload)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.publishCh.PublishWithContext(
+		ctx,
+		commonconstants.ItemCreatedItemEvent,
+		"",
+		false,
+		false,
+		amqp.Publishing{
+			ContentType: "application/json",
+			Body:        marshalledPayload,
+			// persist message
+			DeliveryMode: amqp.Persistent,
+		})
+
 	return &pb.CreateItemResponse{Message: fmt.Sprintf("成功創建item")}, nil
 }
 
@@ -123,7 +161,7 @@ func (s *service) UpdateItemService(ctx context.Context, req *pb.UpdateItemReque
 		return nil, status.Errorf(codes.InvalidArgument, "無效的 ID 格式: %v", err)
 	}
 
-	_, err = s.repo.UpdateItemById(id, UpdateItemReq{
+	_, err = s.Repo.UpdateItemById(id, UpdateItemReq{
 		Id:       id,
 		Category: req.Category,
 		Class:    req.Class,
@@ -162,10 +200,10 @@ func (s *service) CreateRareItemService(ctx context.Context, req *pb.CreateRareI
 
 	// create rare item to member list for customize or normal list
 	if req.ToList {
-		err = s.repo.CreateRareItemToList(&item)
+		err = s.Repo.CreateRareItemToList(&item)
 
 	} else {
-		err = s.repo.CreateRareItem(&item)
+		err = s.Repo.CreateRareItem(&item)
 	}
 
 	if err != nil {
@@ -514,7 +552,7 @@ func getItem(currentItemThs []string, index int, tr *goquery.Selection, itemsCh 
 func (s *service) CrawlingAndAddUniqueItemsService(db *sqlx.DB) error {
 	return dbutils.ExecTx(db, func(tx *sqlx.Tx) error {
 
-		isExist := s.repo.CheckUniqueItemExist()
+		isExist := s.Repo.CheckUniqueItemExist()
 		if isExist {
 			fmt.Println("Items already exist, skipping unique item crawling.")
 			return nil
@@ -567,7 +605,7 @@ func (s *service) CrawlingAndAddUniqueItemsService(db *sqlx.DB) error {
 			items = append(items, itemCh)
 		}
 
-		err := s.repo.AddUniqueItems(tx, &items)
+		err := s.Repo.AddUniqueItems(tx, &items)
 		if err != nil {
 			return err
 		}
@@ -580,7 +618,7 @@ func (s *service) CrawlingAndAddUniqueItemsService(db *sqlx.DB) error {
 func (s *service) CrawlingAndAddBaseItemsService(db *sqlx.DB) error {
 	return dbutils.ExecTx(db, func(tx *sqlx.Tx) error {
 
-		isExist := s.repo.CheckBaseItemExist()
+		isExist := s.Repo.CheckBaseItemExist()
 		if isExist {
 			fmt.Println("base Items already exist, skipping base item crawling.")
 			return nil
@@ -602,7 +640,7 @@ func (s *service) CrawlingAndAddBaseItemsService(db *sqlx.DB) error {
 		for itemCh := range itemsCh {
 			items = append(items, itemCh)
 		}
-		err := s.repo.AddBaseItems(tx, &items)
+		err := s.Repo.AddBaseItems(tx, &items)
 		if err != nil {
 			return err
 		}
@@ -777,7 +815,7 @@ func getBaseItemTable(equipType string, table *goquery.Selection, itemsCh chan m
 func (s *service) CrawlingAndAddItemModsService(db *sqlx.DB) error {
 	return dbutils.ExecTx(db, func(tx *sqlx.Tx) error {
 
-		isExist := s.repo.CheckItemModExist()
+		isExist := s.Repo.CheckItemModExist()
 		if isExist {
 			fmt.Println("Item mods already exist, skipping item mods crawling.")
 			return nil
@@ -799,7 +837,7 @@ func (s *service) CrawlingAndAddItemModsService(db *sqlx.DB) error {
 			items = append(items, itemCh)
 		}
 
-		err := s.repo.AddItemMods(tx, &items)
+		err := s.Repo.AddItemMods(tx, &items)
 		if err != nil {
 			return err
 		}

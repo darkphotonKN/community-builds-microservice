@@ -16,6 +16,7 @@ type CreateItemRequest struct {
 	Type     string `json:"type" binding:"required" db:"type"`
 	Name     string `json:"name" binding:"required,min=2" db:"name"`
 	ImageURL string `json:"imageUrl,omitempty" db:"image_url"`
+	Slot     string `json:"slot,omitempty" db:"image_url"`
 }
 
 type UpdateItemReq struct {

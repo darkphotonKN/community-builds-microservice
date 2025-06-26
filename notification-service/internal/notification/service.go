@@ -2,7 +2,6 @@ package notification
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/notification"
@@ -21,21 +20,22 @@ type service struct {
 type Repository interface {
 	Create(notification *CreateNotification) (*Notification, error)
 	GetAll(ctx context.Context, request *QueryNotifications) ([]Notification, error)
+	// CreateItem(notification *CreateNotification) (*Notification, error)
 }
 
 func NewService(repo Repository, ch *amqp.Channel) *service {
 	return &service{repo: repo, publishCh: ch}
 }
 
-func (s *service) Create(memberCreated *MemberCreatedNotification) (*Notification, error) {
+func (s *service) Create(notification *MemberCreatedNotification) (*Notification, error) {
 	// validation and error handling TODO: missing fields
-	if memberCreated.Title == "" {
+	if notification.Title == "" {
 		fmt.Println("Title is required for creating a new notification.")
 		return nil, status.Errorf(codes.InvalidArgument, "Name field is required")
 	}
 
 	// validate id is a legit uuid
-	id, err := uuid.Parse(memberCreated.MemberID)
+	id, err := uuid.Parse(notification.MemberID)
 
 	if err != nil {
 		fmt.Println("Error occured when parsing uuid:", err)
@@ -45,10 +45,10 @@ func (s *service) Create(memberCreated *MemberCreatedNotification) (*Notificatio
 	// map it to notifications table entity
 	createNotification := &CreateNotification{
 		MemberID: id,
-		Type:     memberCreated.Type,
-		Title:    "welcome_message",
-		Message:  memberCreated.Message,
-		SourceID: memberCreated.SourceID,
+		Type:     notification.Type,
+		Title:    notification.Title,
+		Message:  notification.Message,
+		SourceID: notification.SourceID,
 	}
 
 	newNotification, err := s.repo.Create(createNotification)
@@ -123,6 +123,33 @@ func (s *service) GetAllByMemberId(ctx context.Context, request *pb.GetNotificat
 	return notificationsResponse, nil
 }
 
+func (s *service) CreateItem(itemCreated *CreateNotification) (*Notification, error) {
+	// validation and error handling TODO: missing fields
+	if itemCreated.Title == "" {
+		fmt.Println("Title is required for creating a new notification.")
+		return nil, status.Errorf(codes.InvalidArgument, "Name field is required")
+	}
+
+	// map it to notifications table entity
+	createNotification := &CreateNotification{
+		MemberID: itemCreated.MemberID,
+		Type:     itemCreated.Type,
+		Title:    "create_item_message",
+		Message:  itemCreated.Message,
+		SourceID: itemCreated.SourceID,
+	}
+
+	newNotification, err := s.repo.Create(createNotification)
+	if err != nil {
+		fmt.Println("Error occured when creating new notification:", err)
+		return nil, err
+	}
+
+	fmt.Println("notification was created:", newNotification)
+
+	return newNotification, nil
+}
+
 /**
 * Notification Constants and Helper functions
 **/
@@ -132,6 +159,7 @@ type NotificationType string
 const (
 	NotificationWelcome      NotificationType = "welcome"
 	NotificationBuildCreated NotificationType = "build_created"
+	NotificationItemCreated  NotificationType = "item_created"
 )
 
 type NotificationTemplate struct {
@@ -152,10 +180,17 @@ var buildNotificationMessage = NotificationTemplate{
 	Message: "Build was successfully created.",
 }
 
+var itemCreateNotificationMessage = NotificationTemplate{
+	Type:    NotificationItemCreated,
+	Title:   "Create Item",
+	Message: "Item was successfully created.",
+}
+
 func (s *service) GetNotificationTemplate(notificationType NotificationType) (*NotificationTemplate, error) {
 	notificationTemplates := map[NotificationType]*NotificationTemplate{
 		NotificationWelcome:      &welcomeNotificationMessage,
 		NotificationBuildCreated: &buildNotificationMessage,
+		NotificationItemCreated:  &itemCreateNotificationMessage,
 	}
 
 	template, exists := notificationTemplates[notificationType]

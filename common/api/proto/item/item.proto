@@ -68,6 +68,7 @@ message CreateItemRequest {
   string type = 4;
   string name = 5;
   string imageURL = 6;
+  string slot = 7;
   // repeated Item items = 6;
 }
 

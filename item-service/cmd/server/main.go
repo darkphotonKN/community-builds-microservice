@@ -7,6 +7,8 @@ import (
 	"time"
 
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/item"
+	"github.com/darkphotonKN/community-builds-microservice/common/broker"
+	commonconstants "github.com/darkphotonKN/community-builds-microservice/common/constants"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery/consul"
 	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
@@ -21,6 +23,11 @@ var (
 	serviceName = "item-service"
 	grpcAddr    = commonhelpers.GetEnvString("GRPC_EXAMPLE_ADDR", "7010")
 	consulAddr  = commonhelpers.GetEnvString("CONSUL_ADDR", "localhost:8510")
+	// rabbit mq
+	amqpUser     = commonhelpers.GetEnvString("RABBITMQ_USER", "guest")
+	amqpPassword = commonhelpers.GetEnvString("RABBITMQ_PASS", "guest")
+	amqpHost     = commonhelpers.GetEnvString("RABBITMQ_HOST", "localhost")
+	amqpPort     = commonhelpers.GetEnvString("RABBITMQ_PORT", "5672")
 )
 
 func main() {
@@ -73,8 +80,17 @@ func main() {
 
 	defer listener.Close()
 
+	// --- message broker - rabbit mq ---
+	ch, close := broker.Connect(amqpUser, amqpPassword, amqpHost, amqpPort)
+
+	broker.DeclareExchange(ch, commonconstants.ItemCreatedItemEvent, "fanout")
+	defer func() {
+		close()
+		ch.Close()
+	}()
+
 	repo := item.NewRepository(db)
-	service := item.NewService(repo)
+	service := item.NewService(repo, ch)
 	handler := item.NewHandler(service)
 
 	go service.InitCrawling(db)

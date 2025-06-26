@@ -21,8 +21,9 @@ type Exchange struct {
 func DeclareExchanges(ch *amqp.Channel) {
 
 	exchangeList := []Exchange{
-		{ExchangeName: commonconstants.ExampleCreatedEvent, ExchangeType: "fanout"},
+		// {ExchangeName: commonconstants.ExampleCreatedEvent, ExchangeType: "fanout"},
 		{ExchangeName: commonconstants.MemberSignedUpEvent, ExchangeType: "fanout"},
+		{ExchangeName: commonconstants.ItemCreatedItemEvent, ExchangeType: "fanout"},
 	}
 
 	for _, exchange := range exchangeList {
