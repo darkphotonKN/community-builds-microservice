@@ -2,7 +2,6 @@ package notification
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/notification"
