@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package skill;
+
+option go_package = "github.com/darkphotonKN/community-builds-microservices/common/api/proto/skill";
+
+service SkillService {
+  rpc CreateSkill(CreateSkillRequest) returns (CreateSkillResponse) {}
+  // rpc GetBuildsByMemberId(GetBuildsByMemberIdRequest) returns (GetBuildsByMemberIdResponse) {}
+  // rpc GetBuilds(GetBuildsRequest) returns (GetBuildsResponse) {}
+}
+
+// message Skill {
+//   string name = 1;
+//   string type = 2;
+// }
+
+message CreateSkillRequest {
+  string name = 1;
+  string type = 2;
+}
+
+message CreateSkillResponse {
+}
+
+// message GetBuildsByMemberIdRequest {
+//  string memberId = 1;
+// }
+
+// message GetBuildsByMemberIdResponse {
+//   repeated Build builds = 1; // array of items
+// }
+
+// message GenerateUniqueItemsResponse {
+//   string message = 1;
+// }
+
+// message UpdateItemRequest {
+//   string id = 1;
+//   string category = 2;
+//   string class = 3;
+//   string type = 4;
+//   string name = 5;
+//   string imageURL = 6;
+// }
+
+// message UpdateItemResponse {
+//   string message = 1;
+// }
+
+// message CreateRareItemRequest {
+//   string userId = 1;
+//   string baseItemId = 2;
+//   string name = 3;
+//   string class = 4;
+//   repeated string stats = 5;
+//   bool toList = 6; // whether to add the item to the user's item list
+// }
+
+
+// message CreateRareItemResponse {
+//   string message = 1;
+// }
