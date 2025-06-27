@@ -6,11 +6,10 @@ import (
 
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/build"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
-	// pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/item"
 )
 
 const (
-	serviceName = "item-service"
+	serviceName = "build-service"
 )
 
 type Client struct {
