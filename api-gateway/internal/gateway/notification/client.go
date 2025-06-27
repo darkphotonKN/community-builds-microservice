@@ -35,3 +35,17 @@ func (c *Client) GetNotifications(ctx context.Context, req *pb.GetNotificationsR
 	response, err := client.GetNotifications(ctx, req)
 	return response, err
 }
+
+func (c *Client) ReadNotifications(ctx context.Context, req *pb.ReadNotificationRequest) (*pb.ReadNotificationResponse, error) {
+	conn, err := discovery.ServiceConnection(ctx, serviceName, c.registry)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to notification service: %w", err)
+	}
+	defer conn.Close()
+
+	client := pb.NewNotificationServiceClient(conn)
+
+	response, err := client.ReadNotification(ctx, req)
+	return response, err
+}

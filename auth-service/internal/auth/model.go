@@ -20,4 +20,5 @@ type AuthCreate struct {
 // AuthUpdate represents the data needed to update an existing auth
 type AuthUpdate struct {
 	Name string `json:"name" validate:"required"`
-} 
+}
+

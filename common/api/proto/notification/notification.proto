@@ -9,10 +9,16 @@ import "google/protobuf/timestamp.proto";
 service NotificationService {
   // get list of notifications for user
   rpc GetNotifications(GetNotificationsRequest) returns (GetNotificationsResponse) {}
+  rpc ReadNotification(ReadNotificationRequest) returns (ReadNotificationResponse) {}
 }
 
 message GetNotificationsResponse {
   repeated Notification data = 1;
+}
+
+message ReadNotificationResponse {
+  bool success = 1;
+  string message = 2;
 }
 
 message Notification {
@@ -33,3 +39,8 @@ message GetNotificationsRequest {
   optional int32 limit = 2;        
   optional int32 offset = 3;      
 } 
+
+message ReadNotificationRequest {
+  string memberId = 1;
+  string notificationId = 2;
+}

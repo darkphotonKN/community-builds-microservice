@@ -101,3 +101,67 @@ func (h *Handler) GetNotificationsByMemberIdHandler(c *gin.Context) {
 	fmt.Printf("\nnotificationRes before going back to FE: %+v\n\n", notificationRes)
 	c.JSON(http.StatusOK, notificationRes)
 }
+
+func (h *Handler) ReadNotificationsByMemberIdHandler(c *gin.Context) {
+	userIdStr, exists := c.Get("userIdStr")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"statusCode": http.StatusUnauthorized,
+			"message":    "User ID not found in context",
+		})
+		return
+	}
+
+	notificationIdParam, exists := c.Get("notificationId")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"statusCode": http.StatusUnauthorized,
+			"message":    "Notification Id param not provided",
+		})
+		return
+	}
+
+	req := &pb.ReadNotificationRequest{
+		MemberId:       userIdStr.(string),
+		NotificationId: notificationIdParam.(string),
+	}
+
+	response, err := h.client.ReadNotifications(c.Request.Context(), req)
+
+	if err != nil {
+		status, ok := status.FromError(err)
+		if !ok {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"statusCode": http.StatusInternalServerError,
+				"message":    "Internal server error",
+			})
+			return
+		}
+
+		httpStatus := http.StatusInternalServerError
+		switch status.Code() {
+		case codes.NotFound:
+			httpStatus = http.StatusNotFound
+		case codes.InvalidArgument:
+			httpStatus = http.StatusBadRequest
+		}
+
+		c.JSON(httpStatus, gin.H{
+			"statusCode": httpStatus,
+			"message":    status.Message(),
+		})
+		return
+	}
+
+	res := gin.H{
+		"statusCode": http.StatusOK,
+		"message":    response.Message,
+		"result": pb.ReadNotificationResponse{
+			Success: response.Success,
+			Message: response.Message,
+		},
+	}
+
+	c.JSON(http.StatusOK, res)
+}
