@@ -252,7 +252,6 @@ const file_api_proto_notification_notification_proto_rawDesc = "" +
 	"\temailSent\x18\a \x01(\bR\temailSent\x12\x1a\n" +
 	"\bsourceId\x18\b \x01(\tR\bsourceId\x129\n" +
 	"\n" +
-<<<<<<< HEAD
 	"created_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\x82\x01\n" +
 	"\x17GetNotificationsRequest\x12\x1a\n" +
 	"\bmemberId\x18\x01 \x01(\tR\bmemberId\x12\x19\n" +
@@ -260,13 +259,6 @@ const file_api_proto_notification_notification_proto_rawDesc = "" +
 	"\x06offset\x18\x03 \x01(\x05H\x01R\x06offset\x88\x01\x01B\b\n" +
 	"\x06_limitB\t\n" +
 	"\a_offset2z\n" +
-=======
-	"created_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"c\n" +
-	"\x17GetNotificationsRequest\x12\x1a\n" +
-	"\bmemberId\x18\x01 \x01(\tR\bmemberId\x12\x14\n" +
-	"\x05limit\x18\x02 \x01(\x05R\x05limit\x12\x16\n" +
-	"\x06offset\x18\x03 \x01(\x05R\x06offset2z\n" +
->>>>>>> b88431d (build microservice)
 	"\x13NotificationService\x12c\n" +
 	"\x10GetNotifications\x12%.notification.GetNotificationsRequest\x1a&.notification.GetNotificationsResponse\"\x00BUZSgithub.com/darkphotonKN/community-builds-microservice/common/api/proto/notificationb\x06proto3"
 
