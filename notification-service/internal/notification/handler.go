@@ -14,9 +14,9 @@ type Handler struct {
 func (h *Handler) GetNotifications(ctx context.Context, request *pb.GetNotificationsRequest) (*pb.GetNotificationsResponse, error) {
 	return h.service.GetAllByMemberId(ctx, request)
 }
-func (h *Handler) ReadNotifications(ctx context.Context, request *pb.ReadNotificationRequest) error {
 
-	return h.service.ReadNotification(request.MemberId)
+func (h *Handler) ReadNotifications(ctx context.Context, request *pb.ReadNotificationRequest) error {
+	return h.service.ReadNotification(ctx, request)
 }
 
 func NewHandler(service QueryHandlerService) *Handler {

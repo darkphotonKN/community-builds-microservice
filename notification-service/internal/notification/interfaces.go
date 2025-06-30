@@ -19,13 +19,12 @@ type Reader interface {
 type EventConsumerService interface {
 	Creator
 	GetNotificationTemplate(notificationType NotificationType) (*NotificationTemplate, error)
-	ReadNotification(id string) error
 }
 
 // for handler
 type QueryHandlerService interface {
 	Reader
-	ReadNotification(id string) error
+	ReadNotification(ctx context.Context, request *pb.ReadNotificationRequest) error
 }
 
 // core full service interface
