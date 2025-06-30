@@ -41,6 +41,7 @@ type QueryNotifications struct {
 }
 
 type UpdateNotification struct {
-	ID   uuid.UUID `json:"id" db:"id"`
-	Read bool      `json:"read" db:"read"`
+	ID       uuid.UUID `json:"id" db:"id"`
+	MemberId uuid.UUID `json:"member_id" db:"member_id"`
+	Read     bool      `json:"read" db:"read"`
 }
