@@ -25,6 +25,7 @@ type EventConsumerService interface {
 // for handler
 type QueryHandlerService interface {
 	Reader
+	ReadNotification(id string) error
 }
 
 // core full service interface

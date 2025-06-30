@@ -113,6 +113,7 @@ func (r *repository) Update(request *UpdateNotification) error {
 	UPDATE notifications(read)
 	SET read =: :read
 	WHERE id = :id
+	AND member_id = :member_id
 	`
 
 	_, err := r.db.NamedExec(query, request)
