@@ -108,7 +108,7 @@ func (r *repository) GetAll(ctx context.Context, request *QueryNotifications) ([
 	return notifications, nil
 }
 
-func (r *repository) Update(request *UpdateNotification) error {
+func (r *repository) Update(ctx context.Context, request *UpdateNotification) error {
 	query := `
 	UPDATE notifications(read)
 	SET read =: :read
