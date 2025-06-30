@@ -22,7 +22,7 @@ func NewHandler(client NotificationClient) *Handler {
 }
 
 func (h *Handler) GetNotificationsByMemberIdHandler(c *gin.Context) {
-	userIdStr, exists := c.Get("userIdStr")
+	memberIdStr, exists := c.Get("userIdStr")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"statusCode": http.StatusUnauthorized,
@@ -55,7 +55,7 @@ func (h *Handler) GetNotificationsByMemberIdHandler(c *gin.Context) {
 	offset := int32(offsetInt64)
 
 	req := &pb.GetNotificationsRequest{
-		MemberId: userIdStr.(string),
+		MemberId: memberIdStr.(string),
 		Limit:    &limit,
 		Offset:   &offset,
 	}
@@ -103,7 +103,7 @@ func (h *Handler) GetNotificationsByMemberIdHandler(c *gin.Context) {
 }
 
 func (h *Handler) ReadNotificationsByMemberIdHandler(c *gin.Context) {
-	userIdStr, exists := c.Get("userIdStr")
+	memberIdStr, exists := c.Get("userIdStr")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"statusCode": http.StatusUnauthorized,
@@ -123,7 +123,7 @@ func (h *Handler) ReadNotificationsByMemberIdHandler(c *gin.Context) {
 	}
 
 	req := &pb.ReadNotificationRequest{
-		MemberId:       userIdStr.(string),
+		MemberId:       memberIdStr.(string),
 		NotificationId: notificationIdParam.(string),
 	}
 

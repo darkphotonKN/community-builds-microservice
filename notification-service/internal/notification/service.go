@@ -20,8 +20,7 @@ type service struct {
 type Repository interface {
 	Create(notification *CreateNotification) (*Notification, error)
 	GetAll(ctx context.Context, request *QueryNotifications) ([]Notification, error)
-	// CreateItem(notification *CreateNotification) (*Notification, error)
-	Update(request *UpdateNotification) error
+	Update(ctx context.Context, request *UpdateNotification) error
 }
 
 func NewService(repo Repository, ch *amqp.Channel) *service {
@@ -151,7 +150,7 @@ func (s *service) CreateItem(itemCreated *CreateNotification) (*Notification, er
 	return newNotification, nil
 }
 
-func (s *service) ReadNotification(request *pb.ReadNotificationRequest) error {
+func (s *service) ReadNotification(ctx context.Context, request *pb.ReadNotificationRequest) error {
 	// validate ids are legit uuids
 	memberId, err := uuid.Parse(request.MemberId)
 
@@ -174,7 +173,7 @@ func (s *service) ReadNotification(request *pb.ReadNotificationRequest) error {
 		Read:     true,
 	}
 
-	return s.repo.Update(entity)
+	return s.repo.Update(ctx, entity)
 }
 
 /**
