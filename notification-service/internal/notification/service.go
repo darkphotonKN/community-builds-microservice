@@ -151,20 +151,30 @@ func (s *service) CreateItem(itemCreated *CreateNotification) (*Notification, er
 	return newNotification, nil
 }
 
-func (s *service) ReadNotification(idStr string) error {
-
-	// validate id is a legit uuid
-	id, err := uuid.Parse(idStr)
+func (s *service) ReadNotification(request *pb.ReadNotificationRequest) error {
+	// validate ids are legit uuids
+	memberId, err := uuid.Parse(request.MemberId)
 
 	if err != nil {
-		fmt.Println("Error occured when parsing uuid:", err)
+		fmt.Println("Error occured when parsing memberId as uuid:", err)
 		return err
 	}
 
-	request := &UpdateNotification{
-		ID: id,
+	// validate id is a legit uuid
+	notificationId, err := uuid.Parse(request.NotificationId)
+
+	if err != nil {
+		fmt.Println("Error occured when parsing notificationId as uuid:", err)
+		return err
 	}
-	return s.repo.Update(request)
+
+	entity := &UpdateNotification{
+		ID:       notificationId,
+		MemberId: memberId,
+		Read:     true,
+	}
+
+	return s.repo.Update(entity)
 }
 
 /**
