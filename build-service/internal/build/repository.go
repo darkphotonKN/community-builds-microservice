@@ -27,7 +27,7 @@ func (r *repository) GetAllBuilds(
 	search string,
 	skillId uuid.UUID,
 	minRating *int,
-	ratingCategory types.RatingCategory) ([]BuildListQuery, error) {
+	ratingCategory types.RatingCategory) (*[]BuildListQuery, error) {
 
 	var builds []BuildListQuery
 
@@ -149,7 +149,7 @@ func (r *repository) GetAllBuilds(
 
 	fmt.Println("all community buildList:", buildList)
 
-	return buildList, nil
+	return &buildList, nil
 }
 
 func (r *repository) CreateBuild(memberId uuid.UUID, createBuildRequest CreateBuildRequest) (*uuid.UUID, error) {
@@ -260,4 +260,235 @@ func (r *repository) GetBuildsByMemberId(memberId uuid.UUID) (*[]BuildListQuery,
 		return nil, commonhelpers.AnalyzeDBErr(err)
 	}
 	return &builds, nil
+}
+
+/**
+* Community Version for public viewing when the build is published.
+*
+* Getting all information related with builds via joins of
+* join table build skills, builds, and skills, in order to reduce DB
+* round trips.
+**/
+func (r *repository) GetBuildInfo(buildId uuid.UUID) (*BuildInfoResponse, error) {
+	var buildInfoRows []BuildInfoRows
+
+	query := `
+	SELECT
+		builds.id as id,
+		builds.title as title,
+		builds.description as description,
+		build_skill_links.id as skill_link_id,
+		build_skill_links.name as skill_link_name,
+		build_skill_links.is_main as skill_link_is_main,
+		skills.id as skill_id,
+		skills.name as skill_name,
+		skills.type as skill_type
+	FROM builds
+	JOIN build_skill_links ON build_skill_links.build_id = builds.id
+	JOIN build_skill_link_skills ON build_skill_link_skills.build_skill_link_id = build_skill_links.id
+	JOIN skills ON skills.id = build_skill_link_skills.skill_id
+	WHERE builds.id = $1
+	ORDER BY build_skill_links.id
+	`
+
+	fmt.Println("buildId", buildId)
+	err := r.db.Select(&buildInfoRows, query, buildId)
+
+	fmt.Println("buildInfoRows", buildInfoRows)
+
+	if err != nil {
+		fmt.Printf("Error when querying for build info: %s\n", err)
+		return nil, commonhelpers.AnalyzeDBErr(err)
+	}
+
+	var buildItemRows []BuildItemSetResponse
+	itemQuery := `
+	SELECT
+		builds.id AS build_id,
+		build_item_sets.id AS set_id,
+		build_item_set_items.slot AS set_slot,
+		COALESCE(items.unique_item, false) AS unique_item,
+		COALESCE(items.id, null) AS item_id,
+		COALESCE(items.name, '') AS name,
+		COALESCE(items.description, '') AS description,
+		COALESCE(items.required_level, null) AS required_level,
+		COALESCE(items.required_strength, null) AS required_strength,
+		COALESCE(items.required_dexterity, null) AS required_dexterity,
+		COALESCE(items.required_intelligence, null) AS required_intelligence,
+		COALESCE(items.damage, null) AS damage,
+		COALESCE(items.aps, null) AS aps,
+		COALESCE(items.crit, null) AS crit,
+		COALESCE(items.pdps, null) AS pdps,
+		COALESCE(items.edps, null) AS edps,
+		COALESCE(items.dps, null) AS dps,
+		COALESCE(items.additional, null) AS additional,
+		COALESCE(items.stats, null) AS stats,
+		COALESCE(items.implicit, null) AS implicit,
+		COALESCE(items.slot, '') AS slot,
+		COALESCE(items.armour, null) AS armour,
+		COALESCE(items.energy_shield, null) AS energy_shield,
+		COALESCE(items.evasion, null) AS evasion,
+		COALESCE(items.block, null) AS block,
+		COALESCE(items.ward, null) AS ward
+	FROM builds
+	JOIN build_item_sets ON build_item_sets.build_id = builds.id
+	JOIN build_item_set_items ON build_item_set_items.build_item_set_id = build_item_sets.id
+	LEFT JOIN items ON items.id = build_item_set_items.item_id
+	WHERE builds.id = $1
+	`
+	err = r.db.Select(&buildItemRows, itemQuery, buildId)
+
+	if err != nil {
+		fmt.Printf("Error when querying for build items: %s\n", err)
+		return nil, commonhelpers.AnalyzeDBErr(err)
+	}
+
+	fmt.Println("buildItemRows", &buildItemRows)
+	if len(buildInfoRows) == 0 {
+		fmt.Println("No builds queried.")
+
+		// no builds queried with skills or item joins
+		return nil, nil
+	}
+
+	// create the base of the response
+	result := BuildInfoResponse{
+		ID:          buildInfoRows[0].ID,
+		Title:       buildInfoRows[0].Title,
+		Description: buildInfoRows[0].Description,
+	}
+
+	var skillRows []models.SkillRow
+
+	for _, buildInfoRow := range buildInfoRows {
+		skillRows = append(skillRows, models.SkillRow{
+			SkillLinkID:     buildInfoRow.SkillLinkID,
+			SkillLinkName:   buildInfoRow.SkillLinkName,
+			SkillLinkIsMain: buildInfoRow.SkillLinkIsMain,
+			SkillID:         buildInfoRow.SkillID,
+			SkillType:       buildInfoRow.SkillType,
+		})
+
+	}
+
+	skills := r.GetAndFormSkillLinks(skillRows)
+
+	result.Skills = &skills
+
+	result.Sets = buildItemRows
+
+	return &result, nil
+}
+
+/**
+* Retrieves and organizes all skills and skill links.
+**/
+
+func (r *repository) GetAndFormSkillLinks(skillData []models.SkillRow) SkillGroupResponse {
+	var mainSkillLink SkillLinkResponse          // store primary skills
+	var additionalSkillLinks []SkillLinkResponse // stores additional skills
+
+	// group up all skill information
+	for _, row := range skillData {
+
+		// --- grouping primary skills ---
+
+		// identify the "main skilllink" with the "skill_link_is_main" field
+		if row.SkillLinkIsMain {
+			mainSkillLink.SkillLinkName = row.SkillLinkName
+
+			// match start of skill by active skill - match after casting
+			if types.SkillType(row.SkillType) == types.Active {
+
+				mainSkillLink.Skill = models.Skill{
+					Id:   row.SkillID,
+					Name: row.SkillName,
+					Type: row.SkillType,
+				}
+
+			} else {
+				// else its a support skill link
+				mainSkillLink.Links = append(mainSkillLink.Links, models.Skill{
+					Id:   row.SkillID,
+					Name: row.SkillName,
+					Type: row.SkillType,
+				})
+			}
+		} else {
+			// else we construct the secondary skills
+
+			// --- grouping secondary skills ---
+
+			// find existing skillLink via SkillLinkName
+			skillLinkExists := false
+			var existingSkillLink *SkillLinkResponse
+
+			for index := range additionalSkillLinks {
+				if additionalSkillLinks[index].SkillLinkName == row.SkillLinkName {
+					skillLinkExists = true
+					// save reference to original skill link slice
+					existingSkillLink = &additionalSkillLinks[index]
+					break
+				}
+			}
+
+			// update existing link
+			if skillLinkExists {
+				// starting link skill
+				if types.SkillType(row.SkillType) == types.Active {
+
+					existingSkillLink.Skill = models.Skill{
+						Id:   row.SkillID,
+						Name: row.SkillName,
+						Type: row.SkillType,
+					}
+
+				} else {
+					existingSkillLink.Links = append(existingSkillLink.Links, models.Skill{
+						Id:   row.SkillID,
+						Name: row.SkillName,
+						Type: row.SkillType,
+					})
+				}
+
+			} else {
+				// creating new link
+
+				var newAdditionalSkillLink SkillLinkResponse
+
+				// create new skill link name and the first skill
+				newAdditionalSkillLink.SkillLinkName = row.SkillLinkName
+
+				// starting link skill
+				if types.SkillType(row.SkillType) == types.Active {
+					newAdditionalSkillLink.Skill = models.Skill{
+						Id:   row.SkillID,
+						Name: row.SkillName,
+						Type: row.SkillType,
+					}
+
+				} else {
+					// supporting skill link
+					newAdditionalSkillLink.Links = append(newAdditionalSkillLink.Links, models.Skill{
+						Id:   row.SkillID,
+						Name: row.SkillName,
+						Type: row.SkillType,
+					})
+				}
+
+				// add it to slice of additionalSkillLinks
+				additionalSkillLinks = append(additionalSkillLinks, newAdditionalSkillLink)
+			}
+
+		}
+
+	}
+
+	// wrap them for response
+	skills := SkillGroupResponse{
+		MainSkillLinks:   mainSkillLink,
+		AdditionalSkills: additionalSkillLinks,
+	}
+
+	return skills
 }

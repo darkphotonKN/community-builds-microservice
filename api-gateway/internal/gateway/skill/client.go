@@ -44,25 +44,23 @@ func (c *Client) CreateSkill(ctx context.Context, req *pb.CreateSkillRequest) (*
 	return skill, nil
 }
 
-// func (c *Client) GetBuildsByMemberId(ctx context.Context, req *pb.GetBuildsByMemberIdRequest) (*pb.GetBuildsByMemberIdResponse, error) {
+func (c *Client) GetSkills(ctx context.Context, req *pb.GetSkillsRequest) (*pb.GetSkillsResponse, error) {
 
-// 	// connection instance created through service discovery first
-// 	// searches for the service registered as "orders"
-// 	conn, err := discovery.ServiceConnection(ctx, serviceName, c.registry)
+	// connection instance created through service discovery first
+	// searches for the service registered as "orders"
+	conn, err := discovery.ServiceConnection(ctx, serviceName, c.registry)
 
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to connect to item service: %w", err)
-// 	}
-// 	defer conn.Close()
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to item service: %w", err)
+	}
+	defer conn.Close()
 
-// 	client := pb.NewBuildServiceClient(conn)
+	client := pb.NewSkillServiceClient(conn)
 
-// 	// create client to interface with through service discovery connection
-// 	items, err := client.GetBuildsByMemberId(ctx, &pb.GetBuildsByMemberIdRequest{
-// 		MemberId: req.MemberId,
-// 	})
+	// create client to interface with through service discovery connection
+	items, err := client.GetSkills(ctx, &pb.GetSkillsRequest{})
 
-// 	fmt.Printf("Get items %+v through gateway after service discovery\n", items)
+	fmt.Printf("Get items %+v through gateway after service discovery\n", items)
 
-// 	return items, nil
-// }
+	return items, nil
+}

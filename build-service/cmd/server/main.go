@@ -8,10 +8,14 @@ import (
 
 	"github.com/darkphotonKN/community-builds-microservice/build-service/config"
 	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/build"
+	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/skill"
+	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/tag"
 	"github.com/darkphotonKN/community-builds-microservice/common/broker"
 	commonconstants "github.com/darkphotonKN/community-builds-microservice/common/constants"
 
-	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/build"
+	buildPb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/build"
+	skillPb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/skill"
+	tagPb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/tag"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery/consul"
 	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
@@ -90,11 +94,23 @@ func main() {
 		ch.Close()
 	}()
 
-	repo := build.NewRepository(db)
-	service := build.NewService(repo, ch)
-	handler := build.NewHandler(service)
+	skillRepo := skill.NewRepository(db)
+	skillService := skill.NewService(skillRepo)
+	skillHandler := skill.NewHandler(skillService)
 
-	pb.RegisterBuildServiceServer(grpcServer, handler)
+	skillPb.RegisterSkillServiceServer(grpcServer, skillHandler)
+
+	tagRepo := tag.NewRepository(db)
+	tagService := tag.NewService(tagRepo)
+	tagHandler := tag.NewHandler(tagService)
+
+	tagPb.RegisterTagServiceServer(grpcServer, tagHandler)
+
+	buildRepo := build.NewRepository(db)
+	buildService := build.NewService(buildRepo, ch, skillService, tagService)
+	buildHandler := build.NewHandler(buildService)
+
+	buildPb.RegisterBuildServiceServer(grpcServer, buildHandler)
 
 	log.Printf("grpc Order Server started on PORT: %s\n", grpcAddr)
 

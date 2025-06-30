@@ -7,10 +7,56 @@ option go_package = "github.com/darkphotonKN/community-builds-microservices/comm
 service BuildService {
   rpc CreateBuild(CreateBuildRequest) returns (CreateBuildResponse) {}
   rpc GetBuildsByMemberId(GetBuildsByMemberIdRequest) returns (GetBuildsByMemberIdResponse) {}
+  rpc GetCommunityBuilds(GetCommunityBuildsRequest) returns (GetCommunityBuildsResponse) {}
+  rpc GetBuildInfo(GetBuildInfoRequest) returns (GetBuildInfoResponse) {}
   // rpc GetBuilds(GetBuildsRequest) returns (GetBuildsResponse) {}
   // rpc GenerateUniqueBuilds(google.protobuf.Empty) returns (GenerateUniqueBuildsResponse) {}
   // rpc UpdateBuild(UpdateBuildRequest) returns (UpdateBuildResponse) {}
   // rpc CreateRareBuild(CreateRareBuildRequest) returns (CreateRareBuildResponse) {}
+}
+
+message buildItemSetResponse {
+  string buildId = 1;
+  string setId = 2;
+  string itemId = 3;
+  string setSlot = 4;
+
+  string imageUrl = 5;
+  string category = 6;
+  string class = 7;
+  string name = 8;
+  string type = 9;
+  string description = 10;
+  bool UniqueItem = 11;
+  string slot = 12;
+
+  // armor
+  optional string requiredLevel = 13;
+  optional string requiredStrength = 14;
+  optional string requiredDexterity = 15;
+  optional string requiredIntelligence = 16;
+  optional string armour = 17;
+  optional string energyShield = 18;
+  optional string evasion = 19;
+  optional string block = 20;
+  optional string ward = 21;
+  // weapon
+  optional string damage = 22;
+  optional string APS = 23;
+  optional string crit = 24;
+  optional string PDPS = 25;
+  optional string EDPS = 26;
+  optional string DPS = 27;
+  // poison
+  optional string life = 28;
+  optional string mana = 29;
+  optional string duration = 30;
+  optional string usage = 31;
+  optional string capacity = 32;
+  // common
+  optional string additional = 33;
+  repeated string implicit = 34;
+  repeated string stats = 35;
 }
 
 message Build {
@@ -60,6 +106,50 @@ message Build {
   optional string updatedAt = 37;
 }
 
+message skill {
+  string id = 1;
+  string name = 2;
+  string type = 3; 
+  string createdAt = 4;
+  string updatedAt = 5;
+}
+
+message tag {
+  string id = 1;
+  string name = 2;
+  string createdAt = 3; 
+  string updatedAt = 4;
+}
+
+message skillLinkResponse {
+  string skillLinkName = 1;
+  skill skill = 2;
+  repeated skill links = 3;
+}
+
+message skillGroupResponse {
+  skillLinkResponse MainSkillLinks = 1;
+  repeated skillLinkResponse AdditionalSkills = 2;
+}
+
+message BuildList {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  string class = 4;
+  string ascendancy = 5;
+  string mainSkillName = 6;
+  float avgEndGameRating = 7;
+  float avgFunRating = 8;
+  float avgCreativeRating = 9;
+  float avgSpeedFarmRating = 10;
+  float avgBossingRating = 11;
+  int32 views = 12;
+  repeated tag tags = 13; 
+  int32 status = 14; 
+  string createdAt = 15; 
+}
+
 message CreateBuildRequest {
   string memberId = 1;
   string skillId = 2;
@@ -78,36 +168,36 @@ message GetBuildsByMemberIdRequest {
 }
 
 message GetBuildsByMemberIdResponse {
-  repeated Build builds = 1; // array of items
+  repeated BuildList builds = 1; // array of items
 }
 
-// message GenerateUniqueItemsResponse {
-//   string message = 1;
-// }
+message GetCommunityBuildsRequest {
+  int32 pageNo = 1;
+  int32 pageSize = 2;
+  string sortOrder = 3; 
+  string sortBy = 4; 
+  string search = 5; 
+  string skillId = 6;
+  int32 minRating = 7;
+  string ratingCategory = 8; 
+}
 
-// message UpdateItemRequest {
-//   string id = 1;
-//   string category = 2;
-//   string class = 3;
-//   string type = 4;
-//   string name = 5;
-//   string imageURL = 6;
-// }
+message GetCommunityBuildsResponse {
+  repeated BuildList builds = 1; // array of items
+}
 
-// message UpdateItemResponse {
-//   string message = 1;
-// }
+message GetBuildInfoRequest {
+  string id = 1;
 
-// message CreateRareItemRequest {
-//   string userId = 1;
-//   string baseItemId = 2;
-//   string name = 3;
-//   string class = 4;
-//   repeated string stats = 5;
-//   bool toList = 6; // whether to add the item to the user's item list
-// }
+}
 
-
-// message CreateRareItemResponse {
-//   string message = 1;
-// }
+message GetBuildInfoResponse {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  string class = 4;
+  string ascendancy = 5;
+  repeated tag tags = 6;  
+  skillGroupResponse skills = 7;
+  repeated buildItemSetResponse Sets = 8;
+}

@@ -8,3 +8,4 @@ gen:
 		api/proto/notification/notification.proto \
 		api/proto/build/build.proto \
 		api/proto/skill/skill.proto \
+		api/proto/tag/tag.proto \

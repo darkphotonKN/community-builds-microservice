@@ -1,7 +1,9 @@
 package skill
 
 import (
+	"github.com/darkphotonKN/community-builds-microservice/common/constants/models"
 	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -44,36 +46,36 @@ func (s *repository) CreateSkill(createSkillRequest CreateSkillRequest) error {
 // 	return nil
 // }
 
-// func (s *SkillRepository) GetSkill(id uuid.UUID) (*models.Skill, error) {
-// 	var skill models.Skill
+func (r *repository) GetSkill(id uuid.UUID) (*models.Skill, error) {
+	var skill models.Skill
 
-// 	query := `
-// 	SELECT * FROM skills
-// 	WHERE id = $1
-// 	`
+	query := `
+	SELECT * FROM skills
+	WHERE id = $1
+	`
 
-// 	err := s.DB.Get(&skill, query, id)
+	err := r.db.Get(&skill, query, id)
 
-// 	if err != nil {
-// 		return nil, errorutils.AnalyzeDBErr(err)
-// 	}
+	if err != nil {
+		return nil, commonhelpers.AnalyzeDBErr(err)
+	}
 
-// 	return &skill, nil
-// }
+	return &skill, nil
+}
 
-// func (s *SkillRepository) GetSkills() (*[]models.Skill, error) {
-// 	var skills []models.Skill
+func (r *repository) GetSkills() (*[]models.Skill, error) {
+	var skills []models.Skill
 
-// 	query := `SELECT * FROM skills`
+	query := `SELECT * FROM skills`
 
-// 	err := s.DB.Select(&skills, query)
+	err := r.db.Select(&skills, query)
 
-// 	if err != nil {
-// 		return nil, errorutils.AnalyzeDBErr(err)
-// 	}
+	if err != nil {
+		return nil, commonhelpers.AnalyzeDBErr(err)
+	}
 
-// 	return &skills, nil
-// }
+	return &skills, nil
+}
 
 // func (s *SkillRepository) GetSkillsAndLinksByBuildId(buildId uuid.UUID) (*[]models.SkillRow, error) {
 

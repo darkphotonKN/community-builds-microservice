@@ -3,9 +3,12 @@ package build
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/types"
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/build"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type BuildHandler struct {
@@ -22,64 +25,75 @@ func NewHandler(client BuildClient) *BuildHandler {
 * Get all builds for community viewing.
 **/
 
-// func (h *BuildHandler) GetCommunityBuildsHandler(c *gin.Context) {
-// 	// defaults
-// 	pageNo := 1
-// 	pageSize := 20
+func (h *BuildHandler) GetCommunityBuildsHandler(c *gin.Context) {
+	// defaults
+	pageNo := 1
+	pageSize := 20
 
-// 	// parse query pagination querystrings to ints
-// 	if pageNoQuery := c.Query("page_no"); pageNoQuery != "" {
-// 		pageNo, _ = strconv.Atoi(pageNoQuery)
-// 	}
+	// parse query pagination querystrings to ints
+	if pageNoQuery := c.Query("page_no"); pageNoQuery != "" {
+		pageNo, _ = strconv.Atoi(pageNoQuery)
+	}
 
-// 	if pageSizeQuery := c.Query("page_size"); pageSizeQuery != "" {
-// 		pageSize, _ = strconv.Atoi(pageSizeQuery)
-// 	}
+	if pageSizeQuery := c.Query("page_size"); pageSizeQuery != "" {
+		pageSize, _ = strconv.Atoi(pageSizeQuery)
+	}
 
-// 	// query strings
-// 	sortBy := c.Query("sort_by")
-// 	sortOrder := c.Query("sort_order")
-// 	search := c.Query("search")
-// 	skillQuery := c.Query("skill")
-// 	minRatingQuery := c.Query("min_rating")
-// 	ratingCategory := c.Query("rating_category")
+	// query strings
+	sortBy := c.Query("sort_by")
+	sortOrder := c.Query("sort_order")
+	search := c.Query("search")
+	skillQuery := c.Query("skill")
+	minRatingQuery := c.Query("min_rating")
+	ratingCategory := c.Query("rating_category")
 
-// 	// validate querystrings
-// 	skillId, err := uuid.Parse(skillQuery)
-// 	if skillQuery != "" && err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Skill in querystring was not a valid uuid, error: %s", err.Error())})
-// 		return
-// 	}
+	// validate querystrings
+	skillId, err := uuid.Parse(skillQuery)
+	if skillQuery != "" && err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Skill in querystring was not a valid uuid, error: %s", err.Error())})
+		return
+	}
 
-// 	var minRating int
-// 	if minRatingQuery != "" {
-// 		minRating, err = strconv.Atoi(minRatingQuery)
+	var minRating int
+	if minRatingQuery != "" {
+		minRating, err = strconv.Atoi(minRatingQuery)
 
-// 		if err != nil {
-// 			c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("minRating in querystring was not a valid integer, error: %s", err.Error())})
-// 			return
-// 		}
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("minRating in querystring was not a valid integer, error: %s", err.Error())})
+			return
+		}
 
-// 		fmt.Println("minRating:", minRating)
+		fmt.Println("minRating:", minRating)
 
-// 		if minRating < 1 || minRating > 10 {
-// 			c.JSON(http.StatusBadRequest,
-// 				gin.H{
-// 					"statusCode": http.StatusBadRequest,
-// 					"message":    "min_rating needs to be in the range 1-10."})
-// 			return
-// 		}
-// 	}
+		if minRating < 1 || minRating > 10 {
+			c.JSON(http.StatusBadRequest,
+				gin.H{
+					"statusCode": http.StatusBadRequest,
+					"message":    "min_rating needs to be in the range 1-10."})
+			return
+		}
+	}
 
-// 	builds, err := h.Service.GetCommunityBuildsService(pageNo, pageSize, sortOrder, sortBy, search, skillId, &minRating, types.RatingCategory(ratingCategory))
+	// Get builds from gRPC client
+	grpcReq := &pb.GetCommunityBuildsRequest{
+		PageNo:         int32(pageNo),
+		PageSize:       int32(pageSize),
+		SortOrder:      sortOrder,
+		SortBy:         sortBy,
+		Search:         search,
+		SkillId:        skillId.String(),
+		MinRating:      int32(minRating),
+		RatingCategory: string(types.RatingCategory(ratingCategory)),
+	}
+	builds, err := h.Client.GetCommunityBuilds(c.Request.Context(), grpcReq)
 
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all community builds: %s", err.Error())})
-// 		return
-// 	}
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all community builds: %s", err.Error())})
+		return
+	}
 
-// 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all builds for member.", "result": builds})
-// }
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all builds for member.", "result": builds})
+}
 
 /**
 * Create build for a signed-in member.
@@ -198,28 +212,32 @@ func (h *BuildHandler) CreateBuildHandler(c *gin.Context) {
 // /**
 // * Get all information for a single build by id community version.
 // **/
-// func (h *BuildHandler) GetBuildInfoByIdHandler(c *gin.Context) {
+func (h *BuildHandler) GetBuildInfoByIdHandler(c *gin.Context) {
 
-// 	idParam := c.Param("id")
+	idParam := c.Param("id")
 
-// 	id, err := uuid.Parse(idParam)
+	id, err := uuid.Parse(idParam)
 
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.", id)})
-// 		return
-// 	}
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.", id)})
+		return
+	}
 
-// 	fmt.Printf("id: %s\n", id)
+	fmt.Printf("id: %s\n", id)
 
-// 	build, err := h.Service.GetBuildInfoService(id)
+	grpcReq := &pb.GetBuildInfoRequest{
+		Id: id.String(),
+	}
 
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all build information: %s", err.Error())})
-// 		return
-// 	}
+	build, err := h.Client.GetBuildInfo(c.Request.Context(), grpcReq)
 
-// 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved build for member.", "result": build})
-// }
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all build information: %s", err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved build for member.", "result": build})
+}
 
 // /**
 // * Adds primary, secondary, and other skills and links to an existing build.

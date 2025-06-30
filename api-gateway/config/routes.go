@@ -13,8 +13,8 @@ import (
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/example"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/item"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/notification"
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/skill"
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/tag"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/skill"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/tag"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -107,9 +107,12 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	// --- SKILL ---
 
 	// -- Skill Setup --
-	skillRepo := skill.NewSkillRepository(db)
-	skillService := skill.NewSkillService(skillRepo)
-	skillHandler := skill.NewSkillHandler(skillService)
+
+	skillClient := skill.NewClient(registry)
+	skillHandler := skill.NewHandler(skillClient)
+	// skillRepo := skill.NewSkillRepository(db)
+	// skillService := skill.NewSkillService(skillRepo)
+	// skillHandler := skill.NewSkillHandler(skillService)
 
 	// -- Skill Routes --
 	skillRoutes := api.Group("/skill")
@@ -163,8 +166,8 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	buildRoutes := api.Group("/build")
 
 	// Public Routes
-	// buildRoutes.GET("/community", buildHandler.GetCommunityBuildsHandler)
-	// buildRoutes.GET("/community/:id/info", buildHandler.GetBuildInfoByIdHandler)
+	buildRoutes.GET("/community", buildHandler.GetCommunityBuildsHandler)
+	buildRoutes.GET("/community/:id/info", buildHandler.GetBuildInfoByIdHandler)
 
 	// Protected Routes
 	protectedBuildRoutes := buildRoutes.Group("")
@@ -181,9 +184,12 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	// --- TAG ---
 
 	// -- Tag Setup --
-	tagRepo := tag.NewTagRepository(db)
-	tagService := tag.NewTagService(tagRepo)
-	tagHandler := tag.NewTagHandler(tagService)
+
+	tagClient := tag.NewClient(registry)
+	tagHandler := tag.NewHandler(tagClient)
+	// tagRepo := tag.NewTagRepository(db)
+	// tagService := tag.NewTagService(tagRepo)
+	// tagHandler := tag.NewTagHandler(tagService)
 
 	// -- Tag Routes --
 	tagRoutes := api.Group("/tag")
