@@ -65,3 +65,44 @@ func (c *Client) GetBuildsByMemberId(ctx context.Context, req *pb.GetBuildsByMem
 
 	return items, nil
 }
+
+func (c *Client) GetCommunityBuilds(ctx context.Context, req *pb.GetCommunityBuildsRequest) (*pb.GetCommunityBuildsResponse, error) {
+
+	// connection instance created through service discovery first
+	// searches for the service registered as "orders"
+	conn, err := discovery.ServiceConnection(ctx, serviceName, c.registry)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to item service: %w", err)
+	}
+	defer conn.Close()
+
+	client := pb.NewBuildServiceClient(conn)
+
+	// create client to interface with through service discovery connection
+	builds, err := client.GetCommunityBuilds(ctx, req)
+
+	fmt.Printf("Get community builds %+v through gateway after service discovery\n", builds)
+
+	return builds, nil
+}
+
+func (c *Client) GetBuildInfo(ctx context.Context, req *pb.GetBuildInfoRequest) (*pb.GetBuildInfoResponse, error) {
+
+	// connection instance created through service discovery first
+	// searches for the service registered as "orders"
+	conn, err := discovery.ServiceConnection(ctx, serviceName, c.registry)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to item service: %w", err)
+	}
+	defer conn.Close()
+
+	client := pb.NewBuildServiceClient(conn)
+
+	info, err := client.GetBuildInfo(ctx, req)
+
+	fmt.Printf("Get build info %+v through gateway after service discovery\n", info)
+
+	return info, nil
+}

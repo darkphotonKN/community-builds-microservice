@@ -136,7 +136,7 @@ type ItemMod struct {
 * Skills
 **/
 type Skill struct {
-	ID        uuid.UUID `db:"id" json:"id"`
+	Id        uuid.UUID `db:"id" json:"id"`
 	Name      string    `db:"name" json:"name"`
 	Type      string    `db:"type" json:"type"` // "active" or "support"
 	CreatedAt time.Time `db:"created_at" json:"createdAt"`

@@ -4,20 +4,22 @@ import (
 	"context"
 
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/skill"
-	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/darkphotonKN/community-builds-microservice/common/constants/models"
+	"github.com/google/uuid"
 )
 
 type service struct {
-	repo      Repository
-	publishCh *amqp.Channel
+	repo Repository
 }
 
 type Repository interface {
 	CreateSkill(createBuildRequest CreateSkillRequest) error
+	GetSkills() (*[]models.Skill, error)
+	GetSkill(id uuid.UUID) (*models.Skill, error)
 }
 
-func NewService(repo Repository, publishCh *amqp.Channel) Service {
-	return &service{repo: repo, publishCh: publishCh}
+func NewService(repo Repository) Service {
+	return &service{repo: repo}
 }
 
 /**
@@ -25,24 +27,46 @@ func NewService(repo Repository, publishCh *amqp.Channel) Service {
 **/
 func (s *service) CreateSkill(ctx context.Context, req *pb.CreateSkillRequest) (*pb.CreateSkillResponse, error) {
 
-	// return s.repo.CreateSkill(req)
+	createSkillReq := CreateSkillRequest{
+		Name: req.Name,
+		Type: req.Type,
+	}
+	err := s.repo.CreateSkill(createSkillReq)
+	if err != nil {
+		return nil, err
+	}
 
 	return &pb.CreateSkillResponse{}, nil
 }
 
 /**
-* Get a single skill by skill's id.
+* Get a single skill by skill's id. not grpc
 **/
-// func (s *SkillService) GetSkillByIdService(id uuid.UUID) (*models.Skill, error) {
-// 	return s.Repo.GetSkill(id)
-// }
+func (s *service) GetSkillById(id uuid.UUID) (*models.Skill, error) {
+	return s.repo.GetSkill(id)
+}
 
 /**
 * Get list of skills available.
 **/
-// func (s *SkillService) GetSkillsService() (*[]models.Skill, error) {
-// 	return s.Repo.GetSkills()
-// }
+func (s *service) GetSkills(ctx context.Context, req *pb.GetSkillsRequest) (*pb.GetSkillsResponse, error) {
+
+	skills, err := s.repo.GetSkills()
+	if err != nil {
+		return nil, err
+	}
+	pbSkills := make([]*pb.Skill, 0, len(*skills))
+	for _, skill := range *skills {
+		pbSkills = append(pbSkills, &pb.Skill{
+			Id:        skill.Id.String(),
+			Name:      skill.Name,
+			Type:      skill.Type,
+			CreatedAt: skill.CreatedAt.String(),
+			UpdatedAt: skill.UpdatedAt.String(),
+		})
+	}
+	return &pb.GetSkillsResponse{Skills: pbSkills}, nil
+}
 
 /**
 * Creates a list of skills.

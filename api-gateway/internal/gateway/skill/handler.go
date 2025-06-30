@@ -19,19 +19,27 @@ func NewHandler(client SkillClient) *SkillHandler {
 }
 
 // --- GLOBAL HANDLERS ---
-// func (h *SkillHandler) GetSkillsHandler(c *gin.Context) {
-// 	skills, err := h.Service.GetSkillsService()
+func (h *SkillHandler) GetSkillsHandler(c *gin.Context) {
+	skills, err := h.Client.GetSkills(c.Request.Context(), &pb.GetSkillsRequest{})
 
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all skills %s", err.Error())})
-// 		return
-// 	}
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all skills %s", err.Error())})
+		return
+	}
 
-// 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all skills.", "result": skills})
-// }
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all skills.", "result": skills})
+}
 
 // --- ADMIN HANDLERS ---
 func (h *SkillHandler) CreateSkillHandler(c *gin.Context) {
+	userIdStr, exists := c.Get("userIdStr")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"statusCode": http.StatusUnauthorized,
+			"message":    "User ID not found in context",
+		})
+		return
+	}
 	var createSkillReq CreateSkillRequest
 
 	if err := c.ShouldBindJSON(&createSkillReq); err != nil {
@@ -40,8 +48,9 @@ func (h *SkillHandler) CreateSkillHandler(c *gin.Context) {
 	}
 	// Convert REST request to gRPC request
 	grpcReq := &pb.CreateSkillRequest{
-		Name: createSkillReq.Name,
-		Type: createSkillReq.Type,
+		MemberId: userIdStr.(string),
+		Name:     createSkillReq.Name,
+		Type:     createSkillReq.Type,
 	}
 
 	skill, err := h.Client.CreateSkill(c.Request.Context(), grpcReq)

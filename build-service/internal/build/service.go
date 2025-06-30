@@ -5,26 +5,33 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/skill"
+	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/tag"
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/build"
 	commonconstants "github.com/darkphotonKN/community-builds-microservice/common/constants"
+	"github.com/darkphotonKN/community-builds-microservice/common/constants/models"
 	"github.com/darkphotonKN/community-builds-microservice/common/constants/types"
 	"github.com/google/uuid"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type service struct {
-	repo      Repository
-	publishCh *amqp.Channel
+	repo         Repository
+	publishCh    *amqp.Channel
+	skillService skill.Service
+	tagService   tag.Service
 }
 
 type Repository interface {
 	CreateBuild(memberId uuid.UUID, createBuildRequest CreateBuildRequest) (*uuid.UUID, error)
 	GetBuildsByMemberId(id uuid.UUID) (*[]BuildListQuery, error)
-	GetAllBuilds(pageNo int, pageSize int, sortOrder string, sortBy string, search string, skillId uuid.UUID, minRating *int, ratingCategory types.RatingCategory) ([]BuildListQuery, error)
+	GetAllBuilds(pageNo int, pageSize int, sortOrder string, sortBy string, search string, skillId uuid.UUID, minRating *int, ratingCategory types.RatingCategory) (*[]BuildListQuery, error)
+	GetBuildInfo(buildId uuid.UUID) (*BuildInfoResponse, error)
+	GetAndFormSkillLinks(skillData []models.SkillRow) SkillGroupResponse
 }
 
-func NewService(repo Repository, publishCh *amqp.Channel) Service {
-	return &service{repo: repo, publishCh: publishCh}
+func NewService(repo Repository, publishCh *amqp.Channel, skillService skill.Service, tagService tag.Service) Service {
+	return &service{repo: repo, publishCh: publishCh, skillService: skillService, tagService: tagService}
 }
 
 /**
@@ -41,7 +48,7 @@ func (s *service) GetBuildsForMember(memberId uuid.UUID) (*[]BuildListResponse, 
 
 	// query and add each builds tag's
 	for index, build := range *baseBuilds {
-		// tags, err := s.Repo.GetBuildTagsForMemberById(build.ID)
+		tags, err := s.tagService.GetBuildTagsForMemberById(build.Id)
 
 		// stop query pre-maturely if errored on query
 		if err != nil {
@@ -49,7 +56,7 @@ func (s *service) GetBuildsForMember(memberId uuid.UUID) (*[]BuildListResponse, 
 		}
 
 		buildListResponse[index] = BuildListResponse{
-			ID:                 build.Id,
+			Id:                 build.Id,
 			Title:              build.Title,
 			Description:        build.Description,
 			Class:              build.Class,
@@ -60,10 +67,10 @@ func (s *service) GetBuildsForMember(memberId uuid.UUID) (*[]BuildListResponse, 
 			AvgCreativeRating:  build.AvgCreativeRating,
 			AvgFunRating:       build.AvgFunRating,
 			AvgSpeedFarmRating: build.AvgSpeedFarmRating,
-			// Tags:               *tags,
-			Views:     build.Views,
-			Status:    build.Status,
-			CreatedAt: build.CreatedAt,
+			Tags:               *tags,
+			Views:              build.Views,
+			Status:             build.Status,
+			CreatedAt:          build.CreatedAt,
 		}
 	}
 
@@ -77,59 +84,87 @@ const (
 /**
 * Gets list of public community builds.
 **/
-func (s *service) GetCommunityBuildsService(pageNo int, pageSize int, sortOrder string, sortBy string, search string, skillId uuid.UUID, minRating *int, ratingCategory types.RatingCategory) ([]BuildListResponse, error) {
 
-	builds, err := s.repo.GetAllBuilds(pageNo, pageSize, sortOrder, sortBy, search, skillId, minRating, ratingCategory)
+func (s *service) GetCommunityBuilds(ctx context.Context, req *pb.GetCommunityBuildsRequest) (*pb.GetCommunityBuildsResponse, error) {
+
+	pageNo := int(req.PageNo)
+	pageSize := int(req.PageSize)
+	sortOrder := string(req.SortOrder)
+	sortBy := string(req.SortBy)
+	search := string(req.Search)
+	skillId, err := uuid.Parse(req.SkillId)
+	if err != nil {
+		return nil, err
+	}
+	minRating := int(req.MinRating)
+	ratingCategory := types.RatingCategory(req.RatingCategory)
+
+	baseBuilds, err := s.repo.GetAllBuilds(pageNo, pageSize, sortOrder, sortBy, search, skillId, &minRating, ratingCategory)
 
 	if err != nil {
 		return nil, err
 	}
 
-	// get tags and add to build
-	buildList := make([]BuildListResponse, len(builds))
+	pbBuilds := make([]*pb.BuildList, len(*baseBuilds))
+	// query and add each builds tag's
+	for index, build := range *baseBuilds {
+		tags, err := s.tagService.GetBuildTagsForMemberById(build.Id)
 
-	for index, build := range builds {
-		// tags, err := s.repo.GetBuildTagsForMemberById(build.ID)
-
-		// exit prematurely with error if any tags returned an error
+		// stop query pre-maturely if errored on query
 		if err != nil {
 			return nil, err
 		}
 
-		buildList[index] = BuildListResponse{
-			ID:                 build.Id,
+		idStr := build.Id.String()
+		pbTags := make([]*pb.Tag, len(*tags))
+		for tagIndex, tag := range *tags {
+			pbTags[tagIndex] = &pb.Tag{
+				Id:        tag.ID.String(),
+				Name:      tag.Name,
+				CreatedAt: tag.CreatedAt.String(),
+				UpdatedAt: tag.UpdatedAt.String(),
+			}
+		}
+		pbBuilds[index] = &pb.BuildList{
+			Id:                 idStr,
 			Title:              build.Title,
 			Description:        build.Description,
 			Class:              build.Class,
-			Ascendancy:         build.Ascendancy,
+			Ascendancy:         *build.Ascendancy,
 			MainSkillName:      build.MainSkillName,
-			AvgEndGameRating:   build.AvgEndGameRating,
-			AvgFunRating:       build.AvgFunRating,
-			AvgCreativeRating:  build.AvgCreativeRating,
-			AvgSpeedFarmRating: build.AvgSpeedFarmRating,
-			AvgBossingRating:   build.AvgBossingRating,
-			// Tags:               *tags,
-			Views:     build.Views,
-			Status:    build.Status,
-			CreatedAt: build.CreatedAt,
+			AvgEndGameRating:   *build.AvgEndGameRating,
+			AvgBossingRating:   *build.AvgBossingRating,
+			AvgCreativeRating:  *build.AvgCreativeRating,
+			AvgFunRating:       *build.AvgFunRating,
+			AvgSpeedFarmRating: *build.AvgSpeedFarmRating,
+			Tags:               pbTags,
+			Views:              int32(build.Views),
+			Status:             int32(build.Status),
+			CreatedAt:          build.CreatedAt,
 		}
 	}
 
-	return buildList, nil
+	return &pb.GetCommunityBuildsResponse{
+		Builds: pbBuilds,
+	}, nil
 }
 
 func (s *service) CreateBuild(ctx context.Context, req *pb.CreateBuildRequest) (*pb.CreateBuildResponse, error) {
 	memberId, err := uuid.Parse(req.MemberId)
+	if err != nil {
+		return nil, err
+	}
 
+	skillId, err := uuid.Parse(req.SkillId)
 	if err != nil {
 		return nil, err
 	}
 	// confirm skill exists
-	// _, err := s.SkillService.GetSkillByIdService(createBuildRequest.SkillID)
+	_, err = s.skillService.GetSkillById(skillId)
 
-	// if err != nil {
-	// 	return fmt.Errorf("main skill id could not be found when attempting to create build for it.")
-	// }
+	if err != nil {
+		return nil, fmt.Errorf("main skill id could not be found when attempting to create build for it.")
+	}
 
 	// check how many builds a user has, prevent creation if over the limit
 	builds, err := s.GetBuildsForMember(memberId)
@@ -235,38 +270,150 @@ func (s *service) GetBuildsByMemberId(ctx context.Context, req *pb.GetBuildsByMe
 		return nil, err
 	}
 
-	buildListResponse := make([]BuildListResponse, len(*baseBuilds))
+	pbBuilds := make([]*pb.BuildList, len(*baseBuilds))
 
 	// query and add each builds tag's
 	for index, build := range *baseBuilds {
-		// tags, err := s.repo.GetBuildTagsForMemberById(build.ID)
+		tags, err := s.tagService.GetBuildTagsForMemberById(build.Id)
 
 		// stop query pre-maturely if errored on query
 		if err != nil {
 			return nil, err
 		}
 
-		buildListResponse[index] = BuildListResponse{
-			ID:                 build.Id,
+		pbTags := make([]*pb.Tag, len(*tags))
+		for tagIndex, tag := range *tags {
+			pbTags[tagIndex] = &pb.Tag{
+				Id:        tag.ID.String(),
+				Name:      tag.Name,
+				CreatedAt: tag.CreatedAt.String(),
+				UpdatedAt: tag.UpdatedAt.String(),
+			}
+		}
+		pbBuilds[index] = &pb.BuildList{
+			Id:                 build.Id.String(),
 			Title:              build.Title,
 			Description:        build.Description,
 			Class:              build.Class,
-			Ascendancy:         build.Ascendancy,
+			Ascendancy:         *build.Ascendancy,
 			MainSkillName:      build.MainSkillName,
-			AvgEndGameRating:   build.AvgEndGameRating,
-			AvgBossingRating:   build.AvgBossingRating,
-			AvgCreativeRating:  build.AvgCreativeRating,
-			AvgFunRating:       build.AvgFunRating,
-			AvgSpeedFarmRating: build.AvgSpeedFarmRating,
-			// Tags:               *tags,
-			Views:     build.Views,
-			Status:    build.Status,
-			CreatedAt: build.CreatedAt,
+			AvgEndGameRating:   *build.AvgEndGameRating,
+			AvgBossingRating:   *build.AvgBossingRating,
+			AvgCreativeRating:  *build.AvgCreativeRating,
+			AvgFunRating:       *build.AvgFunRating,
+			AvgSpeedFarmRating: *build.AvgSpeedFarmRating,
+			Tags:               pbTags,
+			Views:              int32(build.Views),
+			Status:             int32(build.Status),
+			CreatedAt:          build.CreatedAt,
 		}
 	}
 
-	// return &buildListResponse, nil
 	return &pb.GetBuildsByMemberIdResponse{
-		// Builds: pbBuilds,
+		Builds: pbBuilds,
 	}, nil
+}
+
+func (s *service) GetBuildInfo(ctx context.Context, req *pb.GetBuildInfoRequest) (*pb.GetBuildInfoResponse, error) {
+
+	// return all join information (base, class, ascendancy, skills and items)
+	buildId, err := uuid.Parse(req.Id)
+	if err != nil {
+		return nil, err
+	}
+	info, err := s.repo.GetBuildInfo(buildId)
+
+	pbTags := make([]*pb.Tag, len(info.Tags))
+	for tagIndex, tag := range info.Tags {
+		pbTags[tagIndex] = &pb.Tag{
+			Id:        tag.ID.String(),
+			Name:      tag.Name,
+			CreatedAt: tag.CreatedAt.String(),
+			UpdatedAt: tag.UpdatedAt.String(),
+		}
+	}
+
+	pbLinks := make([]*pb.Skill, len(info.Skills.MainSkillLinks.Links))
+	for skillIndex, skill := range info.Skills.MainSkillLinks.Links {
+		pbLinks[skillIndex] = &pb.Skill{
+			Id:        skill.Id.String(),
+			Name:      skill.Name,
+			Type:      skill.Type,
+			CreatedAt: skill.CreatedAt.String(),
+			UpdatedAt: skill.UpdatedAt.String(),
+		}
+	}
+	pbSkill := &pb.Skill{
+		Id:        info.Skills.MainSkillLinks.Skill.Id.String(),
+		Name:      info.Skills.MainSkillLinks.Skill.Name,
+		Type:      info.Skills.MainSkillLinks.Skill.Type,
+		CreatedAt: info.Skills.MainSkillLinks.Skill.CreatedAt.String(),
+		UpdatedAt: info.Skills.MainSkillLinks.Skill.UpdatedAt.String(),
+	}
+
+	pbSkills := &pb.SkillGroupResponse{
+		MainSkillLinks: &pb.SkillLinkResponse{
+			SkillLinkName: info.Skills.MainSkillLinks.SkillLinkName,
+			Skill:         pbSkill,
+			Links:         pbLinks,
+		},
+	}
+
+	pbSets := make([]*pb.BuildItemSetResponse, len(info.Sets))
+	for SetIndex, Set := range info.Sets {
+		pbSets[SetIndex] = &pb.BuildItemSetResponse{
+			BuildId:     Set.BuildId.String(),
+			SetId:       Set.SetId.String(),
+			ItemId:      Set.ItemId.String(),
+			ImageUrl:    Set.ImageUrl,
+			Category:    Set.Category,
+			Class:       Set.Class,
+			Name:        Set.Name,
+			Type:        Set.Type,
+			Description: Set.Description,
+			UniqueItem:  Set.UniqueItem,
+			Slot:        Set.Slot,
+			// todo 補齊剩下的選填
+
+			RequiredLevel:        Set.RequiredLevel,
+			RequiredStrength:     Set.RequiredStrength,
+			RequiredDexterity:    Set.RequiredDexterity,
+			RequiredIntelligence: Set.RequiredIntelligence,
+			Armour:               Set.Armour,
+			EnergyShield:         Set.EnergyShield,
+			Evasion:              Set.Evasion,
+			Block:                Set.Block,
+			Ward:                 Set.Ward,
+
+			Damage: Set.Damage,
+			APS:    Set.APS,
+			Crit:   Set.Crit,
+			PDPS:   Set.PDPS,
+			EDPS:   Set.EDPS,
+			DPS:    Set.DPS,
+
+			Life:     Set.Life,
+			Mana:     Set.Mana,
+			Duration: Set.Duration,
+			Usage:    Set.Usage,
+			Capacity: Set.Capacity,
+
+			Additional: Set.Additional,
+			Stats:      Set.Stats,
+			Implicit:   *Set.Implicit,
+		}
+	}
+
+	res := &pb.GetBuildInfoResponse{
+		Id:          info.ID.String(),
+		Title:       info.Title,
+		Description: info.Description,
+		Class:       info.Class,
+		Ascendancy:  *info.Ascendancy,
+		Tags:        pbTags,
+		Skills:      pbSkills,
+		Sets:        pbSets,
+	}
+
+	return res, nil
 }

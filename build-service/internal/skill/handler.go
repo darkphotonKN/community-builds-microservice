@@ -4,6 +4,8 @@ import (
 	"context"
 
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/skill"
+	"github.com/darkphotonKN/community-builds-microservice/common/constants/models"
+	"github.com/google/uuid"
 )
 
 type Handler struct {
@@ -13,7 +15,8 @@ type Handler struct {
 
 type Service interface {
 	CreateSkill(ctx context.Context, req *pb.CreateSkillRequest) (*pb.CreateSkillResponse, error)
-	// GetBuildsByMemberId(ctx context.Context, req *pb.GetBuildsByMemberIdRequest) (*pb.GetBuildsByMemberIdResponse, error)
+	GetSkills(ctx context.Context, req *pb.GetSkillsRequest) (*pb.GetSkillsResponse, error)
+	GetSkillById(id uuid.UUID) (*models.Skill, error)
 }
 
 func NewHandler(service Service) *Handler {
@@ -21,16 +24,9 @@ func NewHandler(service Service) *Handler {
 }
 
 // --- GLOBAL HANDLERS ---
-// func (h *SkillHandler) GetSkillsHandler(c *gin.Context) {
-// 	skills, err := h.Service.GetSkillsService()
-
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all skills %s", err.Error())})
-// 		return
-// 	}
-
-// 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all skills.", "result": skills})
-// }
+func (h *Handler) GetSkills(ctx context.Context, req *pb.GetSkillsRequest) (*pb.GetSkillsResponse, error) {
+	return h.service.GetSkills(ctx, req)
+}
 
 // --- ADMIN HANDLERS ---
 func (h *Handler) CreateSkill(ctx context.Context, req *pb.CreateSkillRequest) (*pb.CreateSkillResponse, error) {

@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	SkillService_CreateSkill_FullMethodName = "/skill.SkillService/CreateSkill"
+	SkillService_GetSkills_FullMethodName   = "/skill.SkillService/GetSkills"
 )
 
 // SkillServiceClient is the client API for SkillService service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SkillServiceClient interface {
 	CreateSkill(ctx context.Context, in *CreateSkillRequest, opts ...grpc.CallOption) (*CreateSkillResponse, error)
+	GetSkills(ctx context.Context, in *GetSkillsRequest, opts ...grpc.CallOption) (*GetSkillsResponse, error)
 }
 
 type skillServiceClient struct {
@@ -47,11 +49,22 @@ func (c *skillServiceClient) CreateSkill(ctx context.Context, in *CreateSkillReq
 	return out, nil
 }
 
+func (c *skillServiceClient) GetSkills(ctx context.Context, in *GetSkillsRequest, opts ...grpc.CallOption) (*GetSkillsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetSkillsResponse)
+	err := c.cc.Invoke(ctx, SkillService_GetSkills_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SkillServiceServer is the server API for SkillService service.
 // All implementations must embed UnimplementedSkillServiceServer
 // for forward compatibility.
 type SkillServiceServer interface {
 	CreateSkill(context.Context, *CreateSkillRequest) (*CreateSkillResponse, error)
+	GetSkills(context.Context, *GetSkillsRequest) (*GetSkillsResponse, error)
 	mustEmbedUnimplementedSkillServiceServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedSkillServiceServer struct{}
 
 func (UnimplementedSkillServiceServer) CreateSkill(context.Context, *CreateSkillRequest) (*CreateSkillResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateSkill not implemented")
+}
+func (UnimplementedSkillServiceServer) GetSkills(context.Context, *GetSkillsRequest) (*GetSkillsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSkills not implemented")
 }
 func (UnimplementedSkillServiceServer) mustEmbedUnimplementedSkillServiceServer() {}
 func (UnimplementedSkillServiceServer) testEmbeddedByValue()                      {}
@@ -104,6 +120,24 @@ func _SkillService_CreateSkill_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SkillService_GetSkills_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSkillsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SkillServiceServer).GetSkills(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SkillService_GetSkills_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SkillServiceServer).GetSkills(ctx, req.(*GetSkillsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SkillService_ServiceDesc is the grpc.ServiceDesc for SkillService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +148,10 @@ var SkillService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateSkill",
 			Handler:    _SkillService_CreateSkill_Handler,
+		},
+		{
+			MethodName: "GetSkills",
+			Handler:    _SkillService_GetSkills_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

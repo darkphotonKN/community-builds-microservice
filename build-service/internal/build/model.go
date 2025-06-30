@@ -4,6 +4,7 @@ import (
 	"time"
 
 	// "github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/models"
+	"github.com/darkphotonKN/community-builds-microservice/common/constants/models"
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 )
@@ -81,28 +82,28 @@ type TempSkillLink struct {
 }
 
 // Data Structure of Skill Links + Information for Response
-// type SkillLinkResponse struct {
-// 	SkillLinkName string         `json:"skillLinkName"`
-// 	Skill         models.Skill   `json:"skill"`
-// 	Links         []models.Skill `json:"links"`
-// }
+type SkillLinkResponse struct {
+	SkillLinkName string         `json:"skillLinkName"`
+	Skill         models.Skill   `json:"skill"`
+	Links         []models.Skill `json:"links"`
+}
 
-// type SkillGroupResponse struct {
-// 	MainSkillLinks   SkillLinkResponse   `json:"mainSkillLinks"`
-// 	AdditionalSkills []SkillLinkResponse `json:"additionalSkills"`
-// }
+type SkillGroupResponse struct {
+	MainSkillLinks   SkillLinkResponse   `json:"mainSkillLinks"`
+	AdditionalSkills []SkillLinkResponse `json:"additionalSkills"`
+}
 
 // All Build Information
-// type BuildInfoResponse struct {
-// 	ID          uuid.UUID              `json:"id"`
-// 	Title       string                 `json:"title"`
-// 	Description string                 `json:"description"`
-// 	Class       string                 `json:"class"`
-// 	Ascendancy  *string                `json:"ascendancy,omitempty"`
-// 	Tags        []models.Tag           `json:"tags"`
-// 	Skills      *SkillGroupResponse    `json:"skills"`
-// 	Sets        []BuildItemSetResponse `json:"sets"`
-// }
+type BuildInfoResponse struct {
+	ID          uuid.UUID              `json:"id"`
+	Title       string                 `json:"title"`
+	Description string                 `json:"description"`
+	Class       string                 `json:"class"`
+	Ascendancy  *string                `json:"ascendancy,omitempty"`
+	Tags        []models.Tag           `json:"tags"`
+	Skills      *SkillGroupResponse    `json:"skills"`
+	Sets        []BuildItemSetResponse `json:"sets"`
+}
 
 // Partial, basic build information
 type BasicBuildInfoResponse struct {
@@ -141,21 +142,21 @@ type BuildListQuery struct {
 }
 
 type BuildListResponse struct {
-	ID                 uuid.UUID `json:"id"`
-	Title              string    `json:"title"`
-	Description        string    `json:"description"`
-	Class              string    `json:"class"`
-	Ascendancy         *string   `json:"ascendancy"`
-	MainSkillName      string    `json:"mainSkill"`
-	AvgEndGameRating   *float32  `json:"avgEndGameRating,omitempty"`
-	AvgFunRating       *float32  `json:"avgFunRating,omitempty"`
-	AvgCreativeRating  *float32  `json:"avgCreativeRating,omitempty"`
-	AvgSpeedFarmRating *float32  `json:"avgSpeedFarmRating,omitempty"`
-	AvgBossingRating   *float32  `json:"avgBossingRating,omitempty"`
-	Views              int       `json:"views"`
-	// Tags               []models.Tag `json:"tags"`
-	Status    int    `json:"status"`
-	CreatedAt string `json:"createdAt"`
+	Id                 uuid.UUID    `json:"id"`
+	Title              string       `json:"title"`
+	Description        string       `json:"description"`
+	Class              string       `json:"class"`
+	Ascendancy         *string      `json:"ascendancy"`
+	MainSkillName      string       `json:"mainSkill"`
+	AvgEndGameRating   *float32     `json:"avgEndGameRating,omitempty"`
+	AvgFunRating       *float32     `json:"avgFunRating,omitempty"`
+	AvgCreativeRating  *float32     `json:"avgCreativeRating,omitempty"`
+	AvgSpeedFarmRating *float32     `json:"avgSpeedFarmRating,omitempty"`
+	AvgBossingRating   *float32     `json:"avgBossingRating,omitempty"`
+	Views              int          `json:"views"`
+	Tags               []models.Tag `json:"tags"`
+	Status             int          `json:"status"`
+	CreatedAt          string       `json:"createdAt"`
 }
 
 type BuildItemSetResponse struct {
