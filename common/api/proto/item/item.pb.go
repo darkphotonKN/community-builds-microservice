@@ -1180,10 +1180,13 @@ const file_api_proto_item_item_proto_rawDesc = "" +
 	"UpdateItem\x12\x1b.itemgrpc.UpdateItemRequest\x1a\x1c.itemgrpc.UpdateItemResponse\"\x00\x12U\n" +
 	"\x0eCreateRareItem\x12\x1f.itemgrpc.CreateRareItemRequest\x1a .itemgrpc.CreateRareItemResponse\"\x00BMZKgithub.com/darkphotonKN/community-builds-microservice/common/api/proto/itemb\x06proto3"
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> b88431d (build microservice)
 >>>>>>> a50a97f (build microservice)
 =======
 >>>>>>> 5c27384 (skill service)
+=======
+>>>>>>> c2387d240046afc0b2e2079741812b21239cfd2a
 
 var (
 	file_api_proto_item_item_proto_rawDescOnce sync.Once
