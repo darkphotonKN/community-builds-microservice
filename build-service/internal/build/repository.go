@@ -1,14 +1,18 @@
 package build
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
+	"reflect"
 
-	// "github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/models"
+	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/utils/errorutils"
 	"github.com/darkphotonKN/community-builds-microservice/common/constants/models"
 	"github.com/darkphotonKN/community-builds-microservice/common/constants/types"
 	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type repository struct {
@@ -227,7 +231,7 @@ func (r *repository) GetBuildTagsForMemberById(buildId uuid.UUID) (*[]models.Tag
 	return &tags, nil
 }
 
-func (r *repository) GetBuildsByMemberId(memberId uuid.UUID) (*[]BuildListQuery, error) {
+func (r *repository) GetBuildsForMember(memberId uuid.UUID) (*[]BuildListQuery, error) {
 	var builds []BuildListQuery
 
 	query := `
@@ -353,7 +357,7 @@ func (r *repository) GetBuildInfo(buildId uuid.UUID) (*BuildInfoResponse, error)
 
 	// create the base of the response
 	result := BuildInfoResponse{
-		ID:          buildInfoRows[0].ID,
+		Id:          buildInfoRows[0].ID,
 		Title:       buildInfoRows[0].Title,
 		Description: buildInfoRows[0].Description,
 	}
@@ -491,4 +495,454 @@ func (r *repository) GetAndFormSkillLinks(skillData []models.SkillRow) SkillGrou
 	}
 
 	return skills
+}
+
+func (r *repository) CreateBuildTags(buildId uuid.UUID, tagIds []uuid.UUID) error {
+	buildTagQuery := `
+	INSERT INTO build_tags(build_id, tag_id)
+	VALUES($1, unnest($2::uuid[]))
+	`
+	_, buildTagsErr := r.db.Exec(buildTagQuery, buildId, pq.Array(tagIds))
+	if buildTagsErr != nil {
+		return commonhelpers.AnalyzeDBErr(buildTagsErr)
+	}
+
+	return nil
+}
+
+/**
+* Single build query By Id, for a specific member.
+**/
+func (r *repository) GetBuildForMemberById(memberId uuid.UUID, buildId uuid.UUID) (*models.Build, error) {
+	var build models.Build
+
+	query := `
+	SELECT * FROM builds
+	WHERE member_id = $1
+	AND id = $2
+	`
+
+	err := r.db.Get(&build, query, memberId, buildId)
+
+	if err != nil {
+		return nil, commonhelpers.AnalyzeDBErr(err)
+	}
+
+	return &build, nil
+}
+
+/**
+* Get's a class belonging to a build.
+**/
+func (r *repository) GetBuildClassById(buildId uuid.UUID) (*string, error) {
+	var className string
+
+	query := `
+	SELECT
+		classes.name as name
+	FROM builds
+	JOIN classes on classes.id = builds.class_id
+	WHERE builds.id = $1
+	`
+
+	err := r.db.Get(&className, query, buildId)
+
+	if err != nil {
+		return nil, commonhelpers.AnalyzeDBErr(err)
+	}
+
+	return &className, nil
+
+}
+
+/**
+* Get's an ascendancy belonging to a build.
+**/
+func (r *repository) GetBuildAscendancyById(buildId uuid.UUID) (*string, error) {
+	var ascendancyName string
+
+	query := `
+	SELECT
+		ascendancies.name as name
+	FROM builds
+	JOIN ascendancies on ascendancies.id = builds.ascendancy_id
+	WHERE builds.id = $1
+	`
+
+	err := r.db.Get(&ascendancyName, query, buildId)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, commonhelpers.AnalyzeDBErr(err)
+	}
+
+	return &ascendancyName, nil
+}
+
+/**
+* Adds a item to a existing item set.
+**/
+func (r *repository) CreateItemToSetTx(tx *sqlx.Tx, buildItemSetId uuid.UUID, slot string, itemId interface{}) error {
+
+	// create set item
+	query := `
+	INSERT INTO build_item_set_items(build_item_set_id, item_id, slot)
+	VALUES(:build_item_set_id, :item_id, :slot)
+	`
+
+	params := map[string]interface{}{
+		"build_item_set_id": buildItemSetId,
+		"item_id":           itemId,
+		"slot":              slot,
+	}
+
+	_, err := tx.NamedExec(query, params)
+
+	if err != nil {
+		fmt.Printf("DEBUG AddItemToSetTx: Error when attempting to insert into join table build_item_set_items: %s\n", err)
+		return commonhelpers.AnalyzeDBErr(err)
+	}
+
+	return nil
+}
+
+/**
+* Creates a skill link group for a build.
+**/
+func (r *repository) CreateBuildItemSetTx(tx *sqlx.Tx, buildId uuid.UUID) (uuid.UUID, error) {
+
+	var newId uuid.UUID
+
+	query := `
+	INSERT INTO build_item_sets(build_id)
+	VALUES($1)
+	RETURNING id
+	`
+
+	err := tx.QueryRowx(query, buildId).Scan(&newId)
+
+	if err != nil {
+		fmt.Printf("Error when attempting to insert into build_item_links: %s\n", err)
+		return uuid.Nil, commonhelpers.AnalyzeDBErr(err)
+	}
+
+	return newId, nil
+}
+
+func (r *repository) GetBuildItemSetById(buildId uuid.UUID) ([]BuildItemSetResponse, error) {
+	var buildItemSetItems []BuildItemSetResponse
+	query := `
+	SELECT
+	build_item_sets.id AS set_id,
+	build_item_sets.build_id AS build_id,
+	build_item_set_items.slot AS set_slot,
+	COALESCE(items.unique_item, false) AS unique_item,
+	COALESCE(items.id, null) AS item_id,
+	COALESCE(items.name, '') AS name,
+	COALESCE(items.description, '') AS description,
+	COALESCE(items.required_level, null) AS required_level,
+	COALESCE(items.required_strength, null) AS required_strength,
+	COALESCE(items.required_dexterity, null) AS required_dexterity,
+	COALESCE(items.required_intelligence, null) AS required_intelligence,
+	COALESCE(items.damage, null) AS damage,
+	COALESCE(items.aps, null) AS aps,
+	COALESCE(items.crit, null) AS crit,
+	COALESCE(items.pdps, null) AS pdps,
+	COALESCE(items.edps, null) AS edps,
+	COALESCE(items.dps, null) AS dps,
+	COALESCE(items.additional, null) AS additional,
+	COALESCE(items.stats, null) AS stats,
+	COALESCE(items.implicit, null) AS implicit,
+	COALESCE(items.slot, '') AS slot,
+	COALESCE(items.armour, null) AS armour,
+	COALESCE(items.energy_shield, null) AS energy_shield,
+	COALESCE(items.evasion, null) AS evasion,
+	COALESCE(items.block, null) AS block,
+	COALESCE(items.ward, null) AS ward
+	FROM build_item_sets
+	JOIN build_item_set_items ON build_item_set_items.build_item_set_id = build_item_sets.id
+	LEFT JOIN items ON items.id = build_item_set_items.item_id
+	WHERE build_id = $1
+	`
+
+	err := r.db.Select(&buildItemSetItems, query, buildId)
+	if err != nil {
+		return nil, err
+	}
+
+	return buildItemSetItems, nil
+}
+
+func (r *repository) UpdateBuildByIdForMember(id uuid.UUID, memberId uuid.UUID, updateFields models.Build) error {
+
+	query := `
+	UPDATE builds
+	SET status = $1 
+	`
+
+	// convert update fields into sql string
+	v := reflect.ValueOf(updateFields)
+
+	if v.Kind() != reflect.Struct {
+		fmt.Println("Update fields was not a struct")
+		return fmt.Errorf("Update fields was not a struct")
+	}
+
+	// type information
+	t := v.Type()
+
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+
+		// skip id, created at and updated at fields
+		if field.Name == "ID" || field.Name == "BaseDBDateModel" {
+			continue
+		}
+
+		// TODO: update this, commented out due to errors
+		// dbCol, ok := buildFieldToDBColumn[string(v.Field(i))]
+		//
+		// if !ok {
+		// 	continue
+		// }
+		//
+		query += fmt.Sprintf("SET %s :%s")
+
+	}
+
+	return nil
+}
+
+func (r *repository) GetBasicBuildInfoByIdForMember(id uuid.UUID, memberId uuid.UUID) (*BasicBuildInfoResponse, error) {
+	var build BasicBuildInfoResponse
+
+	query := `
+	SELECT 
+		builds.id as id,
+		title,
+		builds.description as description,
+		skills.name as main_skill,
+		classes.name as class,
+		ascendancies.name as ascendancy,
+		avg_end_game_rating,
+		avg_fun_rating,
+		avg_creative_rating,
+		avg_speed_farm_rating,
+		views,
+		status,
+		builds.created_at as created_at,
+		builds.updated_at as updated_at
+	FROM builds
+	JOIN classes ON classes.id = builds.class_id
+	JOIN ascendancies ON ascendancies.id = builds.ascendancy_id
+	JOIN skills ON skills.id = builds.main_skill_id
+	WHERE builds.member_id = $1
+	AND builds.id = $2
+	`
+
+	err := r.db.Get(&build, query, memberId, id)
+
+	if err != nil {
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return &build, nil
+}
+
+func (r *repository) UpdateBuild(memberId uuid.UUID, buildId uuid.UUID, request UpdateBuildRequest) error {
+
+	fmt.Printf("request.SkillID :%s\n", request.SkillId)
+
+	query := `
+	UPDATE builds
+	SET 
+		title = COALESCE(:title, title),
+		description = COALESCE(:description, description),
+		main_skill_id = COALESCE(:main_skill_id, main_skill_id),
+		class_id = COALESCE(:class_id, class_id),
+		ascendancy_id = COALESCE(:ascendancy_id, ascendancy_id),
+		updated_at = CURRENT_TIMESTAMP
+	WHERE id = :build_id AND member_id = :member_id
+	`
+
+	params := map[string]interface{}{
+		"title":         request.Title,
+		"description":   request.Description,
+		"main_skill_id": request.SkillId,
+		"class_id":      request.ClassId,
+		"ascendancy_id": request.AscendancyId,
+		"build_id":      buildId,
+		"member_id":     memberId,
+	}
+
+	fmt.Printf("Final Query: %s\n", query)
+
+	_, err := r.db.NamedExec(query, params)
+
+	if err != nil {
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	return nil
+}
+
+/**
+* Creates a skill link group for a build.
+**/
+func (r *repository) CreateBuildSkillLinkTx(tx *sqlx.Tx, buildId uuid.UUID, name string, isMain bool) (uuid.UUID, error) {
+
+	// validate that skill link and name combination doesn't already exists for the build
+	var existsId uuid.UUID
+
+	query := `
+	SELECT id FROM build_skill_links
+	WHERE build_id = $1 AND name = $2
+	`
+
+	err := tx.Get(&existsId, query, buildId, name)
+
+	if !errors.Is(err, sql.ErrNoRows) {
+		return uuid.Nil, errorutils.ErrDuplicateResource
+	}
+
+	var newId uuid.UUID
+
+	query = `
+	INSERT INTO build_skill_links(build_id, name, is_main)
+	VALUES($1, $2, $3)
+	RETURNING id
+	`
+
+	err = tx.QueryRowx(query, buildId, name, isMain).Scan(&newId)
+
+	if err != nil {
+		fmt.Printf("Error when attempting to insert into build_skill_links: %s\n", err)
+		return uuid.Nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return newId, nil
+}
+
+/**
+* Adds a skill to a existing skill link.
+**/
+func (r *repository) AddSkillToLinkTx(tx *sqlx.Tx, buildSkillLinkId uuid.UUID, skillId uuid.UUID) error {
+
+	// validate that skill doesn't already exists first
+	var existsId uuid.UUID
+
+	query := `
+	SELECT id FROM build_skill_link_skills
+	WHERE build_skill_link_id = $1 AND skill_id = $2
+	`
+
+	err := tx.Get(&existsId, query, buildSkillLinkId, skillId)
+
+	// if resource IS found, don't create duplicate skill-link to skill relation insert
+	if !errors.Is(err, sql.ErrNoRows) {
+		fmt.Println("Rows found, duplicate.")
+		return errorutils.ErrDuplicateResource
+	}
+
+	query = `
+	INSERT INTO build_skill_link_skills(build_skill_link_id, skill_id)
+	VALUES(:build_skill_link_id, :skill_id)
+	`
+
+	params := map[string]interface{}{
+		"build_skill_link_id": buildSkillLinkId,
+		"skill_id":            skillId,
+	}
+
+	_, err = tx.NamedExec(query, params)
+
+	if err != nil {
+		fmt.Printf("DEBUG AddSkillToLinkTx: Error when attempting to insert into join table build_skill_link_skills: %s\n", err)
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	return nil
+}
+
+/**
+* Creates a skill link group for a build.
+**/
+func (r *repository) GetBuildItemSetIdTx(tx *sqlx.Tx, buildId uuid.UUID) (uuid.UUID, error) {
+	fmt.Println("buildId", buildId)
+	var setId uuid.UUID
+
+	query := `
+	SELECT id
+	FROM build_item_sets
+	WHERE build_id = $1
+	`
+
+	err := tx.Get(&setId, query, buildId)
+
+	if err != nil {
+		fmt.Printf("Error when attempting to insert into build_item_links: %s\n", err)
+		return uuid.Nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return setId, nil
+}
+
+/**
+* Adds a item to a existing item set.
+**/
+func (r *repository) UpdateItemToSetTx(tx *sqlx.Tx, buildItemSetId uuid.UUID, slot string, itemId interface{}) error {
+
+	var itemSetSlotItemId uuid.UUID
+	// get item of update
+	query := `
+	SELECT id
+	FROM build_item_set_items
+	WHERE build_item_set_id = $1 AND slot = $2
+	`
+	err := tx.Get(&itemSetSlotItemId, query, buildItemSetId, slot)
+	if err != nil {
+		fmt.Printf("Error when attempting to insert into build_item_set_item: %s\n", err)
+		return errorutils.AnalyzeDBErr(err)
+	}
+	fmt.Println("itemSetSlotItemId", itemSetSlotItemId)
+	// update set item
+	query = `
+	UPDATE build_item_set_items
+	SET item_id = :item_id
+	WHERE id = :id
+	`
+
+	params := map[string]interface{}{
+		"id":      itemSetSlotItemId,
+		"item_id": itemId,
+	}
+
+	_, err = tx.NamedExec(query, params)
+
+	if err != nil {
+		fmt.Printf("DEBUG AddItemToSetTx: Error when attempting to insert into join table build_item_set_items: %s\n", err)
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	return nil
+}
+
+/**
+* Delete Build by build id and member id.
+**/
+func (r *repository) DeleteBuildByIdForMember(memberId uuid.UUID, buildId uuid.UUID) error {
+	query := `
+	DELETE FROM builds 
+	WHERE id = $1 AND member_id = $2
+	`
+
+	_, err := r.db.Exec(query, buildId, memberId)
+	if err != nil {
+		return errorutils.AnalyzeDBErr(err)
+	}
+
+	return nil
 }

@@ -4,8 +4,6 @@ import (
 	"context"
 
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/tag"
-	"github.com/darkphotonKN/community-builds-microservice/common/constants/models"
-	"github.com/google/uuid"
 	// "github.com/google/uuid"
 )
 
@@ -18,7 +16,6 @@ type Service interface {
 	CreateTag(ctx context.Context, req *pb.CreateTagRequest) (*pb.CreateTagResponse, error)
 	GetTags(ctx context.Context, req *pb.GetTagsRequest) (*pb.GetTagsResponse, error)
 	UpdateTag(ctx context.Context, req *pb.UpdateTagRequest) (*pb.UpdateTagResponse, error)
-	GetBuildTagsForMemberById(memberId uuid.UUID) (*[]models.Tag, error)
 }
 
 func NewHandler(service Service) *Handler {

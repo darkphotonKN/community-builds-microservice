@@ -19,10 +19,17 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	BuildService_CreateBuild_FullMethodName         = "/build.BuildService/CreateBuild"
-	BuildService_GetBuildsByMemberId_FullMethodName = "/build.BuildService/GetBuildsByMemberId"
-	BuildService_GetCommunityBuilds_FullMethodName  = "/build.BuildService/GetCommunityBuilds"
-	BuildService_GetBuildInfo_FullMethodName        = "/build.BuildService/GetBuildInfo"
+	BuildService_CreateBuild_FullMethodName           = "/build.BuildService/CreateBuild"
+	BuildService_GetBuildsByMemberId_FullMethodName   = "/build.BuildService/GetBuildsByMemberId"
+	BuildService_GetCommunityBuilds_FullMethodName    = "/build.BuildService/GetCommunityBuilds"
+	BuildService_GetBuildInfo_FullMethodName          = "/build.BuildService/GetBuildInfo"
+	BuildService_GetBuildsForMember_FullMethodName    = "/build.BuildService/GetBuildsForMember"
+	BuildService_GetBuildInfoForMember_FullMethodName = "/build.BuildService/GetBuildInfoForMember"
+	BuildService_PublishBuild_FullMethodName          = "/build.BuildService/PublishBuild"
+	BuildService_UpdateBuild_FullMethodName           = "/build.BuildService/UpdateBuild"
+	BuildService_AddSkillLinksToBuild_FullMethodName  = "/build.BuildService/AddSkillLinksToBuild"
+	BuildService_UpdateItemSetsToBuild_FullMethodName = "/build.BuildService/UpdateItemSetsToBuild"
+	BuildService_DeleteBuildByMember_FullMethodName   = "/build.BuildService/DeleteBuildByMember"
 )
 
 // BuildServiceClient is the client API for BuildService service.
@@ -33,6 +40,13 @@ type BuildServiceClient interface {
 	GetBuildsByMemberId(ctx context.Context, in *GetBuildsByMemberIdRequest, opts ...grpc.CallOption) (*GetBuildsByMemberIdResponse, error)
 	GetCommunityBuilds(ctx context.Context, in *GetCommunityBuildsRequest, opts ...grpc.CallOption) (*GetCommunityBuildsResponse, error)
 	GetBuildInfo(ctx context.Context, in *GetBuildInfoRequest, opts ...grpc.CallOption) (*GetBuildInfoResponse, error)
+	GetBuildsForMember(ctx context.Context, in *GetBuildsForMemberRequest, opts ...grpc.CallOption) (*GetBuildsForMemberResponse, error)
+	GetBuildInfoForMember(ctx context.Context, in *GetBuildInfoForMemberRequest, opts ...grpc.CallOption) (*GetBuildInfoForMemberResponse, error)
+	PublishBuild(ctx context.Context, in *PublishBuildRequest, opts ...grpc.CallOption) (*PublishBuildResponse, error)
+	UpdateBuild(ctx context.Context, in *UpdateBuildRequest, opts ...grpc.CallOption) (*UpdateBuildResponse, error)
+	AddSkillLinksToBuild(ctx context.Context, in *AddSkillLinksToBuildRequest, opts ...grpc.CallOption) (*AddSkillLinksToBuildResponse, error)
+	UpdateItemSetsToBuild(ctx context.Context, in *UpdateItemSetsToBuildRequest, opts ...grpc.CallOption) (*UpdateItemSetsToBuildResponse, error)
+	DeleteBuildByMember(ctx context.Context, in *DeleteBuildByMemberRequest, opts ...grpc.CallOption) (*DeleteBuildByMemberResponse, error)
 }
 
 type buildServiceClient struct {
@@ -83,6 +97,76 @@ func (c *buildServiceClient) GetBuildInfo(ctx context.Context, in *GetBuildInfoR
 	return out, nil
 }
 
+func (c *buildServiceClient) GetBuildsForMember(ctx context.Context, in *GetBuildsForMemberRequest, opts ...grpc.CallOption) (*GetBuildsForMemberResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetBuildsForMemberResponse)
+	err := c.cc.Invoke(ctx, BuildService_GetBuildsForMember_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *buildServiceClient) GetBuildInfoForMember(ctx context.Context, in *GetBuildInfoForMemberRequest, opts ...grpc.CallOption) (*GetBuildInfoForMemberResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetBuildInfoForMemberResponse)
+	err := c.cc.Invoke(ctx, BuildService_GetBuildInfoForMember_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *buildServiceClient) PublishBuild(ctx context.Context, in *PublishBuildRequest, opts ...grpc.CallOption) (*PublishBuildResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PublishBuildResponse)
+	err := c.cc.Invoke(ctx, BuildService_PublishBuild_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *buildServiceClient) UpdateBuild(ctx context.Context, in *UpdateBuildRequest, opts ...grpc.CallOption) (*UpdateBuildResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateBuildResponse)
+	err := c.cc.Invoke(ctx, BuildService_UpdateBuild_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *buildServiceClient) AddSkillLinksToBuild(ctx context.Context, in *AddSkillLinksToBuildRequest, opts ...grpc.CallOption) (*AddSkillLinksToBuildResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AddSkillLinksToBuildResponse)
+	err := c.cc.Invoke(ctx, BuildService_AddSkillLinksToBuild_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *buildServiceClient) UpdateItemSetsToBuild(ctx context.Context, in *UpdateItemSetsToBuildRequest, opts ...grpc.CallOption) (*UpdateItemSetsToBuildResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateItemSetsToBuildResponse)
+	err := c.cc.Invoke(ctx, BuildService_UpdateItemSetsToBuild_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *buildServiceClient) DeleteBuildByMember(ctx context.Context, in *DeleteBuildByMemberRequest, opts ...grpc.CallOption) (*DeleteBuildByMemberResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteBuildByMemberResponse)
+	err := c.cc.Invoke(ctx, BuildService_DeleteBuildByMember_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BuildServiceServer is the server API for BuildService service.
 // All implementations must embed UnimplementedBuildServiceServer
 // for forward compatibility.
@@ -91,6 +175,13 @@ type BuildServiceServer interface {
 	GetBuildsByMemberId(context.Context, *GetBuildsByMemberIdRequest) (*GetBuildsByMemberIdResponse, error)
 	GetCommunityBuilds(context.Context, *GetCommunityBuildsRequest) (*GetCommunityBuildsResponse, error)
 	GetBuildInfo(context.Context, *GetBuildInfoRequest) (*GetBuildInfoResponse, error)
+	GetBuildsForMember(context.Context, *GetBuildsForMemberRequest) (*GetBuildsForMemberResponse, error)
+	GetBuildInfoForMember(context.Context, *GetBuildInfoForMemberRequest) (*GetBuildInfoForMemberResponse, error)
+	PublishBuild(context.Context, *PublishBuildRequest) (*PublishBuildResponse, error)
+	UpdateBuild(context.Context, *UpdateBuildRequest) (*UpdateBuildResponse, error)
+	AddSkillLinksToBuild(context.Context, *AddSkillLinksToBuildRequest) (*AddSkillLinksToBuildResponse, error)
+	UpdateItemSetsToBuild(context.Context, *UpdateItemSetsToBuildRequest) (*UpdateItemSetsToBuildResponse, error)
+	DeleteBuildByMember(context.Context, *DeleteBuildByMemberRequest) (*DeleteBuildByMemberResponse, error)
 	mustEmbedUnimplementedBuildServiceServer()
 }
 
@@ -112,6 +203,27 @@ func (UnimplementedBuildServiceServer) GetCommunityBuilds(context.Context, *GetC
 }
 func (UnimplementedBuildServiceServer) GetBuildInfo(context.Context, *GetBuildInfoRequest) (*GetBuildInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBuildInfo not implemented")
+}
+func (UnimplementedBuildServiceServer) GetBuildsForMember(context.Context, *GetBuildsForMemberRequest) (*GetBuildsForMemberResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBuildsForMember not implemented")
+}
+func (UnimplementedBuildServiceServer) GetBuildInfoForMember(context.Context, *GetBuildInfoForMemberRequest) (*GetBuildInfoForMemberResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBuildInfoForMember not implemented")
+}
+func (UnimplementedBuildServiceServer) PublishBuild(context.Context, *PublishBuildRequest) (*PublishBuildResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PublishBuild not implemented")
+}
+func (UnimplementedBuildServiceServer) UpdateBuild(context.Context, *UpdateBuildRequest) (*UpdateBuildResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateBuild not implemented")
+}
+func (UnimplementedBuildServiceServer) AddSkillLinksToBuild(context.Context, *AddSkillLinksToBuildRequest) (*AddSkillLinksToBuildResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddSkillLinksToBuild not implemented")
+}
+func (UnimplementedBuildServiceServer) UpdateItemSetsToBuild(context.Context, *UpdateItemSetsToBuildRequest) (*UpdateItemSetsToBuildResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateItemSetsToBuild not implemented")
+}
+func (UnimplementedBuildServiceServer) DeleteBuildByMember(context.Context, *DeleteBuildByMemberRequest) (*DeleteBuildByMemberResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteBuildByMember not implemented")
 }
 func (UnimplementedBuildServiceServer) mustEmbedUnimplementedBuildServiceServer() {}
 func (UnimplementedBuildServiceServer) testEmbeddedByValue()                      {}
@@ -206,6 +318,132 @@ func _BuildService_GetBuildInfo_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BuildService_GetBuildsForMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBuildsForMemberRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BuildServiceServer).GetBuildsForMember(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BuildService_GetBuildsForMember_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuildServiceServer).GetBuildsForMember(ctx, req.(*GetBuildsForMemberRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BuildService_GetBuildInfoForMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBuildInfoForMemberRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BuildServiceServer).GetBuildInfoForMember(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BuildService_GetBuildInfoForMember_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuildServiceServer).GetBuildInfoForMember(ctx, req.(*GetBuildInfoForMemberRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BuildService_PublishBuild_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PublishBuildRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BuildServiceServer).PublishBuild(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BuildService_PublishBuild_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuildServiceServer).PublishBuild(ctx, req.(*PublishBuildRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BuildService_UpdateBuild_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateBuildRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BuildServiceServer).UpdateBuild(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BuildService_UpdateBuild_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuildServiceServer).UpdateBuild(ctx, req.(*UpdateBuildRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BuildService_AddSkillLinksToBuild_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddSkillLinksToBuildRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BuildServiceServer).AddSkillLinksToBuild(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BuildService_AddSkillLinksToBuild_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuildServiceServer).AddSkillLinksToBuild(ctx, req.(*AddSkillLinksToBuildRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BuildService_UpdateItemSetsToBuild_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateItemSetsToBuildRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BuildServiceServer).UpdateItemSetsToBuild(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BuildService_UpdateItemSetsToBuild_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuildServiceServer).UpdateItemSetsToBuild(ctx, req.(*UpdateItemSetsToBuildRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BuildService_DeleteBuildByMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteBuildByMemberRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BuildServiceServer).DeleteBuildByMember(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BuildService_DeleteBuildByMember_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuildServiceServer).DeleteBuildByMember(ctx, req.(*DeleteBuildByMemberRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BuildService_ServiceDesc is the grpc.ServiceDesc for BuildService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -228,6 +466,34 @@ var BuildService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetBuildInfo",
 			Handler:    _BuildService_GetBuildInfo_Handler,
+		},
+		{
+			MethodName: "GetBuildsForMember",
+			Handler:    _BuildService_GetBuildsForMember_Handler,
+		},
+		{
+			MethodName: "GetBuildInfoForMember",
+			Handler:    _BuildService_GetBuildInfoForMember_Handler,
+		},
+		{
+			MethodName: "PublishBuild",
+			Handler:    _BuildService_PublishBuild_Handler,
+		},
+		{
+			MethodName: "UpdateBuild",
+			Handler:    _BuildService_UpdateBuild_Handler,
+		},
+		{
+			MethodName: "AddSkillLinksToBuild",
+			Handler:    _BuildService_AddSkillLinksToBuild_Handler,
+		},
+		{
+			MethodName: "UpdateItemSetsToBuild",
+			Handler:    _BuildService_UpdateItemSetsToBuild_Handler,
+		},
+		{
+			MethodName: "DeleteBuildByMember",
+			Handler:    _BuildService_DeleteBuildByMember_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

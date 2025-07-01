@@ -95,7 +95,7 @@ type SkillGroupResponse struct {
 
 // All Build Information
 type BuildInfoResponse struct {
-	ID          uuid.UUID              `json:"id"`
+	Id          uuid.UUID              `json:"id"`
 	Title       string                 `json:"title"`
 	Description string                 `json:"description"`
 	Class       string                 `json:"class"`

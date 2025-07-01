@@ -16,7 +16,6 @@ type Repository interface {
 	CreateTag(createBuildRequest CreateTagRequest) error
 	GetTags() (*[]models.Tag, error)
 	UpdateTag(updateTagRequest UpdateTagRequest) error
-	GetBuildTagsForMemberById(memberId uuid.UUID) (*[]models.Tag, error)
 }
 
 func NewService(repo Repository) Service {
@@ -63,14 +62,14 @@ func (s *service) GetTags(ctx context.Context, req *pb.GetTagsRequest) (*pb.GetT
 	return &pb.GetTagsResponse{Tags: pbTags}, nil
 }
 
-// not grpc
-func (s *service) GetBuildTagsForMemberById(memberId uuid.UUID) (*[]models.Tag, error) {
-	tags, err := s.repo.GetBuildTagsForMemberById(memberId)
-	if err != nil {
-		return nil, err
-	}
-	return tags, nil
-}
+// // not grpc
+// func (s *service) GetBuildTagsForMemberById(memberId uuid.UUID) (*[]models.Tag, error) {
+// 	tags, err := s.repo.GetBuildTagsForMemberById(memberId)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return tags, nil
+// }
 
 // func (s *service) CreateDefaultTags(tags []models.Tag) error {
 // 	return s.repo.BatchCreateTags(tags)
