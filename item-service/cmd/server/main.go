@@ -21,7 +21,7 @@ import (
 
 var (
 	serviceName = "item-service"
-	grpcAddr    = commonhelpers.GetEnvString("GRPC_EXAMPLE_ADDR", "7010")
+	grpcAddr    = commonhelpers.GetEnvString("GRPC_ITEM_ADDR", "7002")
 	consulAddr  = commonhelpers.GetEnvString("CONSUL_ADDR", "localhost:8510")
 	// rabbit mq
 	amqpUser     = commonhelpers.GetEnvString("RABBITMQ_USER", "guest")
