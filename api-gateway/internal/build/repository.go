@@ -433,7 +433,7 @@ func (r *BuildRepository) GetBuildInfo(buildId uuid.UUID) (*BuildInfoResponse, e
 
 	// create the base of the response
 	result := BuildInfoResponse{
-		ID:          buildInfoRows[0].ID,
+		Id:          buildInfoRows[0].Id,
 		Title:       buildInfoRows[0].Title,
 		Description: buildInfoRows[0].Description,
 	}
@@ -442,10 +442,10 @@ func (r *BuildRepository) GetBuildInfo(buildId uuid.UUID) (*BuildInfoResponse, e
 
 	for _, buildInfoRow := range buildInfoRows {
 		skillRows = append(skillRows, models.SkillRow{
-			SkillLinkID:     buildInfoRow.SkillLinkID,
+			SkillLinkId:     buildInfoRow.SkillLinkId,
 			SkillLinkName:   buildInfoRow.SkillLinkName,
 			SkillLinkIsMain: buildInfoRow.SkillLinkIsMain,
-			SkillID:         buildInfoRow.SkillID,
+			SkillId:         buildInfoRow.SkillId,
 			SkillType:       buildInfoRow.SkillType,
 		})
 
@@ -481,7 +481,7 @@ func (r *BuildRepository) GetAndFormSkillLinks(skillData []models.SkillRow) Skil
 			if types.SkillType(row.SkillType) == types.Active {
 
 				mainSkillLink.Skill = models.Skill{
-					ID:   row.SkillID,
+					ID:   row.SkillId,
 					Name: row.SkillName,
 					Type: row.SkillType,
 				}
@@ -489,7 +489,7 @@ func (r *BuildRepository) GetAndFormSkillLinks(skillData []models.SkillRow) Skil
 			} else {
 				// else its a support skill link
 				mainSkillLink.Links = append(mainSkillLink.Links, models.Skill{
-					ID:   row.SkillID,
+					ID:   row.SkillId,
 					Name: row.SkillName,
 					Type: row.SkillType,
 				})
@@ -518,14 +518,14 @@ func (r *BuildRepository) GetAndFormSkillLinks(skillData []models.SkillRow) Skil
 				if types.SkillType(row.SkillType) == types.Active {
 
 					existingSkillLink.Skill = models.Skill{
-						ID:   row.SkillID,
+						ID:   row.SkillId,
 						Name: row.SkillName,
 						Type: row.SkillType,
 					}
 
 				} else {
 					existingSkillLink.Links = append(existingSkillLink.Links, models.Skill{
-						ID:   row.SkillID,
+						ID:   row.SkillId,
 						Name: row.SkillName,
 						Type: row.SkillType,
 					})
@@ -542,7 +542,7 @@ func (r *BuildRepository) GetAndFormSkillLinks(skillData []models.SkillRow) Skil
 				// starting link skill
 				if types.SkillType(row.SkillType) == types.Active {
 					newAdditionalSkillLink.Skill = models.Skill{
-						ID:   row.SkillID,
+						ID:   row.SkillId,
 						Name: row.SkillName,
 						Type: row.SkillType,
 					}
@@ -550,7 +550,7 @@ func (r *BuildRepository) GetAndFormSkillLinks(skillData []models.SkillRow) Skil
 				} else {
 					// supporting skill link
 					newAdditionalSkillLink.Links = append(newAdditionalSkillLink.Links, models.Skill{
-						ID:   row.SkillID,
+						ID:   row.SkillId,
 						Name: row.SkillName,
 						Type: row.SkillType,
 					})

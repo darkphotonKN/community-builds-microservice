@@ -5,15 +5,16 @@ import (
 
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/article"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/auth"
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/build"
+
+	// "github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/build"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/class"
 	authService "github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/auth"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/build"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/example"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/item"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/notification"
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/rating"
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/skill"
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/tag"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/skill"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/tag"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -107,9 +108,12 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	// --- SKILL ---
 
 	// -- Skill Setup --
-	skillRepo := skill.NewSkillRepository(db)
-	skillService := skill.NewSkillService(skillRepo)
-	skillHandler := skill.NewSkillHandler(skillService)
+
+	skillClient := skill.NewClient(registry)
+	skillHandler := skill.NewHandler(skillClient)
+	// skillRepo := skill.NewSkillRepository(db)
+	// skillService := skill.NewSkillService(skillRepo)
+	// skillHandler := skill.NewSkillHandler(skillService)
 
 	// -- Skill Routes --
 	skillRoutes := api.Group("/skill")
@@ -153,9 +157,11 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	// --- BUILD ---
 
 	// -- Build Setup --
-	buildRepo := build.NewBuildRepository(db)
-	buildService := build.NewBuildService(buildRepo, skillService)
-	buildHandler := build.NewBuildHandler(buildService)
+	buildClient := build.NewClient(registry)
+	buildHandler := build.NewHandler(buildClient)
+	// buildRepo := build.NewBuildRepository(db)
+	// buildService := build.NewBuildService(buildRepo, skillService)
+	// buildHandler := build.NewBuildHandler(buildService)
 
 	// -- Build Routes --
 	buildRoutes := api.Group("/build")
@@ -179,9 +185,12 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	// --- TAG ---
 
 	// -- Tag Setup --
-	tagRepo := tag.NewTagRepository(db)
-	tagService := tag.NewTagService(tagRepo)
-	tagHandler := tag.NewTagHandler(tagService)
+
+	tagClient := tag.NewClient(registry)
+	tagHandler := tag.NewHandler(tagClient)
+	// tagRepo := tag.NewTagRepository(db)
+	// tagService := tag.NewTagService(tagRepo)
+	// tagHandler := tag.NewTagHandler(tagService)
 
 	// -- Tag Routes --
 	tagRoutes := api.Group("/tag")
@@ -212,14 +221,14 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	// -- RATING --
 
 	// --- Rating Setup ---
-	ratingRepo := rating.NewRatingRepository(db)
-	ratingService := rating.NewRatingService(ratingRepo, buildService)
-	ratingHandler := rating.NewRatingHandler(ratingService)
+	// ratingRepo := rating.NewRatingRepository(db)
+	// ratingService := rating.NewRatingService(ratingRepo, buildService)
+	// ratingHandler := rating.NewRatingHandler(ratingService)
 
-	ratingRoutes := api.Group("/rating")
+	// ratingRoutes := api.Group("/rating")
 
-	ratingRoutes.Use(auth.AuthMiddleware())
-	ratingRoutes.POST("", ratingHandler.CreateRatingByBuildIdHandler)
+	// ratingRoutes.Use(auth.AuthMiddleware())
+	// ratingRoutes.POST("", ratingHandler.CreateRatingByBuildIdHandler)
 
 	return router
 }

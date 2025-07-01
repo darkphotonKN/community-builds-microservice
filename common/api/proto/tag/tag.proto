@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package tag;
+
+option go_package = "github.com/darkphotonKN/community-builds-microservices/common/api/proto/tag";
+
+service TagService {
+  rpc CreateTag(CreateTagRequest) returns (CreateTagResponse) {}
+  rpc GetTags(GetTagsRequest) returns (GetTagsResponse) {}
+  rpc UpdateTag(UpdateTagRequest) returns (UpdateTagResponse) {}
+}
+
+message Tag {
+	string id = 1;   
+  string name = 2;
+	string createdAt = 3; 
+	string updatedAt = 4;
+}
+
+message CreateTagRequest {
+  string memberId = 1;
+  string name = 2;
+}
+
+message CreateTagResponse {
+}
+
+message GetTagsRequest {
+}
+
+message GetTagsResponse {
+  repeated Tag tags = 1;
+}
+
+message UpdateTagRequest {
+  string memberId = 1;
+  string id = 2;
+  string name = 3;
+}
+
+message UpdateTagResponse {
+}

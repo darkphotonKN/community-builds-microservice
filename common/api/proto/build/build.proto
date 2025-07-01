@@ -1,0 +1,305 @@
+syntax = "proto3";
+
+package build;
+
+option go_package = "github.com/darkphotonKN/community-builds-microservices/common/api/proto/build";
+
+service BuildService {
+  rpc CreateBuild(CreateBuildRequest) returns (CreateBuildResponse) {}
+  rpc GetBuildsByMemberId(GetBuildsByMemberIdRequest) returns (GetBuildsByMemberIdResponse) {}
+  rpc GetCommunityBuilds(GetCommunityBuildsRequest) returns (GetCommunityBuildsResponse) {}
+  rpc GetBuildInfo(GetBuildInfoRequest) returns (GetBuildInfoResponse) {}
+  rpc GetBuildsForMember(GetBuildsForMemberRequest) returns (GetBuildsForMemberResponse) {}
+  rpc GetBuildInfoForMember(GetBuildInfoForMemberRequest) returns (GetBuildInfoForMemberResponse) {}
+  rpc PublishBuild(PublishBuildRequest) returns (PublishBuildResponse) {}
+  rpc UpdateBuild(UpdateBuildRequest) returns (UpdateBuildResponse) {}
+  rpc AddSkillLinksToBuild(AddSkillLinksToBuildRequest) returns (AddSkillLinksToBuildResponse) {}
+  rpc UpdateItemSetsToBuild(UpdateItemSetsToBuildRequest) returns (UpdateItemSetsToBuildResponse) {}
+  rpc DeleteBuildByMember(DeleteBuildByMemberRequest) returns (DeleteBuildByMemberResponse) {}
+}
+
+message buildItemSetResponse {
+  string buildId = 1;
+  string setId = 2;
+  string itemId = 3;
+  string setSlot = 4;
+
+  string imageUrl = 5;
+  string category = 6;
+  string class = 7;
+  string name = 8;
+  string type = 9;
+  string description = 10;
+  bool UniqueItem = 11;
+  string slot = 12;
+
+  // armor
+  optional string requiredLevel = 13;
+  optional string requiredStrength = 14;
+  optional string requiredDexterity = 15;
+  optional string requiredIntelligence = 16;
+  optional string armour = 17;
+  optional string energyShield = 18;
+  optional string evasion = 19;
+  optional string block = 20;
+  optional string ward = 21;
+  // weapon
+  optional string damage = 22;
+  optional string APS = 23;
+  optional string crit = 24;
+  optional string PDPS = 25;
+  optional string EDPS = 26;
+  optional string DPS = 27;
+  // poison
+  optional string life = 28;
+  optional string mana = 29;
+  optional string duration = 30;
+  optional string usage = 31;
+  optional string capacity = 32;
+  // common
+  optional string additional = 33;
+  repeated string implicit = 34;
+  repeated string stats = 35;
+}
+
+message Build {
+  optional string id = 1;
+  string memberId = 2;
+  string baseBuildId = 3;
+  string imageUrl = 4;
+  string category = 5;
+  string class = 6;
+  string name = 7;
+  string type = 8;
+  string description = 9;
+  bool uniqueBuild = 10;
+  string slot = 11;
+  
+  // armor
+  optional string requiredLevel = 12;
+  optional string requiredStrength = 13;
+  optional string requiredDexterity = 14;
+  optional string requiredIntelligence = 15;
+  
+  	// armor
+  optional string armour = 16;
+  optional string energyShield = 17;
+  optional string evasion = 18;
+  optional string block = 19;
+  optional string ward = 20;
+  // weapon
+  optional string damage = 21;
+  optional string APS = 22;
+  optional string crit = 23;
+  optional string PDPS = 24;
+  optional string EDPS = 25;
+  optional string DPS = 26;
+  // poison
+  optional string life = 27;
+  optional string mana = 28;
+  optional string duration = 29;
+  optional string usage = 30;
+  optional string capacity = 31;
+
+  optional string additional = 32;
+  repeated string implicit = 33;
+  repeated string stats = 34;
+
+	optional string createdAt = 36; 
+  optional string updatedAt = 37;
+}
+
+message skill {
+  string id = 1;
+  string name = 2;
+  string type = 3; 
+  string createdAt = 4;
+  string updatedAt = 5;
+}
+
+message tag {
+  string id = 1;
+  string name = 2;
+  string createdAt = 3; 
+  string updatedAt = 4;
+}
+
+message SkillLinks {
+  string skillLinkName = 1;
+  string skill = 2;
+  repeated string links = 3;
+}
+
+message skillLinkResponse {
+  string skillLinkName = 1;
+  skill skill = 2;
+  repeated skill links = 3;
+}
+
+message skillGroupResponse {
+  skillLinkResponse MainSkillLinks = 1;
+  repeated skillLinkResponse AdditionalSkills = 2;
+}
+message AddSkillsToBuildRequest {
+  skillLinkResponse MainSkillLinks = 1;
+  repeated skillLinkResponse AdditionalSkills = 2;
+}
+
+message BuildList {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  string class = 4;
+  string ascendancy = 5;
+  string mainSkillName = 6;
+  float avgEndGameRating = 7;
+  float avgFunRating = 8;
+  float avgCreativeRating = 9;
+  float avgSpeedFarmRating = 10;
+  float avgBossingRating = 11;
+  int32 views = 12;
+  repeated tag tags = 13; 
+  int32 status = 14; 
+  string createdAt = 15; 
+}
+
+
+message CreateBuildRequest {
+  string memberId = 1;
+  string skillId = 2;
+  repeated string tagIds = 3;
+  string title = 4;
+  string description = 5;
+  string classId = 6;
+  string ascendancyId = 7;
+}
+
+message CreateBuildResponse {
+}
+
+message GetBuildsByMemberIdRequest {
+ string memberId = 1;
+}
+
+message GetBuildsByMemberIdResponse {
+  repeated BuildList builds = 1; // array of items
+}
+
+message GetCommunityBuildsRequest {
+  int32 pageNo = 1;
+  int32 pageSize = 2;
+  string sortOrder = 3; 
+  string sortBy = 4; 
+  string search = 5; 
+  string skillId = 6;
+  int32 minRating = 7;
+  string ratingCategory = 8; 
+}
+
+message GetCommunityBuildsResponse {
+  repeated BuildList builds = 1; // array of items
+}
+
+message GetBuildInfoRequest {
+  string id = 1;
+
+}
+
+message GetBuildInfoResponse {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  string class = 4;
+  string ascendancy = 5;
+  repeated tag tags = 6;  
+  skillGroupResponse skills = 7;
+  repeated buildItemSetResponse Sets = 8;
+}
+
+message GetBuildsForMemberRequest {
+  string memberId = 1;
+}
+
+message GetBuildsForMemberResponse {
+  repeated BuildList builds = 1; // array of items
+}
+
+message GetBuildInfoForMemberRequest {
+  string memberId = 1;
+  string id = 2;
+}
+
+message GetBuildInfoForMemberResponse {
+  string id = 1;
+  string title = 2;
+  string Description = 3;
+  // TODO: add ascendancy and class
+  string class = 4;
+  string ascendancy = 5;
+  skillGroupResponse skills = 6;
+  repeated tag tags = 7;
+  repeated buildItemSetResponse sets = 8;
+}
+
+message PublishBuildRequest {
+  string memberId = 1;
+  string id = 2;
+}
+
+message PublishBuildResponse {
+  
+}
+
+message UpdateBuild {
+}
+
+message UpdateBuildRequest {
+  string skillId = 1;
+  repeated string tags = 2;
+  string title = 3;
+  string description = 4;
+  string classId = 5;
+  string ascendancyId = 6;
+  string memberId = 7;
+  string id = 8;
+}
+
+message UpdateBuildResponse {
+}
+
+message AddSkillLinksToBuildRequest {
+  string memberId = 1;
+  string id = 2;
+  SkillLinks MainSkillLinks = 3;
+  repeated SkillLinks AdditionalSkills = 4;
+
+}
+message AddSkillLinksToBuildResponse {
+  
+}
+
+message UpdateItemSetsToBuildRequest {
+  string memberId = 1;
+  string id = 2;
+  string weapon = 3;
+  string shield = 4;
+  string helmet = 5;
+  string bodyArmour = 6;
+  string boots = 7;
+  string gloves = 8;
+  string belt = 9;
+  string amulet = 10;
+  string leftRing = 11;
+  string rightRing = 12;
+}
+
+message UpdateItemSetsToBuildResponse {
+  
+}
+
+message DeleteBuildByMemberRequest {
+  string memberId = 1;
+  string Id = 2;
+}
+
+message DeleteBuildByMemberResponse {}

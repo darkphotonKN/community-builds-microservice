@@ -61,13 +61,13 @@ type AddItemsToBuildRequest struct {
 
 // TEMP CONTAINER for builds JOIN build_skill_links JOIN skills data
 type BuildInfoRows struct {
-	ID              uuid.UUID `db:"id"`
+	Id              uuid.UUID `db:"id"`
 	Title           string    `db:"title"`
 	Description     string    `db:"description"`
-	SkillLinkID     string    `db:"skill_link_id"`
+	SkillLinkId     string    `db:"skill_link_id"`
 	SkillLinkName   string    `db:"skill_link_name"`
 	SkillLinkIsMain bool      `db:"skill_link_is_main"`
-	SkillID         uuid.UUID `db:"skill_id"`
+	SkillId         uuid.UUID `db:"skill_id"`
 	SkillName       string    `db:"skill_name"`
 	SkillType       string    `db:"skill_type"`
 }
@@ -94,7 +94,7 @@ type SkillGroupResponse struct {
 
 // All Build Information
 type BuildInfoResponse struct {
-	ID          uuid.UUID              `json:"id"`
+	Id          uuid.UUID              `json:"id"`
 	Title       string                 `json:"title"`
 	Description string                 `json:"description"`
 	Class       string                 `json:"class"`

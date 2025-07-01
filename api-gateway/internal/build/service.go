@@ -270,7 +270,7 @@ func (s *BuildService) GetBuildInfoForMemberService(memberId uuid.UUID, buildId 
 
 	// return all join information (base, class, ascendancy, skills and items)
 	buildInfo := BuildInfoResponse{
-		ID:          build.ID,
+		Id:          build.Id,
 		Title:       build.Title,
 		Description: build.Description,
 		// TODO: add ascendancy and class

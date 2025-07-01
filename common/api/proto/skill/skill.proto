@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package skill;
+
+option go_package = "github.com/darkphotonKN/community-builds-microservices/common/api/proto/skill";
+
+service SkillService {
+  rpc CreateSkill(CreateSkillRequest) returns (CreateSkillResponse) {}
+  rpc GetSkills(GetSkillsRequest) returns (GetSkillsResponse) {}
+}
+
+message Skill {
+	string id = 1;   
+  string name = 2;
+  string type = 3;
+	string createdAt = 4; 
+	string updatedAt = 5;
+}
+
+
+message CreateSkillRequest {
+  string MemberId = 1;
+  string name = 2;
+  string type = 3;
+}
+
+message CreateSkillResponse {
+}
+
+message GetSkillsRequest {
+}
+
+message GetSkillsResponse {
+  repeated Skill skills = 1;
+}

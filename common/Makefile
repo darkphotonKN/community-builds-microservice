@@ -6,3 +6,6 @@ gen:
 		api/proto/auth/auth.proto \
 		api/proto/item/item.proto \
 		api/proto/notification/notification.proto \
+		api/proto/build/build.proto \
+		api/proto/skill/skill.proto \
+		api/proto/tag/tag.proto \
