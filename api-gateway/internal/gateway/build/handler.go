@@ -136,78 +136,101 @@ func (h *BuildHandler) CreateBuildHandler(c *gin.Context) {
 // /**
 // * Updates an existing build for a signed-in member.
 // **/
-// func (h *BuildHandler) UpdateBuildHandler(c *gin.Context) {
-// 	memberId, _ := c.Get("userId")
+func (h *BuildHandler) UpdateBuildHandler(c *gin.Context) {
+	userIdStr, _ := c.Get("userIdStr")
 
-// 	buildIdQuery := c.Param("id")
+	buildIdQuery := c.Param("id")
 
-// 	buildId, err := uuid.Parse(buildIdQuery)
+	buildId, err := uuid.Parse(buildIdQuery)
 
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.", buildId)})
-// 		return
-// 	}
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.", buildId)})
+		return
+	}
 
-// 	var request UpdateBuildRequest
+	var request UpdateBuildRequest
 
-// 	if err := c.ShouldBindJSON(&request); err != nil {
-// 		fmt.Printf("Failed to bind JSON payload: %+v, Error: %s", request, err.Error())
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON: %s", err)})
-// 		return
-// 	}
+	if err := c.ShouldBindJSON(&request); err != nil {
+		fmt.Printf("Failed to bind JSON payload: %+v, Error: %s", request, err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON: %s", err)})
+		return
+	}
+	tags := make([]string, len(request.TagIds))
+	for _, tag := range request.TagIds {
+		tags = append(tags, tag.String())
+	}
+	grpcReq := &pb.UpdateBuildRequest{
+		MemberId:     userIdStr.(string),
+		Id:           buildId.String(),
+		Tags:         tags,
+		SkillId:      request.SkillId.String(),
+		Title:        *request.Title,
+		Description:  *request.Description,
+		ClassId:      request.ClassId.String(),
+		AscendancyId: request.AscendancyId.String(),
+	}
 
-// 	err = h.Service.UpdateBuildService(memberId.(uuid.UUID), buildId, request)
+	_, err = h.Client.UpdateBuild(c.Request.Context(), grpcReq)
 
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to update a build: %s", err.Error())})
-// 		return
-// 	}
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to update a build: %s", err.Error())})
+		return
+	}
 
-// 	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusCreated, "message": "Successfully updated the build."})
-// }
+	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusCreated, "message": "Successfully updated the build."})
+}
 
 // /**
 // * Get list of builds by a signed-in member's ID.
 // **/
-// func (h *BuildHandler) GetBuildsForMemberHandler(c *gin.Context) {
-// 	memberId, _ := c.Get("userId")
+func (h *BuildHandler) GetBuildsForMemberHandler(c *gin.Context) {
+	userIdStr, _ := c.Get("userIdStr")
 
-// 	builds, err := h.Service.GetBuildsForMemberService(memberId.(uuid.UUID))
+	grpcReq := &pb.GetBuildsForMemberRequest{
+		MemberId: userIdStr.(string),
+	}
 
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all builds for memberId %s: %s", memberId, err.Error())})
-// 		return
-// 	}
+	builds, err := h.Client.GetBuildsForMember(c.Request.Context(), grpcReq)
 
-// 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all builds for member.", "result": builds})
-// }
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all builds for memberId %s: %s", userIdStr.(string), err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all builds for member.", "result": builds})
+}
 
 // /**
 // * Get all information for a single build by ID for a particular member.
 // **/
-// func (h *BuildHandler) GetBuildInfoForMemberHandler(c *gin.Context) {
-// 	memberId, _ := c.Get("userId")
+func (h *BuildHandler) GetBuildInfoForMemberHandler(c *gin.Context) {
+	userIdStr, _ := c.Get("userIdStr")
 
-// 	idParam := c.Param("id")
+	idParam := c.Param("id")
 
-// 	id, err := uuid.Parse(idParam)
+	id, err := uuid.Parse(idParam)
 
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.", id)})
-// 		return
-// 	}
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.", id)})
+		return
+	}
 
-// 	fmt.Printf("memberId: %s, id: %s\n", memberId, id)
+	// fmt.Printf("memberId: %s, id: %s\n", memberId, id)
 
-// 	build, err := h.Service.GetBuildInfoForMemberService(memberId.(uuid.UUID), id)
+	grpcReq := &pb.GetBuildInfoForMemberRequest{
+		MemberId: userIdStr.(string),
+		Id:       id.String(),
+	}
 
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all build information for memberId %s: %s", memberId, err.Error())})
-// 		return
-// 	}
+	build, err := h.Client.GetBuildInfoForMember(c.Request.Context(), grpcReq)
 
-// 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved build for member.", "result": build})
-// }
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all build information for memberId %s: %s", userIdStr.(string), err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved build for member.", "result": build})
+}
 
 // /**
 // * Get all information for a single build by id community version.
@@ -242,68 +265,114 @@ func (h *BuildHandler) GetBuildInfoByIdHandler(c *gin.Context) {
 // /**
 // * Adds primary, secondary, and other skills and links to an existing build.
 // **/
-// func (h *BuildHandler) AddSkillLinksToBuildHandler(c *gin.Context) {
-// 	memberId, _ := c.Get("userId")
+func (h *BuildHandler) AddSkillLinksToBuildHandler(c *gin.Context) {
+	userIdStr, _ := c.Get("userIdStr")
 
-// 	idParam := c.Param("id")
+	idParam := c.Param("id")
 
-// 	id, err := uuid.Parse(idParam)
+	id, err := uuid.Parse(idParam)
 
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.", id)})
-// 		return
-// 	}
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.", id)})
+		return
+	}
 
-// 	var request AddSkillsToBuildRequest
+	var request AddSkillsToBuildRequest
 
-// 	if err := c.ShouldBindJSON(&request); err != nil {
-// 		fmt.Printf("Failed to bind JSON payload: %+v, Error: %s", request, err.Error())
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON: %s", err)})
-// 		return
-// 	}
+	if err := c.ShouldBindJSON(&request); err != nil {
+		fmt.Printf("Failed to bind JSON payload: %+v, Error: %s", request, err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON: %s", err)})
+		return
+	}
 
-// 	err = h.Service.AddSkillLinksToBuildService(memberId.(uuid.UUID), id, request)
+	links := make([]string, len(request.MainSkillLinks.Links))
+	for _, link := range request.MainSkillLinks.Links {
+		links = append(links, link.String())
+	}
+	MainSkillLinks := &pb.SkillLinks{
+		SkillLinkName: request.MainSkillLinks.SkillLinkName,
+		Skill:         request.MainSkillLinks.Skill.String(),
+		Links:         links,
+	}
 
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting add skills to builds, buildId %s: memberId: %s, error: %s", id, memberId, err.Error())})
-// 		return
-// 	}
+	additionsLinks := make([]*pb.SkillLinks, len(request.AdditionalSkills))
+	for _, additionsLink := range request.AdditionalSkills {
 
-// 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully added skills to build for member."})
-// }
+		subLinks := make([]string, len(additionsLink.Links))
+		for _, subLink := range additionsLink.Links {
+			subLinks = append(subLinks, subLink.String())
+		}
+		additionsLinks = append(additionsLinks, &pb.SkillLinks{
+			SkillLinkName: additionsLink.SkillLinkName,
+			Skill:         additionsLink.Skill.String(),
+			Links:         subLinks,
+		})
+	}
+	AdditionalSkills := []*pb.SkillLinks{}
+
+	grpcReq := &pb.AddSkillLinksToBuildRequest{
+		MemberId:         userIdStr.(string),
+		Id:               id.String(),
+		MainSkillLinks:   MainSkillLinks,
+		AdditionalSkills: AdditionalSkills,
+	}
+
+	_, err = h.Client.AddSkillLinksToBuild(c.Request.Context(), grpcReq)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting add skills to builds, buildId %s: memberId: %s, error: %s", id, userIdStr.(string), err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully added skills to build for member."})
+}
 
 // /**
 // * Update set.
 // **/
-// func (h *BuildHandler) UpdateItemSetsToBuildHandler(c *gin.Context) {
-// 	memberId, _ := c.Get("userId")
+func (h *BuildHandler) UpdateItemSetsToBuildHandler(c *gin.Context) {
+	userIdStr, _ := c.Get("userIdStr")
 
-// 	idParam := c.Param("id")
+	idParam := c.Param("id")
 
-// 	id, err := uuid.Parse(idParam)
+	id, err := uuid.Parse(idParam)
 
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.", id)})
-// 		return
-// 	}
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.", id)})
+		return
+	}
 
-// 	var request AddItemsToBuildRequest
+	var request AddItemsToBuildRequest
 
-// 	if err := c.ShouldBindJSON(&request); err != nil {
-// 		fmt.Printf("Failed to bind JSON payload: %+v, Error: %s", request, err.Error())
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON: %s", err)})
-// 		return
-// 	}
+	if err := c.ShouldBindJSON(&request); err != nil {
+		fmt.Printf("Failed to bind JSON payload: %+v, Error: %s", request, err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON: %s", err)})
+		return
+	}
+	grpcReq := &pb.UpdateItemSetsToBuildRequest{
+		MemberId:   userIdStr.(string),
+		Id:         id.String(),
+		Weapon:     request.Weapon,
+		Shield:     request.Shield,
+		Helmet:     request.Helmet,
+		BodyArmour: request.BodyArmour,
+		Boots:      request.Boots,
+		Gloves:     request.Gloves,
+		Belt:       request.Belt,
+		Amulet:     request.Amulet,
+		LeftRing:   request.LeftRing,
+		RightRing:  request.RightRing,
+	}
 
-// 	err = h.Service.UpdateItemSetsToBuildService(memberId.(uuid.UUID), id, request)
+	_, err = h.Client.UpdateItemSetsToBuild(c.Request.Context(), grpcReq)
 
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting add items to builds, buildId %s: memberId: %s, error: %s", id, memberId, err.Error())})
-// 		return
-// 	}
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting add items to builds, buildId %s: memberId: %s, error: %s", id, userIdStr.(string), err.Error())})
+		return
+	}
 
-// 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully added items to build for member."})
-// }
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully added items to build for member."})
+}
 
 // /**
 // * Updates a specific build's skill links.
@@ -342,27 +411,31 @@ func (h *BuildHandler) GetBuildInfoByIdHandler(c *gin.Context) {
 // * Deletes build by member Id.
 // **/
 
-// func (h *BuildHandler) DeleteBuildForMemberHandler(c *gin.Context) {
-// 	memberId, _ := c.Get("userId")
+func (h *BuildHandler) DeleteBuildForMemberHandler(c *gin.Context) {
+	userIdStr, _ := c.Get("userIdStr")
 
-// 	idParam := c.Param("id")
+	idParam := c.Param("id")
 
-// 	buildId, err := uuid.Parse(idParam)
+	buildId, err := uuid.Parse(idParam)
 
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.", buildId)})
-// 		return
-// 	}
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.", buildId)})
+		return
+	}
+	grpcReq := &pb.DeleteBuildByMemberRequest{
+		MemberId: userIdStr.(string),
+		Id:       buildId.String(),
+	}
 
-// 	err = h.Service.DeleteBuildByMemberService(memberId.(uuid.UUID), buildId)
+	_, err = h.Client.DeleteBuildByMember(c.Request.Context(), grpcReq)
 
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all builds for memberId %s: %s", memberId, err.Error())})
-// 		return
-// 	}
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to get all builds for memberId %s: %s", userIdStr.(string), err.Error())})
+		return
+	}
 
-// 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": fmt.Sprintf("Successfully deleted build with build id: %s.", buildId)})
-// }
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": fmt.Sprintf("Successfully deleted build with build id: %s.", buildId)})
+}
 
 // /**
 // * Quick example setup for quick creation of extra handlers.
@@ -383,24 +456,28 @@ func (h *BuildHandler) GetBuildInfoByIdHandler(c *gin.Context) {
 // /**
 // * Publish a build for a member by Id.
 // **/
-// func (h *BuildHandler) PublishBuildHandler(c *gin.Context) {
-// 	memberId, _ := c.Get("userId")
-// 	idParams := c.Param("id")
+func (h *BuildHandler) PublishBuildHandler(c *gin.Context) {
+	userIdStr, _ := c.Get("userIdStr")
+	idParams := c.Param("id")
 
-// 	id, err := uuid.Parse(idParams)
+	id, err := uuid.Parse(idParams)
 
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.\n", id)})
-// 		return
-// 	}
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error with id %d, not a valid uuid.\n", id)})
+		return
+	}
 
-// 	err = h.Service.PublishBuildService(id, memberId.(uuid.UUID))
+	grpcReq := &pb.PublishBuildRequest{
+		MemberId: userIdStr.(string),
+		Id:       id.String(),
+	}
+	_, err = h.Client.PublishBuild(c.Request.Context(), grpcReq)
 
-// 	if err != nil {
+	if err != nil {
 
-// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Could not publish build due to error: %s\n", err)})
-// 		return
-// 	}
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Could not publish build due to error: %s\n", err)})
+		return
+	}
 
-// 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully published build.", "result": "success"})
-// }
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully published build.", "result": "success"})
+}

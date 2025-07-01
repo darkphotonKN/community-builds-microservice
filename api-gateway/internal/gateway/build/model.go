@@ -214,7 +214,13 @@ const (
 
 type BuildClient interface {
 	CreateBuild(ctx context.Context, req *pb.CreateBuildRequest) (*pb.CreateBuildResponse, error)
-	GetBuildsByMemberId(ctx context.Context, req *pb.GetBuildsByMemberIdRequest) (*pb.GetBuildsByMemberIdResponse, error)
 	GetCommunityBuilds(ctx context.Context, req *pb.GetCommunityBuildsRequest) (*pb.GetCommunityBuildsResponse, error)
 	GetBuildInfo(ctx context.Context, req *pb.GetBuildInfoRequest) (*pb.GetBuildInfoResponse, error)
+	GetBuildsForMember(ctx context.Context, req *pb.GetBuildsForMemberRequest) (*pb.GetBuildsForMemberResponse, error)
+	GetBuildInfoForMember(ctx context.Context, req *pb.GetBuildInfoForMemberRequest) (*pb.GetBuildInfoForMemberResponse, error)
+	PublishBuild(ctx context.Context, req *pb.PublishBuildRequest) (*pb.PublishBuildResponse, error)
+	UpdateBuild(ctx context.Context, req *pb.UpdateBuildRequest) (*pb.UpdateBuildResponse, error)
+	AddSkillLinksToBuild(ctx context.Context, req *pb.AddSkillLinksToBuildRequest) (*pb.AddSkillLinksToBuildResponse, error)
+	UpdateItemSetsToBuild(ctx context.Context, req *pb.UpdateItemSetsToBuildRequest) (*pb.UpdateItemSetsToBuildResponse, error)
+	DeleteBuildByMember(ctx context.Context, req *pb.DeleteBuildByMemberRequest) (*pb.DeleteBuildByMemberResponse, error)
 }

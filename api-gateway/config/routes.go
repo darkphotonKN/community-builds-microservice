@@ -172,14 +172,14 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	// Protected Routes
 	protectedBuildRoutes := buildRoutes.Group("")
 	protectedBuildRoutes.Use(auth.AuthMiddleware())
-	// protectedBuildRoutes.GET("", buildHandler.GetBuildsForMemberHandler)
-	// protectedBuildRoutes.GET("/:id/info", buildHandler.GetBuildInfoForMemberHandler)
-	// protectedBuildRoutes.GET("/:id/publish", buildHandler.PublishBuildHandler)
+	protectedBuildRoutes.GET("", buildHandler.GetBuildsForMemberHandler)
+	protectedBuildRoutes.GET("/:id/info", buildHandler.GetBuildInfoForMemberHandler)
+	protectedBuildRoutes.GET("/:id/publish", buildHandler.PublishBuildHandler)
 	protectedBuildRoutes.POST("", buildHandler.CreateBuildHandler)
-	// protectedBuildRoutes.PATCH("/:id", buildHandler.UpdateBuildHandler)
-	// protectedBuildRoutes.POST("/:id/addSkills", buildHandler.AddSkillLinksToBuildHandler)
-	// protectedBuildRoutes.PATCH(":id/update-set", buildHandler.UpdateItemSetsToBuildHandler)
-	// protectedBuildRoutes.DELETE("/:id", buildHandler.DeleteBuildForMemberHandler)
+	protectedBuildRoutes.PATCH("/:id", buildHandler.UpdateBuildHandler)
+	protectedBuildRoutes.POST("/:id/addSkills", buildHandler.AddSkillLinksToBuildHandler)
+	protectedBuildRoutes.PATCH(":id/update-set", buildHandler.UpdateItemSetsToBuildHandler)
+	protectedBuildRoutes.DELETE("/:id", buildHandler.DeleteBuildForMemberHandler)
 
 	// --- TAG ---
 

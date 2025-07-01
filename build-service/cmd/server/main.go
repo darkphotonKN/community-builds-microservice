@@ -25,8 +25,8 @@ import (
 )
 
 var (
-	serviceName = "item-service"
-	grpcAddr    = commonhelpers.GetEnvString("GRPC_EXAMPLE_ADDR", "7010")
+	serviceName = "build-service"
+	grpcAddr    = commonhelpers.GetEnvString("GRPC_BUILD_ADDR", "7004")
 	consulAddr  = commonhelpers.GetEnvString("CONSUL_ADDR", "localhost:8510")
 	// rabbit mq
 	amqpUser     = commonhelpers.GetEnvString("RABBITMQ_USER", "guest")
@@ -107,7 +107,7 @@ func main() {
 	tagPb.RegisterTagServiceServer(grpcServer, tagHandler)
 
 	buildRepo := build.NewRepository(db)
-	buildService := build.NewService(buildRepo, ch, skillService, tagService)
+	buildService := build.NewService(db, buildRepo, ch, skillService, tagService)
 	buildHandler := build.NewHandler(buildService)
 
 	buildPb.RegisterBuildServiceServer(grpcServer, buildHandler)

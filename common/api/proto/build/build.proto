@@ -9,10 +9,13 @@ service BuildService {
   rpc GetBuildsByMemberId(GetBuildsByMemberIdRequest) returns (GetBuildsByMemberIdResponse) {}
   rpc GetCommunityBuilds(GetCommunityBuildsRequest) returns (GetCommunityBuildsResponse) {}
   rpc GetBuildInfo(GetBuildInfoRequest) returns (GetBuildInfoResponse) {}
-  // rpc GetBuilds(GetBuildsRequest) returns (GetBuildsResponse) {}
-  // rpc GenerateUniqueBuilds(google.protobuf.Empty) returns (GenerateUniqueBuildsResponse) {}
-  // rpc UpdateBuild(UpdateBuildRequest) returns (UpdateBuildResponse) {}
-  // rpc CreateRareBuild(CreateRareBuildRequest) returns (CreateRareBuildResponse) {}
+  rpc GetBuildsForMember(GetBuildsForMemberRequest) returns (GetBuildsForMemberResponse) {}
+  rpc GetBuildInfoForMember(GetBuildInfoForMemberRequest) returns (GetBuildInfoForMemberResponse) {}
+  rpc PublishBuild(PublishBuildRequest) returns (PublishBuildResponse) {}
+  rpc UpdateBuild(UpdateBuildRequest) returns (UpdateBuildResponse) {}
+  rpc AddSkillLinksToBuild(AddSkillLinksToBuildRequest) returns (AddSkillLinksToBuildResponse) {}
+  rpc UpdateItemSetsToBuild(UpdateItemSetsToBuildRequest) returns (UpdateItemSetsToBuildResponse) {}
+  rpc DeleteBuildByMember(DeleteBuildByMemberRequest) returns (DeleteBuildByMemberResponse) {}
 }
 
 message buildItemSetResponse {
@@ -121,6 +124,12 @@ message tag {
   string updatedAt = 4;
 }
 
+message SkillLinks {
+  string skillLinkName = 1;
+  string skill = 2;
+  repeated string links = 3;
+}
+
 message skillLinkResponse {
   string skillLinkName = 1;
   skill skill = 2;
@@ -128,6 +137,10 @@ message skillLinkResponse {
 }
 
 message skillGroupResponse {
+  skillLinkResponse MainSkillLinks = 1;
+  repeated skillLinkResponse AdditionalSkills = 2;
+}
+message AddSkillsToBuildRequest {
   skillLinkResponse MainSkillLinks = 1;
   repeated skillLinkResponse AdditionalSkills = 2;
 }
@@ -149,6 +162,7 @@ message BuildList {
   int32 status = 14; 
   string createdAt = 15; 
 }
+
 
 message CreateBuildRequest {
   string memberId = 1;
@@ -201,3 +215,91 @@ message GetBuildInfoResponse {
   skillGroupResponse skills = 7;
   repeated buildItemSetResponse Sets = 8;
 }
+
+message GetBuildsForMemberRequest {
+  string memberId = 1;
+}
+
+message GetBuildsForMemberResponse {
+  repeated BuildList builds = 1; // array of items
+}
+
+message GetBuildInfoForMemberRequest {
+  string memberId = 1;
+  string id = 2;
+}
+
+message GetBuildInfoForMemberResponse {
+  string id = 1;
+  string title = 2;
+  string Description = 3;
+  // TODO: add ascendancy and class
+  string class = 4;
+  string ascendancy = 5;
+  skillGroupResponse skills = 6;
+  repeated tag tags = 7;
+  repeated buildItemSetResponse sets = 8;
+}
+
+message PublishBuildRequest {
+  string memberId = 1;
+  string id = 2;
+}
+
+message PublishBuildResponse {
+  
+}
+
+message UpdateBuild {
+}
+
+message UpdateBuildRequest {
+  string skillId = 1;
+  repeated string tags = 2;
+  string title = 3;
+  string description = 4;
+  string classId = 5;
+  string ascendancyId = 6;
+  string memberId = 7;
+  string id = 8;
+}
+
+message UpdateBuildResponse {
+}
+
+message AddSkillLinksToBuildRequest {
+  string memberId = 1;
+  string id = 2;
+  SkillLinks MainSkillLinks = 3;
+  repeated SkillLinks AdditionalSkills = 4;
+
+}
+message AddSkillLinksToBuildResponse {
+  
+}
+
+message UpdateItemSetsToBuildRequest {
+  string memberId = 1;
+  string id = 2;
+  string weapon = 3;
+  string shield = 4;
+  string helmet = 5;
+  string bodyArmour = 6;
+  string boots = 7;
+  string gloves = 8;
+  string belt = 9;
+  string amulet = 10;
+  string leftRing = 11;
+  string rightRing = 12;
+}
+
+message UpdateItemSetsToBuildResponse {
+  
+}
+
+message DeleteBuildByMemberRequest {
+  string memberId = 1;
+  string Id = 2;
+}
+
+message DeleteBuildByMemberResponse {}

@@ -813,6 +813,66 @@ func (x *Tag) GetUpdatedAt() string {
 	return ""
 }
 
+type SkillLinks struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SkillLinkName string                 `protobuf:"bytes,1,opt,name=skillLinkName,proto3" json:"skillLinkName,omitempty"`
+	Skill         string                 `protobuf:"bytes,2,opt,name=skill,proto3" json:"skill,omitempty"`
+	Links         []string               `protobuf:"bytes,3,rep,name=links,proto3" json:"links,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SkillLinks) Reset() {
+	*x = SkillLinks{}
+	mi := &file_api_proto_build_build_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SkillLinks) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SkillLinks) ProtoMessage() {}
+
+func (x *SkillLinks) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_build_build_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SkillLinks.ProtoReflect.Descriptor instead.
+func (*SkillLinks) Descriptor() ([]byte, []int) {
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *SkillLinks) GetSkillLinkName() string {
+	if x != nil {
+		return x.SkillLinkName
+	}
+	return ""
+}
+
+func (x *SkillLinks) GetSkill() string {
+	if x != nil {
+		return x.Skill
+	}
+	return ""
+}
+
+func (x *SkillLinks) GetLinks() []string {
+	if x != nil {
+		return x.Links
+	}
+	return nil
+}
+
 type SkillLinkResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	SkillLinkName string                 `protobuf:"bytes,1,opt,name=skillLinkName,proto3" json:"skillLinkName,omitempty"`
@@ -824,7 +884,7 @@ type SkillLinkResponse struct {
 
 func (x *SkillLinkResponse) Reset() {
 	*x = SkillLinkResponse{}
-	mi := &file_api_proto_build_build_proto_msgTypes[4]
+	mi := &file_api_proto_build_build_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -836,7 +896,7 @@ func (x *SkillLinkResponse) String() string {
 func (*SkillLinkResponse) ProtoMessage() {}
 
 func (x *SkillLinkResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_build_build_proto_msgTypes[4]
+	mi := &file_api_proto_build_build_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -849,7 +909,7 @@ func (x *SkillLinkResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SkillLinkResponse.ProtoReflect.Descriptor instead.
 func (*SkillLinkResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_build_build_proto_rawDescGZIP(), []int{4}
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *SkillLinkResponse) GetSkillLinkName() string {
@@ -883,7 +943,7 @@ type SkillGroupResponse struct {
 
 func (x *SkillGroupResponse) Reset() {
 	*x = SkillGroupResponse{}
-	mi := &file_api_proto_build_build_proto_msgTypes[5]
+	mi := &file_api_proto_build_build_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -895,7 +955,7 @@ func (x *SkillGroupResponse) String() string {
 func (*SkillGroupResponse) ProtoMessage() {}
 
 func (x *SkillGroupResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_build_build_proto_msgTypes[5]
+	mi := &file_api_proto_build_build_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -908,7 +968,7 @@ func (x *SkillGroupResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SkillGroupResponse.ProtoReflect.Descriptor instead.
 func (*SkillGroupResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_build_build_proto_rawDescGZIP(), []int{5}
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *SkillGroupResponse) GetMainSkillLinks() *SkillLinkResponse {
@@ -919,6 +979,58 @@ func (x *SkillGroupResponse) GetMainSkillLinks() *SkillLinkResponse {
 }
 
 func (x *SkillGroupResponse) GetAdditionalSkills() []*SkillLinkResponse {
+	if x != nil {
+		return x.AdditionalSkills
+	}
+	return nil
+}
+
+type AddSkillsToBuildRequest struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	MainSkillLinks   *SkillLinkResponse     `protobuf:"bytes,1,opt,name=MainSkillLinks,proto3" json:"MainSkillLinks,omitempty"`
+	AdditionalSkills []*SkillLinkResponse   `protobuf:"bytes,2,rep,name=AdditionalSkills,proto3" json:"AdditionalSkills,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *AddSkillsToBuildRequest) Reset() {
+	*x = AddSkillsToBuildRequest{}
+	mi := &file_api_proto_build_build_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddSkillsToBuildRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddSkillsToBuildRequest) ProtoMessage() {}
+
+func (x *AddSkillsToBuildRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_build_build_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddSkillsToBuildRequest.ProtoReflect.Descriptor instead.
+func (*AddSkillsToBuildRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *AddSkillsToBuildRequest) GetMainSkillLinks() *SkillLinkResponse {
+	if x != nil {
+		return x.MainSkillLinks
+	}
+	return nil
+}
+
+func (x *AddSkillsToBuildRequest) GetAdditionalSkills() []*SkillLinkResponse {
 	if x != nil {
 		return x.AdditionalSkills
 	}
@@ -948,7 +1060,7 @@ type BuildList struct {
 
 func (x *BuildList) Reset() {
 	*x = BuildList{}
-	mi := &file_api_proto_build_build_proto_msgTypes[6]
+	mi := &file_api_proto_build_build_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -960,7 +1072,7 @@ func (x *BuildList) String() string {
 func (*BuildList) ProtoMessage() {}
 
 func (x *BuildList) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_build_build_proto_msgTypes[6]
+	mi := &file_api_proto_build_build_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -973,7 +1085,7 @@ func (x *BuildList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BuildList.ProtoReflect.Descriptor instead.
 func (*BuildList) Descriptor() ([]byte, []int) {
-	return file_api_proto_build_build_proto_rawDescGZIP(), []int{6}
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *BuildList) GetId() string {
@@ -1096,7 +1208,7 @@ type CreateBuildRequest struct {
 
 func (x *CreateBuildRequest) Reset() {
 	*x = CreateBuildRequest{}
-	mi := &file_api_proto_build_build_proto_msgTypes[7]
+	mi := &file_api_proto_build_build_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1108,7 +1220,7 @@ func (x *CreateBuildRequest) String() string {
 func (*CreateBuildRequest) ProtoMessage() {}
 
 func (x *CreateBuildRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_build_build_proto_msgTypes[7]
+	mi := &file_api_proto_build_build_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1121,7 +1233,7 @@ func (x *CreateBuildRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateBuildRequest.ProtoReflect.Descriptor instead.
 func (*CreateBuildRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_build_build_proto_rawDescGZIP(), []int{7}
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *CreateBuildRequest) GetMemberId() string {
@@ -1181,7 +1293,7 @@ type CreateBuildResponse struct {
 
 func (x *CreateBuildResponse) Reset() {
 	*x = CreateBuildResponse{}
-	mi := &file_api_proto_build_build_proto_msgTypes[8]
+	mi := &file_api_proto_build_build_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1193,7 +1305,7 @@ func (x *CreateBuildResponse) String() string {
 func (*CreateBuildResponse) ProtoMessage() {}
 
 func (x *CreateBuildResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_build_build_proto_msgTypes[8]
+	mi := &file_api_proto_build_build_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1206,7 +1318,7 @@ func (x *CreateBuildResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateBuildResponse.ProtoReflect.Descriptor instead.
 func (*CreateBuildResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_build_build_proto_rawDescGZIP(), []int{8}
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{10}
 }
 
 type GetBuildsByMemberIdRequest struct {
@@ -1218,7 +1330,7 @@ type GetBuildsByMemberIdRequest struct {
 
 func (x *GetBuildsByMemberIdRequest) Reset() {
 	*x = GetBuildsByMemberIdRequest{}
-	mi := &file_api_proto_build_build_proto_msgTypes[9]
+	mi := &file_api_proto_build_build_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1230,7 +1342,7 @@ func (x *GetBuildsByMemberIdRequest) String() string {
 func (*GetBuildsByMemberIdRequest) ProtoMessage() {}
 
 func (x *GetBuildsByMemberIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_build_build_proto_msgTypes[9]
+	mi := &file_api_proto_build_build_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1243,7 +1355,7 @@ func (x *GetBuildsByMemberIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBuildsByMemberIdRequest.ProtoReflect.Descriptor instead.
 func (*GetBuildsByMemberIdRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_build_build_proto_rawDescGZIP(), []int{9}
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *GetBuildsByMemberIdRequest) GetMemberId() string {
@@ -1262,7 +1374,7 @@ type GetBuildsByMemberIdResponse struct {
 
 func (x *GetBuildsByMemberIdResponse) Reset() {
 	*x = GetBuildsByMemberIdResponse{}
-	mi := &file_api_proto_build_build_proto_msgTypes[10]
+	mi := &file_api_proto_build_build_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1274,7 +1386,7 @@ func (x *GetBuildsByMemberIdResponse) String() string {
 func (*GetBuildsByMemberIdResponse) ProtoMessage() {}
 
 func (x *GetBuildsByMemberIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_build_build_proto_msgTypes[10]
+	mi := &file_api_proto_build_build_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1287,7 +1399,7 @@ func (x *GetBuildsByMemberIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBuildsByMemberIdResponse.ProtoReflect.Descriptor instead.
 func (*GetBuildsByMemberIdResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_build_build_proto_rawDescGZIP(), []int{10}
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *GetBuildsByMemberIdResponse) GetBuilds() []*BuildList {
@@ -1313,7 +1425,7 @@ type GetCommunityBuildsRequest struct {
 
 func (x *GetCommunityBuildsRequest) Reset() {
 	*x = GetCommunityBuildsRequest{}
-	mi := &file_api_proto_build_build_proto_msgTypes[11]
+	mi := &file_api_proto_build_build_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1325,7 +1437,7 @@ func (x *GetCommunityBuildsRequest) String() string {
 func (*GetCommunityBuildsRequest) ProtoMessage() {}
 
 func (x *GetCommunityBuildsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_build_build_proto_msgTypes[11]
+	mi := &file_api_proto_build_build_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1338,7 +1450,7 @@ func (x *GetCommunityBuildsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCommunityBuildsRequest.ProtoReflect.Descriptor instead.
 func (*GetCommunityBuildsRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_build_build_proto_rawDescGZIP(), []int{11}
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *GetCommunityBuildsRequest) GetPageNo() int32 {
@@ -1406,7 +1518,7 @@ type GetCommunityBuildsResponse struct {
 
 func (x *GetCommunityBuildsResponse) Reset() {
 	*x = GetCommunityBuildsResponse{}
-	mi := &file_api_proto_build_build_proto_msgTypes[12]
+	mi := &file_api_proto_build_build_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1418,7 +1530,7 @@ func (x *GetCommunityBuildsResponse) String() string {
 func (*GetCommunityBuildsResponse) ProtoMessage() {}
 
 func (x *GetCommunityBuildsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_build_build_proto_msgTypes[12]
+	mi := &file_api_proto_build_build_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1431,7 +1543,7 @@ func (x *GetCommunityBuildsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCommunityBuildsResponse.ProtoReflect.Descriptor instead.
 func (*GetCommunityBuildsResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_build_build_proto_rawDescGZIP(), []int{12}
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *GetCommunityBuildsResponse) GetBuilds() []*BuildList {
@@ -1450,7 +1562,7 @@ type GetBuildInfoRequest struct {
 
 func (x *GetBuildInfoRequest) Reset() {
 	*x = GetBuildInfoRequest{}
-	mi := &file_api_proto_build_build_proto_msgTypes[13]
+	mi := &file_api_proto_build_build_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1462,7 +1574,7 @@ func (x *GetBuildInfoRequest) String() string {
 func (*GetBuildInfoRequest) ProtoMessage() {}
 
 func (x *GetBuildInfoRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_build_build_proto_msgTypes[13]
+	mi := &file_api_proto_build_build_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1475,7 +1587,7 @@ func (x *GetBuildInfoRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBuildInfoRequest.ProtoReflect.Descriptor instead.
 func (*GetBuildInfoRequest) Descriptor() ([]byte, []int) {
-	return file_api_proto_build_build_proto_rawDescGZIP(), []int{13}
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *GetBuildInfoRequest) GetId() string {
@@ -1501,7 +1613,7 @@ type GetBuildInfoResponse struct {
 
 func (x *GetBuildInfoResponse) Reset() {
 	*x = GetBuildInfoResponse{}
-	mi := &file_api_proto_build_build_proto_msgTypes[14]
+	mi := &file_api_proto_build_build_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1513,7 +1625,7 @@ func (x *GetBuildInfoResponse) String() string {
 func (*GetBuildInfoResponse) ProtoMessage() {}
 
 func (x *GetBuildInfoResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_build_build_proto_msgTypes[14]
+	mi := &file_api_proto_build_build_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1526,7 +1638,7 @@ func (x *GetBuildInfoResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBuildInfoResponse.ProtoReflect.Descriptor instead.
 func (*GetBuildInfoResponse) Descriptor() ([]byte, []int) {
-	return file_api_proto_build_build_proto_rawDescGZIP(), []int{14}
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *GetBuildInfoResponse) GetId() string {
@@ -1583,6 +1695,867 @@ func (x *GetBuildInfoResponse) GetSets() []*BuildItemSetResponse {
 		return x.Sets
 	}
 	return nil
+}
+
+type GetBuildsForMemberRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MemberId      string                 `protobuf:"bytes,1,opt,name=memberId,proto3" json:"memberId,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBuildsForMemberRequest) Reset() {
+	*x = GetBuildsForMemberRequest{}
+	mi := &file_api_proto_build_build_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBuildsForMemberRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBuildsForMemberRequest) ProtoMessage() {}
+
+func (x *GetBuildsForMemberRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_build_build_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBuildsForMemberRequest.ProtoReflect.Descriptor instead.
+func (*GetBuildsForMemberRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *GetBuildsForMemberRequest) GetMemberId() string {
+	if x != nil {
+		return x.MemberId
+	}
+	return ""
+}
+
+type GetBuildsForMemberResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Builds        []*BuildList           `protobuf:"bytes,1,rep,name=builds,proto3" json:"builds,omitempty"` // array of items
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBuildsForMemberResponse) Reset() {
+	*x = GetBuildsForMemberResponse{}
+	mi := &file_api_proto_build_build_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBuildsForMemberResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBuildsForMemberResponse) ProtoMessage() {}
+
+func (x *GetBuildsForMemberResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_build_build_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBuildsForMemberResponse.ProtoReflect.Descriptor instead.
+func (*GetBuildsForMemberResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *GetBuildsForMemberResponse) GetBuilds() []*BuildList {
+	if x != nil {
+		return x.Builds
+	}
+	return nil
+}
+
+type GetBuildInfoForMemberRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MemberId      string                 `protobuf:"bytes,1,opt,name=memberId,proto3" json:"memberId,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBuildInfoForMemberRequest) Reset() {
+	*x = GetBuildInfoForMemberRequest{}
+	mi := &file_api_proto_build_build_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBuildInfoForMemberRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBuildInfoForMemberRequest) ProtoMessage() {}
+
+func (x *GetBuildInfoForMemberRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_build_build_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBuildInfoForMemberRequest.ProtoReflect.Descriptor instead.
+func (*GetBuildInfoForMemberRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *GetBuildInfoForMemberRequest) GetMemberId() string {
+	if x != nil {
+		return x.MemberId
+	}
+	return ""
+}
+
+func (x *GetBuildInfoForMemberRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type GetBuildInfoForMemberResponse struct {
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	Id          string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Title       string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	Description string                 `protobuf:"bytes,3,opt,name=Description,proto3" json:"Description,omitempty"`
+	// TODO: add ascendancy and class
+	Class         string                  `protobuf:"bytes,4,opt,name=class,proto3" json:"class,omitempty"`
+	Ascendancy    string                  `protobuf:"bytes,5,opt,name=ascendancy,proto3" json:"ascendancy,omitempty"`
+	Skills        *SkillGroupResponse     `protobuf:"bytes,6,opt,name=skills,proto3" json:"skills,omitempty"`
+	Tags          []*Tag                  `protobuf:"bytes,7,rep,name=tags,proto3" json:"tags,omitempty"`
+	Sets          []*BuildItemSetResponse `protobuf:"bytes,8,rep,name=sets,proto3" json:"sets,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBuildInfoForMemberResponse) Reset() {
+	*x = GetBuildInfoForMemberResponse{}
+	mi := &file_api_proto_build_build_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBuildInfoForMemberResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBuildInfoForMemberResponse) ProtoMessage() {}
+
+func (x *GetBuildInfoForMemberResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_build_build_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBuildInfoForMemberResponse.ProtoReflect.Descriptor instead.
+func (*GetBuildInfoForMemberResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *GetBuildInfoForMemberResponse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *GetBuildInfoForMemberResponse) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *GetBuildInfoForMemberResponse) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *GetBuildInfoForMemberResponse) GetClass() string {
+	if x != nil {
+		return x.Class
+	}
+	return ""
+}
+
+func (x *GetBuildInfoForMemberResponse) GetAscendancy() string {
+	if x != nil {
+		return x.Ascendancy
+	}
+	return ""
+}
+
+func (x *GetBuildInfoForMemberResponse) GetSkills() *SkillGroupResponse {
+	if x != nil {
+		return x.Skills
+	}
+	return nil
+}
+
+func (x *GetBuildInfoForMemberResponse) GetTags() []*Tag {
+	if x != nil {
+		return x.Tags
+	}
+	return nil
+}
+
+func (x *GetBuildInfoForMemberResponse) GetSets() []*BuildItemSetResponse {
+	if x != nil {
+		return x.Sets
+	}
+	return nil
+}
+
+type PublishBuildRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MemberId      string                 `protobuf:"bytes,1,opt,name=memberId,proto3" json:"memberId,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PublishBuildRequest) Reset() {
+	*x = PublishBuildRequest{}
+	mi := &file_api_proto_build_build_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PublishBuildRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PublishBuildRequest) ProtoMessage() {}
+
+func (x *PublishBuildRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_build_build_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PublishBuildRequest.ProtoReflect.Descriptor instead.
+func (*PublishBuildRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *PublishBuildRequest) GetMemberId() string {
+	if x != nil {
+		return x.MemberId
+	}
+	return ""
+}
+
+func (x *PublishBuildRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type PublishBuildResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PublishBuildResponse) Reset() {
+	*x = PublishBuildResponse{}
+	mi := &file_api_proto_build_build_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PublishBuildResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PublishBuildResponse) ProtoMessage() {}
+
+func (x *PublishBuildResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_build_build_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PublishBuildResponse.ProtoReflect.Descriptor instead.
+func (*PublishBuildResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{22}
+}
+
+type UpdateBuild struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateBuild) Reset() {
+	*x = UpdateBuild{}
+	mi := &file_api_proto_build_build_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateBuild) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateBuild) ProtoMessage() {}
+
+func (x *UpdateBuild) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_build_build_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateBuild.ProtoReflect.Descriptor instead.
+func (*UpdateBuild) Descriptor() ([]byte, []int) {
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{23}
+}
+
+type UpdateBuildRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SkillId       string                 `protobuf:"bytes,1,opt,name=skillId,proto3" json:"skillId,omitempty"`
+	Tags          []string               `protobuf:"bytes,2,rep,name=tags,proto3" json:"tags,omitempty"`
+	Title         string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
+	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	ClassId       string                 `protobuf:"bytes,5,opt,name=classId,proto3" json:"classId,omitempty"`
+	AscendancyId  string                 `protobuf:"bytes,6,opt,name=ascendancyId,proto3" json:"ascendancyId,omitempty"`
+	MemberId      string                 `protobuf:"bytes,7,opt,name=memberId,proto3" json:"memberId,omitempty"`
+	Id            string                 `protobuf:"bytes,8,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateBuildRequest) Reset() {
+	*x = UpdateBuildRequest{}
+	mi := &file_api_proto_build_build_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateBuildRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateBuildRequest) ProtoMessage() {}
+
+func (x *UpdateBuildRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_build_build_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateBuildRequest.ProtoReflect.Descriptor instead.
+func (*UpdateBuildRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *UpdateBuildRequest) GetSkillId() string {
+	if x != nil {
+		return x.SkillId
+	}
+	return ""
+}
+
+func (x *UpdateBuildRequest) GetTags() []string {
+	if x != nil {
+		return x.Tags
+	}
+	return nil
+}
+
+func (x *UpdateBuildRequest) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *UpdateBuildRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *UpdateBuildRequest) GetClassId() string {
+	if x != nil {
+		return x.ClassId
+	}
+	return ""
+}
+
+func (x *UpdateBuildRequest) GetAscendancyId() string {
+	if x != nil {
+		return x.AscendancyId
+	}
+	return ""
+}
+
+func (x *UpdateBuildRequest) GetMemberId() string {
+	if x != nil {
+		return x.MemberId
+	}
+	return ""
+}
+
+func (x *UpdateBuildRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type UpdateBuildResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateBuildResponse) Reset() {
+	*x = UpdateBuildResponse{}
+	mi := &file_api_proto_build_build_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateBuildResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateBuildResponse) ProtoMessage() {}
+
+func (x *UpdateBuildResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_build_build_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateBuildResponse.ProtoReflect.Descriptor instead.
+func (*UpdateBuildResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{25}
+}
+
+type AddSkillLinksToBuildRequest struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	MemberId         string                 `protobuf:"bytes,1,opt,name=memberId,proto3" json:"memberId,omitempty"`
+	Id               string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	MainSkillLinks   *SkillLinks            `protobuf:"bytes,3,opt,name=MainSkillLinks,proto3" json:"MainSkillLinks,omitempty"`
+	AdditionalSkills []*SkillLinks          `protobuf:"bytes,4,rep,name=AdditionalSkills,proto3" json:"AdditionalSkills,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *AddSkillLinksToBuildRequest) Reset() {
+	*x = AddSkillLinksToBuildRequest{}
+	mi := &file_api_proto_build_build_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddSkillLinksToBuildRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddSkillLinksToBuildRequest) ProtoMessage() {}
+
+func (x *AddSkillLinksToBuildRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_build_build_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddSkillLinksToBuildRequest.ProtoReflect.Descriptor instead.
+func (*AddSkillLinksToBuildRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *AddSkillLinksToBuildRequest) GetMemberId() string {
+	if x != nil {
+		return x.MemberId
+	}
+	return ""
+}
+
+func (x *AddSkillLinksToBuildRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *AddSkillLinksToBuildRequest) GetMainSkillLinks() *SkillLinks {
+	if x != nil {
+		return x.MainSkillLinks
+	}
+	return nil
+}
+
+func (x *AddSkillLinksToBuildRequest) GetAdditionalSkills() []*SkillLinks {
+	if x != nil {
+		return x.AdditionalSkills
+	}
+	return nil
+}
+
+type AddSkillLinksToBuildResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AddSkillLinksToBuildResponse) Reset() {
+	*x = AddSkillLinksToBuildResponse{}
+	mi := &file_api_proto_build_build_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddSkillLinksToBuildResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddSkillLinksToBuildResponse) ProtoMessage() {}
+
+func (x *AddSkillLinksToBuildResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_build_build_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddSkillLinksToBuildResponse.ProtoReflect.Descriptor instead.
+func (*AddSkillLinksToBuildResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{27}
+}
+
+type UpdateItemSetsToBuildRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MemberId      string                 `protobuf:"bytes,1,opt,name=memberId,proto3" json:"memberId,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	Weapon        string                 `protobuf:"bytes,3,opt,name=weapon,proto3" json:"weapon,omitempty"`
+	Shield        string                 `protobuf:"bytes,4,opt,name=shield,proto3" json:"shield,omitempty"`
+	Helmet        string                 `protobuf:"bytes,5,opt,name=helmet,proto3" json:"helmet,omitempty"`
+	BodyArmour    string                 `protobuf:"bytes,6,opt,name=bodyArmour,proto3" json:"bodyArmour,omitempty"`
+	Boots         string                 `protobuf:"bytes,7,opt,name=boots,proto3" json:"boots,omitempty"`
+	Gloves        string                 `protobuf:"bytes,8,opt,name=gloves,proto3" json:"gloves,omitempty"`
+	Belt          string                 `protobuf:"bytes,9,opt,name=belt,proto3" json:"belt,omitempty"`
+	Amulet        string                 `protobuf:"bytes,10,opt,name=amulet,proto3" json:"amulet,omitempty"`
+	LeftRing      string                 `protobuf:"bytes,11,opt,name=leftRing,proto3" json:"leftRing,omitempty"`
+	RightRing     string                 `protobuf:"bytes,12,opt,name=rightRing,proto3" json:"rightRing,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateItemSetsToBuildRequest) Reset() {
+	*x = UpdateItemSetsToBuildRequest{}
+	mi := &file_api_proto_build_build_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateItemSetsToBuildRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateItemSetsToBuildRequest) ProtoMessage() {}
+
+func (x *UpdateItemSetsToBuildRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_build_build_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateItemSetsToBuildRequest.ProtoReflect.Descriptor instead.
+func (*UpdateItemSetsToBuildRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *UpdateItemSetsToBuildRequest) GetMemberId() string {
+	if x != nil {
+		return x.MemberId
+	}
+	return ""
+}
+
+func (x *UpdateItemSetsToBuildRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateItemSetsToBuildRequest) GetWeapon() string {
+	if x != nil {
+		return x.Weapon
+	}
+	return ""
+}
+
+func (x *UpdateItemSetsToBuildRequest) GetShield() string {
+	if x != nil {
+		return x.Shield
+	}
+	return ""
+}
+
+func (x *UpdateItemSetsToBuildRequest) GetHelmet() string {
+	if x != nil {
+		return x.Helmet
+	}
+	return ""
+}
+
+func (x *UpdateItemSetsToBuildRequest) GetBodyArmour() string {
+	if x != nil {
+		return x.BodyArmour
+	}
+	return ""
+}
+
+func (x *UpdateItemSetsToBuildRequest) GetBoots() string {
+	if x != nil {
+		return x.Boots
+	}
+	return ""
+}
+
+func (x *UpdateItemSetsToBuildRequest) GetGloves() string {
+	if x != nil {
+		return x.Gloves
+	}
+	return ""
+}
+
+func (x *UpdateItemSetsToBuildRequest) GetBelt() string {
+	if x != nil {
+		return x.Belt
+	}
+	return ""
+}
+
+func (x *UpdateItemSetsToBuildRequest) GetAmulet() string {
+	if x != nil {
+		return x.Amulet
+	}
+	return ""
+}
+
+func (x *UpdateItemSetsToBuildRequest) GetLeftRing() string {
+	if x != nil {
+		return x.LeftRing
+	}
+	return ""
+}
+
+func (x *UpdateItemSetsToBuildRequest) GetRightRing() string {
+	if x != nil {
+		return x.RightRing
+	}
+	return ""
+}
+
+type UpdateItemSetsToBuildResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateItemSetsToBuildResponse) Reset() {
+	*x = UpdateItemSetsToBuildResponse{}
+	mi := &file_api_proto_build_build_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateItemSetsToBuildResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateItemSetsToBuildResponse) ProtoMessage() {}
+
+func (x *UpdateItemSetsToBuildResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_build_build_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateItemSetsToBuildResponse.ProtoReflect.Descriptor instead.
+func (*UpdateItemSetsToBuildResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{29}
+}
+
+type DeleteBuildByMemberRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MemberId      string                 `protobuf:"bytes,1,opt,name=memberId,proto3" json:"memberId,omitempty"`
+	Id            string                 `protobuf:"bytes,2,opt,name=Id,proto3" json:"Id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteBuildByMemberRequest) Reset() {
+	*x = DeleteBuildByMemberRequest{}
+	mi := &file_api_proto_build_build_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteBuildByMemberRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteBuildByMemberRequest) ProtoMessage() {}
+
+func (x *DeleteBuildByMemberRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_build_build_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteBuildByMemberRequest.ProtoReflect.Descriptor instead.
+func (*DeleteBuildByMemberRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *DeleteBuildByMemberRequest) GetMemberId() string {
+	if x != nil {
+		return x.MemberId
+	}
+	return ""
+}
+
+func (x *DeleteBuildByMemberRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type DeleteBuildByMemberResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteBuildByMemberResponse) Reset() {
+	*x = DeleteBuildByMemberResponse{}
+	mi := &file_api_proto_build_build_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteBuildByMemberResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteBuildByMemberResponse) ProtoMessage() {}
+
+func (x *DeleteBuildByMemberResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_build_build_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteBuildByMemberResponse.ProtoReflect.Descriptor instead.
+func (*DeleteBuildByMemberResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_build_build_proto_rawDescGZIP(), []int{31}
 }
 
 var File_api_proto_build_build_proto protoreflect.FileDescriptor
@@ -1734,12 +2707,20 @@ const file_api_proto_build_build_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1c\n" +
 	"\tcreatedAt\x18\x03 \x01(\tR\tcreatedAt\x12\x1c\n" +
-	"\tupdatedAt\x18\x04 \x01(\tR\tupdatedAt\"\x81\x01\n" +
+	"\tupdatedAt\x18\x04 \x01(\tR\tupdatedAt\"^\n" +
+	"\n" +
+	"SkillLinks\x12$\n" +
+	"\rskillLinkName\x18\x01 \x01(\tR\rskillLinkName\x12\x14\n" +
+	"\x05skill\x18\x02 \x01(\tR\x05skill\x12\x14\n" +
+	"\x05links\x18\x03 \x03(\tR\x05links\"\x81\x01\n" +
 	"\x11skillLinkResponse\x12$\n" +
 	"\rskillLinkName\x18\x01 \x01(\tR\rskillLinkName\x12\"\n" +
 	"\x05skill\x18\x02 \x01(\v2\f.build.skillR\x05skill\x12\"\n" +
 	"\x05links\x18\x03 \x03(\v2\f.build.skillR\x05links\"\x9c\x01\n" +
 	"\x12skillGroupResponse\x12@\n" +
+	"\x0eMainSkillLinks\x18\x01 \x01(\v2\x18.build.skillLinkResponseR\x0eMainSkillLinks\x12D\n" +
+	"\x10AdditionalSkills\x18\x02 \x03(\v2\x18.build.skillLinkResponseR\x10AdditionalSkills\"\xa1\x01\n" +
+	"\x17AddSkillsToBuildRequest\x12@\n" +
 	"\x0eMainSkillLinks\x18\x01 \x01(\v2\x18.build.skillLinkResponseR\x0eMainSkillLinks\x12D\n" +
 	"\x10AdditionalSkills\x18\x02 \x03(\v2\x18.build.skillLinkResponseR\x10AdditionalSkills\"\xf5\x03\n" +
 	"\tBuildList\x12\x0e\n" +
@@ -1799,12 +2780,80 @@ const file_api_proto_build_build_proto_rawDesc = "" +
 	"\x04tags\x18\x06 \x03(\v2\n" +
 	".build.tagR\x04tags\x121\n" +
 	"\x06skills\x18\a \x01(\v2\x19.build.skillGroupResponseR\x06skills\x12/\n" +
-	"\x04Sets\x18\b \x03(\v2\x1b.build.buildItemSetResponseR\x04Sets2\xde\x02\n" +
+	"\x04Sets\x18\b \x03(\v2\x1b.build.buildItemSetResponseR\x04Sets\"7\n" +
+	"\x19GetBuildsForMemberRequest\x12\x1a\n" +
+	"\bmemberId\x18\x01 \x01(\tR\bmemberId\"F\n" +
+	"\x1aGetBuildsForMemberResponse\x12(\n" +
+	"\x06builds\x18\x01 \x03(\v2\x10.build.BuildListR\x06builds\"J\n" +
+	"\x1cGetBuildInfoForMemberRequest\x12\x1a\n" +
+	"\bmemberId\x18\x01 \x01(\tR\bmemberId\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"\xa1\x02\n" +
+	"\x1dGetBuildInfoForMemberResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\x12 \n" +
+	"\vDescription\x18\x03 \x01(\tR\vDescription\x12\x14\n" +
+	"\x05class\x18\x04 \x01(\tR\x05class\x12\x1e\n" +
+	"\n" +
+	"ascendancy\x18\x05 \x01(\tR\n" +
+	"ascendancy\x121\n" +
+	"\x06skills\x18\x06 \x01(\v2\x19.build.skillGroupResponseR\x06skills\x12\x1e\n" +
+	"\x04tags\x18\a \x03(\v2\n" +
+	".build.tagR\x04tags\x12/\n" +
+	"\x04sets\x18\b \x03(\v2\x1b.build.buildItemSetResponseR\x04sets\"A\n" +
+	"\x13PublishBuildRequest\x12\x1a\n" +
+	"\bmemberId\x18\x01 \x01(\tR\bmemberId\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"\x16\n" +
+	"\x14PublishBuildResponse\"\r\n" +
+	"\vUpdateBuild\"\xe4\x01\n" +
+	"\x12UpdateBuildRequest\x12\x18\n" +
+	"\askillId\x18\x01 \x01(\tR\askillId\x12\x12\n" +
+	"\x04tags\x18\x02 \x03(\tR\x04tags\x12\x14\n" +
+	"\x05title\x18\x03 \x01(\tR\x05title\x12 \n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription\x12\x18\n" +
+	"\aclassId\x18\x05 \x01(\tR\aclassId\x12\"\n" +
+	"\fascendancyId\x18\x06 \x01(\tR\fascendancyId\x12\x1a\n" +
+	"\bmemberId\x18\a \x01(\tR\bmemberId\x12\x0e\n" +
+	"\x02id\x18\b \x01(\tR\x02id\"\x15\n" +
+	"\x13UpdateBuildResponse\"\xc3\x01\n" +
+	"\x1bAddSkillLinksToBuildRequest\x12\x1a\n" +
+	"\bmemberId\x18\x01 \x01(\tR\bmemberId\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\x129\n" +
+	"\x0eMainSkillLinks\x18\x03 \x01(\v2\x11.build.SkillLinksR\x0eMainSkillLinks\x12=\n" +
+	"\x10AdditionalSkills\x18\x04 \x03(\v2\x11.build.SkillLinksR\x10AdditionalSkills\"\x1e\n" +
+	"\x1cAddSkillLinksToBuildResponse\"\xc6\x02\n" +
+	"\x1cUpdateItemSetsToBuildRequest\x12\x1a\n" +
+	"\bmemberId\x18\x01 \x01(\tR\bmemberId\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\x12\x16\n" +
+	"\x06weapon\x18\x03 \x01(\tR\x06weapon\x12\x16\n" +
+	"\x06shield\x18\x04 \x01(\tR\x06shield\x12\x16\n" +
+	"\x06helmet\x18\x05 \x01(\tR\x06helmet\x12\x1e\n" +
+	"\n" +
+	"bodyArmour\x18\x06 \x01(\tR\n" +
+	"bodyArmour\x12\x14\n" +
+	"\x05boots\x18\a \x01(\tR\x05boots\x12\x16\n" +
+	"\x06gloves\x18\b \x01(\tR\x06gloves\x12\x12\n" +
+	"\x04belt\x18\t \x01(\tR\x04belt\x12\x16\n" +
+	"\x06amulet\x18\n" +
+	" \x01(\tR\x06amulet\x12\x1a\n" +
+	"\bleftRing\x18\v \x01(\tR\bleftRing\x12\x1c\n" +
+	"\trightRing\x18\f \x01(\tR\trightRing\"\x1f\n" +
+	"\x1dUpdateItemSetsToBuildResponse\"H\n" +
+	"\x1aDeleteBuildByMemberRequest\x12\x1a\n" +
+	"\bmemberId\x18\x01 \x01(\tR\bmemberId\x12\x0e\n" +
+	"\x02Id\x18\x02 \x01(\tR\x02Id\"\x1d\n" +
+	"\x1bDeleteBuildByMemberResponse2\xdd\a\n" +
 	"\fBuildService\x12F\n" +
 	"\vCreateBuild\x12\x19.build.CreateBuildRequest\x1a\x1a.build.CreateBuildResponse\"\x00\x12^\n" +
 	"\x13GetBuildsByMemberId\x12!.build.GetBuildsByMemberIdRequest\x1a\".build.GetBuildsByMemberIdResponse\"\x00\x12[\n" +
 	"\x12GetCommunityBuilds\x12 .build.GetCommunityBuildsRequest\x1a!.build.GetCommunityBuildsResponse\"\x00\x12I\n" +
-	"\fGetBuildInfo\x12\x1a.build.GetBuildInfoRequest\x1a\x1b.build.GetBuildInfoResponse\"\x00BOZMgithub.com/darkphotonKN/community-builds-microservices/common/api/proto/buildb\x06proto3"
+	"\fGetBuildInfo\x12\x1a.build.GetBuildInfoRequest\x1a\x1b.build.GetBuildInfoResponse\"\x00\x12[\n" +
+	"\x12GetBuildsForMember\x12 .build.GetBuildsForMemberRequest\x1a!.build.GetBuildsForMemberResponse\"\x00\x12d\n" +
+	"\x15GetBuildInfoForMember\x12#.build.GetBuildInfoForMemberRequest\x1a$.build.GetBuildInfoForMemberResponse\"\x00\x12I\n" +
+	"\fPublishBuild\x12\x1a.build.PublishBuildRequest\x1a\x1b.build.PublishBuildResponse\"\x00\x12F\n" +
+	"\vUpdateBuild\x12\x19.build.UpdateBuildRequest\x1a\x1a.build.UpdateBuildResponse\"\x00\x12a\n" +
+	"\x14AddSkillLinksToBuild\x12\".build.AddSkillLinksToBuildRequest\x1a#.build.AddSkillLinksToBuildResponse\"\x00\x12d\n" +
+	"\x15UpdateItemSetsToBuild\x12#.build.UpdateItemSetsToBuildRequest\x1a$.build.UpdateItemSetsToBuildResponse\"\x00\x12^\n" +
+	"\x13DeleteBuildByMember\x12!.build.DeleteBuildByMemberRequest\x1a\".build.DeleteBuildByMemberResponse\"\x00BOZMgithub.com/darkphotonKN/community-builds-microservices/common/api/proto/buildb\x06proto3"
 
 var (
 	file_api_proto_build_build_proto_rawDescOnce sync.Once
@@ -1818,48 +2867,87 @@ func file_api_proto_build_build_proto_rawDescGZIP() []byte {
 	return file_api_proto_build_build_proto_rawDescData
 }
 
-var file_api_proto_build_build_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_api_proto_build_build_proto_msgTypes = make([]protoimpl.MessageInfo, 32)
 var file_api_proto_build_build_proto_goTypes = []any{
-	(*BuildItemSetResponse)(nil),        // 0: build.buildItemSetResponse
-	(*Build)(nil),                       // 1: build.Build
-	(*Skill)(nil),                       // 2: build.skill
-	(*Tag)(nil),                         // 3: build.tag
-	(*SkillLinkResponse)(nil),           // 4: build.skillLinkResponse
-	(*SkillGroupResponse)(nil),          // 5: build.skillGroupResponse
-	(*BuildList)(nil),                   // 6: build.BuildList
-	(*CreateBuildRequest)(nil),          // 7: build.CreateBuildRequest
-	(*CreateBuildResponse)(nil),         // 8: build.CreateBuildResponse
-	(*GetBuildsByMemberIdRequest)(nil),  // 9: build.GetBuildsByMemberIdRequest
-	(*GetBuildsByMemberIdResponse)(nil), // 10: build.GetBuildsByMemberIdResponse
-	(*GetCommunityBuildsRequest)(nil),   // 11: build.GetCommunityBuildsRequest
-	(*GetCommunityBuildsResponse)(nil),  // 12: build.GetCommunityBuildsResponse
-	(*GetBuildInfoRequest)(nil),         // 13: build.GetBuildInfoRequest
-	(*GetBuildInfoResponse)(nil),        // 14: build.GetBuildInfoResponse
+	(*BuildItemSetResponse)(nil),          // 0: build.buildItemSetResponse
+	(*Build)(nil),                         // 1: build.Build
+	(*Skill)(nil),                         // 2: build.skill
+	(*Tag)(nil),                           // 3: build.tag
+	(*SkillLinks)(nil),                    // 4: build.SkillLinks
+	(*SkillLinkResponse)(nil),             // 5: build.skillLinkResponse
+	(*SkillGroupResponse)(nil),            // 6: build.skillGroupResponse
+	(*AddSkillsToBuildRequest)(nil),       // 7: build.AddSkillsToBuildRequest
+	(*BuildList)(nil),                     // 8: build.BuildList
+	(*CreateBuildRequest)(nil),            // 9: build.CreateBuildRequest
+	(*CreateBuildResponse)(nil),           // 10: build.CreateBuildResponse
+	(*GetBuildsByMemberIdRequest)(nil),    // 11: build.GetBuildsByMemberIdRequest
+	(*GetBuildsByMemberIdResponse)(nil),   // 12: build.GetBuildsByMemberIdResponse
+	(*GetCommunityBuildsRequest)(nil),     // 13: build.GetCommunityBuildsRequest
+	(*GetCommunityBuildsResponse)(nil),    // 14: build.GetCommunityBuildsResponse
+	(*GetBuildInfoRequest)(nil),           // 15: build.GetBuildInfoRequest
+	(*GetBuildInfoResponse)(nil),          // 16: build.GetBuildInfoResponse
+	(*GetBuildsForMemberRequest)(nil),     // 17: build.GetBuildsForMemberRequest
+	(*GetBuildsForMemberResponse)(nil),    // 18: build.GetBuildsForMemberResponse
+	(*GetBuildInfoForMemberRequest)(nil),  // 19: build.GetBuildInfoForMemberRequest
+	(*GetBuildInfoForMemberResponse)(nil), // 20: build.GetBuildInfoForMemberResponse
+	(*PublishBuildRequest)(nil),           // 21: build.PublishBuildRequest
+	(*PublishBuildResponse)(nil),          // 22: build.PublishBuildResponse
+	(*UpdateBuild)(nil),                   // 23: build.UpdateBuild
+	(*UpdateBuildRequest)(nil),            // 24: build.UpdateBuildRequest
+	(*UpdateBuildResponse)(nil),           // 25: build.UpdateBuildResponse
+	(*AddSkillLinksToBuildRequest)(nil),   // 26: build.AddSkillLinksToBuildRequest
+	(*AddSkillLinksToBuildResponse)(nil),  // 27: build.AddSkillLinksToBuildResponse
+	(*UpdateItemSetsToBuildRequest)(nil),  // 28: build.UpdateItemSetsToBuildRequest
+	(*UpdateItemSetsToBuildResponse)(nil), // 29: build.UpdateItemSetsToBuildResponse
+	(*DeleteBuildByMemberRequest)(nil),    // 30: build.DeleteBuildByMemberRequest
+	(*DeleteBuildByMemberResponse)(nil),   // 31: build.DeleteBuildByMemberResponse
 }
 var file_api_proto_build_build_proto_depIdxs = []int32{
 	2,  // 0: build.skillLinkResponse.skill:type_name -> build.skill
 	2,  // 1: build.skillLinkResponse.links:type_name -> build.skill
-	4,  // 2: build.skillGroupResponse.MainSkillLinks:type_name -> build.skillLinkResponse
-	4,  // 3: build.skillGroupResponse.AdditionalSkills:type_name -> build.skillLinkResponse
-	3,  // 4: build.BuildList.tags:type_name -> build.tag
-	6,  // 5: build.GetBuildsByMemberIdResponse.builds:type_name -> build.BuildList
-	6,  // 6: build.GetCommunityBuildsResponse.builds:type_name -> build.BuildList
-	3,  // 7: build.GetBuildInfoResponse.tags:type_name -> build.tag
-	5,  // 8: build.GetBuildInfoResponse.skills:type_name -> build.skillGroupResponse
-	0,  // 9: build.GetBuildInfoResponse.Sets:type_name -> build.buildItemSetResponse
-	7,  // 10: build.BuildService.CreateBuild:input_type -> build.CreateBuildRequest
-	9,  // 11: build.BuildService.GetBuildsByMemberId:input_type -> build.GetBuildsByMemberIdRequest
-	11, // 12: build.BuildService.GetCommunityBuilds:input_type -> build.GetCommunityBuildsRequest
-	13, // 13: build.BuildService.GetBuildInfo:input_type -> build.GetBuildInfoRequest
-	8,  // 14: build.BuildService.CreateBuild:output_type -> build.CreateBuildResponse
-	10, // 15: build.BuildService.GetBuildsByMemberId:output_type -> build.GetBuildsByMemberIdResponse
-	12, // 16: build.BuildService.GetCommunityBuilds:output_type -> build.GetCommunityBuildsResponse
-	14, // 17: build.BuildService.GetBuildInfo:output_type -> build.GetBuildInfoResponse
-	14, // [14:18] is the sub-list for method output_type
-	10, // [10:14] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	5,  // 2: build.skillGroupResponse.MainSkillLinks:type_name -> build.skillLinkResponse
+	5,  // 3: build.skillGroupResponse.AdditionalSkills:type_name -> build.skillLinkResponse
+	5,  // 4: build.AddSkillsToBuildRequest.MainSkillLinks:type_name -> build.skillLinkResponse
+	5,  // 5: build.AddSkillsToBuildRequest.AdditionalSkills:type_name -> build.skillLinkResponse
+	3,  // 6: build.BuildList.tags:type_name -> build.tag
+	8,  // 7: build.GetBuildsByMemberIdResponse.builds:type_name -> build.BuildList
+	8,  // 8: build.GetCommunityBuildsResponse.builds:type_name -> build.BuildList
+	3,  // 9: build.GetBuildInfoResponse.tags:type_name -> build.tag
+	6,  // 10: build.GetBuildInfoResponse.skills:type_name -> build.skillGroupResponse
+	0,  // 11: build.GetBuildInfoResponse.Sets:type_name -> build.buildItemSetResponse
+	8,  // 12: build.GetBuildsForMemberResponse.builds:type_name -> build.BuildList
+	6,  // 13: build.GetBuildInfoForMemberResponse.skills:type_name -> build.skillGroupResponse
+	3,  // 14: build.GetBuildInfoForMemberResponse.tags:type_name -> build.tag
+	0,  // 15: build.GetBuildInfoForMemberResponse.sets:type_name -> build.buildItemSetResponse
+	4,  // 16: build.AddSkillLinksToBuildRequest.MainSkillLinks:type_name -> build.SkillLinks
+	4,  // 17: build.AddSkillLinksToBuildRequest.AdditionalSkills:type_name -> build.SkillLinks
+	9,  // 18: build.BuildService.CreateBuild:input_type -> build.CreateBuildRequest
+	11, // 19: build.BuildService.GetBuildsByMemberId:input_type -> build.GetBuildsByMemberIdRequest
+	13, // 20: build.BuildService.GetCommunityBuilds:input_type -> build.GetCommunityBuildsRequest
+	15, // 21: build.BuildService.GetBuildInfo:input_type -> build.GetBuildInfoRequest
+	17, // 22: build.BuildService.GetBuildsForMember:input_type -> build.GetBuildsForMemberRequest
+	19, // 23: build.BuildService.GetBuildInfoForMember:input_type -> build.GetBuildInfoForMemberRequest
+	21, // 24: build.BuildService.PublishBuild:input_type -> build.PublishBuildRequest
+	24, // 25: build.BuildService.UpdateBuild:input_type -> build.UpdateBuildRequest
+	26, // 26: build.BuildService.AddSkillLinksToBuild:input_type -> build.AddSkillLinksToBuildRequest
+	28, // 27: build.BuildService.UpdateItemSetsToBuild:input_type -> build.UpdateItemSetsToBuildRequest
+	30, // 28: build.BuildService.DeleteBuildByMember:input_type -> build.DeleteBuildByMemberRequest
+	10, // 29: build.BuildService.CreateBuild:output_type -> build.CreateBuildResponse
+	12, // 30: build.BuildService.GetBuildsByMemberId:output_type -> build.GetBuildsByMemberIdResponse
+	14, // 31: build.BuildService.GetCommunityBuilds:output_type -> build.GetCommunityBuildsResponse
+	16, // 32: build.BuildService.GetBuildInfo:output_type -> build.GetBuildInfoResponse
+	18, // 33: build.BuildService.GetBuildsForMember:output_type -> build.GetBuildsForMemberResponse
+	20, // 34: build.BuildService.GetBuildInfoForMember:output_type -> build.GetBuildInfoForMemberResponse
+	22, // 35: build.BuildService.PublishBuild:output_type -> build.PublishBuildResponse
+	25, // 36: build.BuildService.UpdateBuild:output_type -> build.UpdateBuildResponse
+	27, // 37: build.BuildService.AddSkillLinksToBuild:output_type -> build.AddSkillLinksToBuildResponse
+	29, // 38: build.BuildService.UpdateItemSetsToBuild:output_type -> build.UpdateItemSetsToBuildResponse
+	31, // 39: build.BuildService.DeleteBuildByMember:output_type -> build.DeleteBuildByMemberResponse
+	29, // [29:40] is the sub-list for method output_type
+	18, // [18:29] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_api_proto_build_build_proto_init() }
@@ -1875,7 +2963,7 @@ func file_api_proto_build_build_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_proto_build_build_proto_rawDesc), len(file_api_proto_build_build_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   15,
+			NumMessages:   32,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

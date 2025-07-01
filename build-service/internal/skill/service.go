@@ -16,6 +16,7 @@ type Repository interface {
 	CreateSkill(createBuildRequest CreateSkillRequest) error
 	GetSkills() (*[]models.Skill, error)
 	GetSkill(id uuid.UUID) (*models.Skill, error)
+	GetSkillsAndLinksByBuildId(buildId uuid.UUID) (*[]models.SkillRow, error)
 }
 
 func NewService(repo Repository) Service {
@@ -83,6 +84,6 @@ func (s *service) GetSkills(ctx context.Context, req *pb.GetSkillsRequest) (*pb.
 /**
 * Gets a list of skills belonging to a build by id.
 **/
-// func (s *SkillService) GetSkillsByBuildIdService(buildId uuid.UUID) (*[]models.SkillRow, error) {
-// 	return s.Repo.GetSkillsAndLinksByBuildId(buildId)
-// }
+func (s *service) GetSkillsByBuildId(buildId uuid.UUID) (*[]models.SkillRow, error) {
+	return s.repo.GetSkillsAndLinksByBuildId(buildId)
+}
