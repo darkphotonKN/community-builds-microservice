@@ -1,9 +1,11 @@
 package build
 
 import (
+	"context"
 	"time"
 
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/models"
+	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/build"
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 )
@@ -11,21 +13,21 @@ import (
 // --- Request ---
 
 type CreateBuildRequest struct {
-	SkillID      uuid.UUID   `json:"skillId" binding:"required" db:"main_skill_id"`
-	TagIDs       []uuid.UUID `json:"tagIds" binding:"required" db:"tag_ids"`
+	SkillId      uuid.UUID   `json:"skillId" binding:"required" db:"main_skill_id"`
+	TagIds       []uuid.UUID `json:"tagIds" binding:"required" db:"tag_ids"`
 	Title        string      `json:"title" binding:"required,min=6" db:"title"`
 	Description  string      `json:"description" binding:"required,min=1" db:"description"`
-	ClassID      uuid.UUID   `json:"classId" binding:"required" db:"class_id"`
-	AscendancyID uuid.UUID   `json:"ascendancyId" db:"ascendancy_id"`
+	ClassId      uuid.UUID   `json:"classId" binding:"required" db:"class_id"`
+	AscendancyId uuid.UUID   `json:"ascendancyId" db:"ascendancy_id"`
 }
 
 type UpdateBuildRequest struct {
-	SkillID      *uuid.UUID  `json:"skillId" binding:"omitempty" db:"main_skill_id"`
-	TagIDs       []uuid.UUID `json:"tagIds" binding:"omitempty" db:"tag_ids"`
+	SkillId      *uuid.UUID  `json:"skillId" binding:"omitempty" db:"main_skill_id"`
+	TagIds       []uuid.UUID `json:"tagIds" binding:"omitempty" db:"tag_ids"`
 	Title        *string     `json:"title" binding:"omitempty,min=6" db:"title"`
 	Description  *string     `json:"description"  binding:"omitempty,min=10" db:"description"`
-	ClassID      *uuid.UUID  `json:"classId" binding:"omitempty" db:"class_id"`
-	AscendancyID *uuid.UUID  `json:"ascendancyId" binding:"omitempty" db:"ascendancy_id"`
+	ClassId      *uuid.UUID  `json:"classId" binding:"omitempty" db:"class_id"`
+	AscendancyId *uuid.UUID  `json:"ascendancyId" binding:"omitempty" db:"ascendancy_id"`
 }
 
 type SkillLinks struct {
@@ -94,7 +96,7 @@ type SkillGroupResponse struct {
 
 // All Build Information
 type BuildInfoResponse struct {
-	Id          uuid.UUID              `json:"id"`
+	ID          uuid.UUID              `json:"id"`
 	Title       string                 `json:"title"`
 	Description string                 `json:"description"`
 	Class       string                 `json:"class"`
@@ -106,7 +108,7 @@ type BuildInfoResponse struct {
 
 // Partial, basic build information
 type BasicBuildInfoResponse struct {
-	ID                     uuid.UUID `json:"id" db:"id"`
+	Id                     uuid.UUID `json:"id" db:"id"`
 	Title                  string    `json:"title" db:"title"`
 	Description            string    `json:"description" db:"description"`
 	Class                  string    `json:"class" db:"class"`
@@ -124,7 +126,7 @@ type BasicBuildInfoResponse struct {
 
 // Build List
 type BuildListQuery struct {
-	ID                 uuid.UUID `json:"id"`
+	Id                 uuid.UUID `json:"id"`
 	Title              string    `db:"title" json:"title"`
 	Description        string    `db:"description" json:"description"`
 	Class              string    `db:"class_name" json:"class"`
@@ -141,7 +143,7 @@ type BuildListQuery struct {
 }
 
 type BuildListResponse struct {
-	ID                 uuid.UUID    `json:"id"`
+	Id                 uuid.UUID    `json:"id"`
 	Title              string       `json:"title"`
 	Description        string       `json:"description"`
 	Class              string       `json:"class"`
@@ -209,3 +211,8 @@ const (
 	published BuildStatus = 1
 	archived  BuildStatus = 2
 )
+
+type BuildClient interface {
+	CreateBuild(ctx context.Context, req *pb.CreateBuildRequest) (*pb.CreateBuildResponse, error)
+	GetBuildsByMemberId(ctx context.Context, req *pb.GetBuildsByMemberIdRequest) (*pb.GetBuildsByMemberIdResponse, error)
+}

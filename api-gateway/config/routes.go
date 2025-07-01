@@ -5,13 +5,14 @@ import (
 
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/article"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/auth"
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/build"
+
+	// "github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/build"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/class"
 	authService "github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/auth"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/build"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/example"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/item"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/notification"
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/rating"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/skill"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/tag"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
@@ -153,28 +154,30 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	// --- BUILD ---
 
 	// -- Build Setup --
-	buildRepo := build.NewBuildRepository(db)
-	buildService := build.NewBuildService(buildRepo, skillService)
-	buildHandler := build.NewBuildHandler(buildService)
+	buildClient := build.NewClient(registry)
+	buildHandler := build.NewHandler(buildClient)
+	// buildRepo := build.NewBuildRepository(db)
+	// buildService := build.NewBuildService(buildRepo, skillService)
+	// buildHandler := build.NewBuildHandler(buildService)
 
 	// -- Build Routes --
 	buildRoutes := api.Group("/build")
 
 	// Public Routes
-	buildRoutes.GET("/community", buildHandler.GetCommunityBuildsHandler)
-	buildRoutes.GET("/community/:id/info", buildHandler.GetBuildInfoByIdHandler)
+	// buildRoutes.GET("/community", buildHandler.GetCommunityBuildsHandler)
+	// buildRoutes.GET("/community/:id/info", buildHandler.GetBuildInfoByIdHandler)
 
 	// Protected Routes
 	protectedBuildRoutes := buildRoutes.Group("")
 	protectedBuildRoutes.Use(auth.AuthMiddleware())
-	protectedBuildRoutes.GET("", buildHandler.GetBuildsForMemberHandler)
-	protectedBuildRoutes.GET("/:id/info", buildHandler.GetBuildInfoForMemberHandler)
-	protectedBuildRoutes.GET("/:id/publish", buildHandler.PublishBuildHandler)
+	// protectedBuildRoutes.GET("", buildHandler.GetBuildsForMemberHandler)
+	// protectedBuildRoutes.GET("/:id/info", buildHandler.GetBuildInfoForMemberHandler)
+	// protectedBuildRoutes.GET("/:id/publish", buildHandler.PublishBuildHandler)
 	protectedBuildRoutes.POST("", buildHandler.CreateBuildHandler)
-	protectedBuildRoutes.PATCH("/:id", buildHandler.UpdateBuildHandler)
-	protectedBuildRoutes.POST("/:id/addSkills", buildHandler.AddSkillLinksToBuildHandler)
-	protectedBuildRoutes.PATCH(":id/update-set", buildHandler.UpdateItemSetsToBuildHandler)
-	protectedBuildRoutes.DELETE("/:id", buildHandler.DeleteBuildForMemberHandler)
+	// protectedBuildRoutes.PATCH("/:id", buildHandler.UpdateBuildHandler)
+	// protectedBuildRoutes.POST("/:id/addSkills", buildHandler.AddSkillLinksToBuildHandler)
+	// protectedBuildRoutes.PATCH(":id/update-set", buildHandler.UpdateItemSetsToBuildHandler)
+	// protectedBuildRoutes.DELETE("/:id", buildHandler.DeleteBuildForMemberHandler)
 
 	// --- TAG ---
 
@@ -212,14 +215,14 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	// -- RATING --
 
 	// --- Rating Setup ---
-	ratingRepo := rating.NewRatingRepository(db)
-	ratingService := rating.NewRatingService(ratingRepo, buildService)
-	ratingHandler := rating.NewRatingHandler(ratingService)
+	// ratingRepo := rating.NewRatingRepository(db)
+	// ratingService := rating.NewRatingService(ratingRepo, buildService)
+	// ratingHandler := rating.NewRatingHandler(ratingService)
 
-	ratingRoutes := api.Group("/rating")
+	// ratingRoutes := api.Group("/rating")
 
-	ratingRoutes.Use(auth.AuthMiddleware())
-	ratingRoutes.POST("", ratingHandler.CreateRatingByBuildIdHandler)
+	// ratingRoutes.Use(auth.AuthMiddleware())
+	// ratingRoutes.POST("", ratingHandler.CreateRatingByBuildIdHandler)
 
 	return router
 }

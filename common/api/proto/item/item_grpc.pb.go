@@ -4,7 +4,7 @@
 // - protoc             v5.27.1
 // source: api/proto/item/item.proto
 
-package itemgrpc
+package item
 
 import (
 	context "context"

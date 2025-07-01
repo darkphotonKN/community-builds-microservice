@@ -4,7 +4,7 @@
 // 	protoc        v5.27.1
 // source: api/proto/item/item.proto
 
-package itemgrpc
+package item
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -883,6 +883,7 @@ func (x *CreateRareItemResponse) GetMessage() string {
 
 var File_api_proto_item_item_proto protoreflect.FileDescriptor
 
+<<<<<<< HEAD
 var file_api_proto_item_item_proto_rawDesc = []byte{
 	0x0a, 0x19, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x69, 0x74, 0x65, 0x6d,
 	0x2f, 0x69, 0x74, 0x65, 0x6d, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x08, 0x69, 0x74, 0x65,
@@ -1056,6 +1057,141 @@ var file_api_proto_item_item_proto_rawDesc = []byte{
 	0x22, 0x00, 0x42, 0x12, 0x5a, 0x10, 0x2e, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x3b, 0x69, 0x74,
 	0x65, 0x6d, 0x67, 0x72, 0x70, 0x63, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
+=======
+const file_api_proto_item_item_proto_rawDesc = "" +
+	"\n" +
+	"\x19api/proto/item/item.proto\x12\bitemgrpc\x1a\x1bgoogle/protobuf/empty.proto\"\xf5\n" +
+	"\n" +
+	"\x04Item\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x88\x01\x01\x12\x1a\n" +
+	"\bmemberId\x18\x02 \x01(\tR\bmemberId\x12\x1e\n" +
+	"\n" +
+	"baseItemId\x18\x03 \x01(\tR\n" +
+	"baseItemId\x12\x1a\n" +
+	"\bimageUrl\x18\x04 \x01(\tR\bimageUrl\x12\x1a\n" +
+	"\bcategory\x18\x05 \x01(\tR\bcategory\x12\x14\n" +
+	"\x05class\x18\x06 \x01(\tR\x05class\x12\x12\n" +
+	"\x04name\x18\a \x01(\tR\x04name\x12\x12\n" +
+	"\x04type\x18\b \x01(\tR\x04type\x12 \n" +
+	"\vdescription\x18\t \x01(\tR\vdescription\x12\x1e\n" +
+	"\n" +
+	"uniqueItem\x18\n" +
+	" \x01(\bR\n" +
+	"uniqueItem\x12\x12\n" +
+	"\x04slot\x18\v \x01(\tR\x04slot\x12)\n" +
+	"\rrequiredLevel\x18\f \x01(\tH\x01R\rrequiredLevel\x88\x01\x01\x12/\n" +
+	"\x10requiredStrength\x18\r \x01(\tH\x02R\x10requiredStrength\x88\x01\x01\x121\n" +
+	"\x11requiredDexterity\x18\x0e \x01(\tH\x03R\x11requiredDexterity\x88\x01\x01\x127\n" +
+	"\x14requiredIntelligence\x18\x0f \x01(\tH\x04R\x14requiredIntelligence\x88\x01\x01\x12\x1b\n" +
+	"\x06armour\x18\x10 \x01(\tH\x05R\x06armour\x88\x01\x01\x12'\n" +
+	"\fenergyShield\x18\x11 \x01(\tH\x06R\fenergyShield\x88\x01\x01\x12\x1d\n" +
+	"\aevasion\x18\x12 \x01(\tH\aR\aevasion\x88\x01\x01\x12\x19\n" +
+	"\x05block\x18\x13 \x01(\tH\bR\x05block\x88\x01\x01\x12\x17\n" +
+	"\x04ward\x18\x14 \x01(\tH\tR\x04ward\x88\x01\x01\x12\x1b\n" +
+	"\x06damage\x18\x15 \x01(\tH\n" +
+	"R\x06damage\x88\x01\x01\x12\x15\n" +
+	"\x03APS\x18\x16 \x01(\tH\vR\x03APS\x88\x01\x01\x12\x17\n" +
+	"\x04crit\x18\x17 \x01(\tH\fR\x04crit\x88\x01\x01\x12\x17\n" +
+	"\x04PDPS\x18\x18 \x01(\tH\rR\x04PDPS\x88\x01\x01\x12\x17\n" +
+	"\x04EDPS\x18\x19 \x01(\tH\x0eR\x04EDPS\x88\x01\x01\x12\x15\n" +
+	"\x03DPS\x18\x1a \x01(\tH\x0fR\x03DPS\x88\x01\x01\x12\x17\n" +
+	"\x04life\x18\x1b \x01(\tH\x10R\x04life\x88\x01\x01\x12\x17\n" +
+	"\x04mana\x18\x1c \x01(\tH\x11R\x04mana\x88\x01\x01\x12\x1f\n" +
+	"\bduration\x18\x1d \x01(\tH\x12R\bduration\x88\x01\x01\x12\x19\n" +
+	"\x05usage\x18\x1e \x01(\tH\x13R\x05usage\x88\x01\x01\x12\x1f\n" +
+	"\bcapacity\x18\x1f \x01(\tH\x14R\bcapacity\x88\x01\x01\x12#\n" +
+	"\n" +
+	"additional\x18  \x01(\tH\x15R\n" +
+	"additional\x88\x01\x01\x12\x1a\n" +
+	"\bimplicit\x18! \x03(\tR\bimplicit\x12\x14\n" +
+	"\x05stats\x18\" \x03(\tR\x05stats\x12!\n" +
+	"\tcreatedAt\x18$ \x01(\tH\x16R\tcreatedAt\x88\x01\x01\x12!\n" +
+	"\tupdatedAt\x18% \x01(\tH\x17R\tupdatedAt\x88\x01\x01B\x05\n" +
+	"\x03_idB\x10\n" +
+	"\x0e_requiredLevelB\x13\n" +
+	"\x11_requiredStrengthB\x14\n" +
+	"\x12_requiredDexterityB\x17\n" +
+	"\x15_requiredIntelligenceB\t\n" +
+	"\a_armourB\x0f\n" +
+	"\r_energyShieldB\n" +
+	"\n" +
+	"\b_evasionB\b\n" +
+	"\x06_blockB\a\n" +
+	"\x05_wardB\t\n" +
+	"\a_damageB\x06\n" +
+	"\x04_APSB\a\n" +
+	"\x05_critB\a\n" +
+	"\x05_PDPSB\a\n" +
+	"\x05_EDPSB\x06\n" +
+	"\x04_DPSB\a\n" +
+	"\x05_lifeB\a\n" +
+	"\x05_manaB\v\n" +
+	"\t_durationB\b\n" +
+	"\x06_usageB\v\n" +
+	"\t_capacityB\r\n" +
+	"\v_additionalB\f\n" +
+	"\n" +
+	"_createdAtB\f\n" +
+	"\n" +
+<<<<<<< HEAD
+	"_updatedAt\"\xad\x01\n" +
+=======
+	"_updatedAt\"\x99\x01\n" +
+>>>>>>> b88431d (build microservice)
+	"\x11CreateItemRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\bcategory\x18\x02 \x01(\tR\bcategory\x12\x14\n" +
+	"\x05class\x18\x03 \x01(\tR\x05class\x12\x12\n" +
+	"\x04type\x18\x04 \x01(\tR\x04type\x12\x12\n" +
+	"\x04name\x18\x05 \x01(\tR\x04name\x12\x1a\n" +
+<<<<<<< HEAD
+	"\bimageURL\x18\x06 \x01(\tR\bimageURL\x12\x12\n" +
+	"\x04slot\x18\a \x01(\tR\x04slot\".\n" +
+=======
+	"\bimageURL\x18\x06 \x01(\tR\bimageURL\".\n" +
+>>>>>>> b88431d (build microservice)
+	"\x12CreateItemResponse\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"%\n" +
+	"\x0fGetItemsRequest\x12\x12\n" +
+	"\x04slot\x18\x01 \x01(\tR\x04slot\"R\n" +
+	"\x10GetItemsResponse\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\x12$\n" +
+	"\x05items\x18\x02 \x03(\v2\x0e.itemgrpc.ItemR\x05items\"7\n" +
+	"\x1bGenerateUniqueItemsResponse\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"\x99\x01\n" +
+	"\x11UpdateItemRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\bcategory\x18\x02 \x01(\tR\bcategory\x12\x14\n" +
+	"\x05class\x18\x03 \x01(\tR\x05class\x12\x12\n" +
+	"\x04type\x18\x04 \x01(\tR\x04type\x12\x12\n" +
+	"\x04name\x18\x05 \x01(\tR\x04name\x12\x1a\n" +
+	"\bimageURL\x18\x06 \x01(\tR\bimageURL\".\n" +
+	"\x12UpdateItemResponse\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"\xa7\x01\n" +
+	"\x15CreateRareItemRequest\x12\x16\n" +
+	"\x06userId\x18\x01 \x01(\tR\x06userId\x12\x1e\n" +
+	"\n" +
+	"baseItemId\x18\x02 \x01(\tR\n" +
+	"baseItemId\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x14\n" +
+	"\x05class\x18\x04 \x01(\tR\x05class\x12\x14\n" +
+	"\x05stats\x18\x05 \x03(\tR\x05stats\x12\x16\n" +
+	"\x06toList\x18\x06 \x01(\bR\x06toList\"2\n" +
+	"\x16CreateRareItemResponse\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage2\x97\x03\n" +
+	"\vItemService\x12I\n" +
+	"\n" +
+	"CreateItem\x12\x1b.itemgrpc.CreateItemRequest\x1a\x1c.itemgrpc.CreateItemResponse\"\x00\x12C\n" +
+	"\bGetItems\x12\x19.itemgrpc.GetItemsRequest\x1a\x1a.itemgrpc.GetItemsResponse\"\x00\x12V\n" +
+	"\x13GenerateUniqueItems\x12\x16.google.protobuf.Empty\x1a%.itemgrpc.GenerateUniqueItemsResponse\"\x00\x12I\n" +
+	"\n" +
+	"UpdateItem\x12\x1b.itemgrpc.UpdateItemRequest\x1a\x1c.itemgrpc.UpdateItemResponse\"\x00\x12U\n" +
+<<<<<<< HEAD
+	"\x0eCreateRareItem\x12\x1f.itemgrpc.CreateRareItemRequest\x1a .itemgrpc.CreateRareItemResponse\"\x00B\x12Z\x10./proto;itemgrpcb\x06proto3"
+=======
+	"\x0eCreateRareItem\x12\x1f.itemgrpc.CreateRareItemRequest\x1a .itemgrpc.CreateRareItemResponse\"\x00BMZKgithub.com/darkphotonKN/community-builds-microservice/common/api/proto/itemb\x06proto3"
+>>>>>>> b88431d (build microservice)
+>>>>>>> a50a97f (build microservice)
 
 var (
 	file_api_proto_item_item_proto_rawDescOnce sync.Once

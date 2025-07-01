@@ -159,10 +159,10 @@ type Rating struct {
 **/
 type Build struct {
 	BaseDBDateModel
-	MemberId           uuid.UUID `db:"member_id" json:"memberId"`
-	MainSkillId        uuid.UUID `db:"main_skill_id" json:"mainSkill"`
-	ClassId            uuid.UUID `db:"class_id" json:"classId"`
-	AscendancyId       uuid.UUID `db:"ascendancy_id" json:"ascendancyId"`
+	MemberID           uuid.UUID `db:"member_id" json:"memberId"`
+	MainSkillID        uuid.UUID `db:"main_skill_id" json:"mainSkill"`
+	ClassID            uuid.UUID `db:"class_id" json:"classId"`
+	AscendancyID       uuid.UUID `db:"ascendancy_id" json:"ascendancyId"`
 	Title              string    `db:"title" json:"title"`
 	Description        string    `db:"description" json:"description"`
 	AvgEndGameRating   *float32  `db:"avg_end_game_rating" json:"avgEndGameRating,omitempty"`
@@ -213,19 +213,19 @@ type BaseIDModel struct {
 }
 
 type BaseDBMemberModel struct {
-	Id            uuid.UUID `db:"id" json:"id"`
+	ID            uuid.UUID `db:"id" json:"id"`
 	UpdatedMember uuid.UUID `db:"updated_member" json:"updatedMember"`
 	CreatedMember uuid.UUID `db:"created_member" json:"createdMember"`
 }
 
 type BaseDBDateModel struct {
-	Id        uuid.UUID `db:"id" json:"id"`
+	ID        uuid.UUID `db:"id" json:"id"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
 
 type BaseDBMemberDateModel struct {
-	Id            uuid.UUID `db:"id" json:"id"`
+	ID            uuid.UUID `db:"id" json:"id"`
 	UpdatedMember uuid.UUID `db:"updated_member" json:"updatedMember"`
 	CreatedMember uuid.UUID `db:"created_member" json:"createdMember"`
 	CreatedAt     time.Time `db:"created_at" json:"created_at"`
@@ -238,10 +238,10 @@ type BaseDBMemberDateModel struct {
 
 // holds temporary data for joining skills skill links and builds tables.
 type SkillRow struct {
-	SkillLinkId     string    `db:"skill_link_id"`
+	SkillLinkID     string    `db:"skill_link_id"`
 	SkillLinkName   string    `db:"skill_link_name"`
 	SkillLinkIsMain bool      `db:"skill_link_is_main"`
-	SkillId         uuid.UUID `db:"skill_id"`
+	SkillID         uuid.UUID `db:"skill_id"`
 	SkillName       string    `db:"skill_name"`
 	SkillType       string    `db:"skill_type"`
 }

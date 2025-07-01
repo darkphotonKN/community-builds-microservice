@@ -340,6 +340,7 @@ func (x *ReadNotificationRequest) GetNotificationId() string {
 
 var File_api_proto_notification_notification_proto protoreflect.FileDescriptor
 
+<<<<<<< HEAD
 var file_api_proto_notification_notification_proto_rawDesc = []byte{
 	0x0a, 0x29, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x6e, 0x6f, 0x74, 0x69,
 	0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63,
@@ -409,6 +410,40 @@ var file_api_proto_notification_notification_proto_rawDesc = []byte{
 	0x2f, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x62, 0x06, 0x70,
 	0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
+=======
+const file_api_proto_notification_notification_proto_rawDesc = "" +
+	"\n" +
+	")api/proto/notification/notification.proto\x12\fnotification\x1a\x1fgoogle/protobuf/timestamp.proto\"J\n" +
+	"\x18GetNotificationsResponse\x12.\n" +
+	"\x04data\x18\x01 \x03(\v2\x1a.notification.NotificationR\x04data\"\x87\x02\n" +
+	"\fNotification\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\bmemberId\x18\x02 \x01(\tR\bmemberId\x12\x12\n" +
+	"\x04type\x18\x03 \x01(\tR\x04type\x12\x14\n" +
+	"\x05title\x18\x04 \x01(\tR\x05title\x12\x18\n" +
+	"\amessage\x18\x05 \x01(\tR\amessage\x12\x12\n" +
+	"\x04read\x18\x06 \x01(\bR\x04read\x12\x1c\n" +
+	"\temailSent\x18\a \x01(\bR\temailSent\x12\x1a\n" +
+	"\bsourceId\x18\b \x01(\tR\bsourceId\x129\n" +
+	"\n" +
+<<<<<<< HEAD
+	"created_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\x82\x01\n" +
+	"\x17GetNotificationsRequest\x12\x1a\n" +
+	"\bmemberId\x18\x01 \x01(\tR\bmemberId\x12\x19\n" +
+	"\x05limit\x18\x02 \x01(\x05H\x00R\x05limit\x88\x01\x01\x12\x1b\n" +
+	"\x06offset\x18\x03 \x01(\x05H\x01R\x06offset\x88\x01\x01B\b\n" +
+	"\x06_limitB\t\n" +
+	"\a_offset2z\n" +
+=======
+	"created_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"c\n" +
+	"\x17GetNotificationsRequest\x12\x1a\n" +
+	"\bmemberId\x18\x01 \x01(\tR\bmemberId\x12\x14\n" +
+	"\x05limit\x18\x02 \x01(\x05R\x05limit\x12\x16\n" +
+	"\x06offset\x18\x03 \x01(\x05R\x06offset2z\n" +
+>>>>>>> b88431d (build microservice)
+	"\x13NotificationService\x12c\n" +
+	"\x10GetNotifications\x12%.notification.GetNotificationsRequest\x1a&.notification.GetNotificationsResponse\"\x00BUZSgithub.com/darkphotonKN/community-builds-microservice/common/api/proto/notificationb\x06proto3"
+>>>>>>> a50a97f (build microservice)
 
 var (
 	file_api_proto_notification_notification_proto_rawDescOnce sync.Once
