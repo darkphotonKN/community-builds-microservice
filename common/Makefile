@@ -10,3 +10,4 @@ gen:
 		api/proto/skill/skill.proto \
 		api/proto/tag/tag.proto \
 		api/proto/class/class.proto \
+		api/proto/rating/rating.proto \
