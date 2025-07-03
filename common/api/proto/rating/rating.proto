@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package rating;
+
+option go_package = "github.com/darkphotonKN/community-builds-microservices/common/api/proto/rating";
+
+service RatingService {
+  rpc CreateRatingByBuildId(CreateRatingByBuildIdRequest) returns (CreateRatingByBuildIdResponse) {}
+}
+
+message CreateRatingByBuildIdRequest {
+  string memberId = 1;
+  string buildId = 2;
+  string category = 3;
+  int32 value = 4;
+}
+
+message CreateRatingByBuildIdResponse {
+}

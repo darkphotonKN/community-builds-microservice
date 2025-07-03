@@ -7,12 +7,13 @@ import (
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/auth"
 
 	// "github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/build"
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/class"
 	authService "github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/auth"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/build"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/class"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/example"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/item"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/notification"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/rating"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/skill"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/tag"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
@@ -98,9 +99,12 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	**********************/
 
 	// --- CLASS AND ASCENDANCY ---
-	classRepo := class.NewClassRepository(db)
-	classService := class.NewClassService(classRepo)
-	classHandler := class.NewClassHandler(classService)
+
+	classClient := class.NewClient(registry)
+	classHandler := class.NewHandler(classClient)
+	// classRepo := class.NewClassRepository(db)
+	// classService := class.NewClassService(classRepo)
+	// classHandler := class.NewClassHandler(classService)
 
 	classRoutes := api.Group("/class")
 	classRoutes.GET("", classHandler.GetClassesAndAscendanciesHandler)
@@ -221,14 +225,18 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	// -- RATING --
 
 	// --- Rating Setup ---
+
+	// rating no used in build microservice
+	ratingClient := rating.NewClient(registry)
+	ratingHandler := rating.NewHandler(ratingClient)
 	// ratingRepo := rating.NewRatingRepository(db)
 	// ratingService := rating.NewRatingService(ratingRepo, buildService)
 	// ratingHandler := rating.NewRatingHandler(ratingService)
 
-	// ratingRoutes := api.Group("/rating")
+	ratingRoutes := api.Group("/rating")
 
-	// ratingRoutes.Use(auth.AuthMiddleware())
-	// ratingRoutes.POST("", ratingHandler.CreateRatingByBuildIdHandler)
+	ratingRoutes.Use(auth.AuthMiddleware())
+	ratingRoutes.POST("", ratingHandler.CreateRatingByBuildIdHandler)
 
 	return router
 }
