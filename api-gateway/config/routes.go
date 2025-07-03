@@ -7,9 +7,9 @@ import (
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/auth"
 
 	// "github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/build"
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/class"
 	authService "github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/auth"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/build"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/class"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/example"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/item"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/notification"
@@ -98,9 +98,12 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	**********************/
 
 	// --- CLASS AND ASCENDANCY ---
-	classRepo := class.NewClassRepository(db)
-	classService := class.NewClassService(classRepo)
-	classHandler := class.NewClassHandler(classService)
+
+	classClient := class.NewClient(registry)
+	classHandler := class.NewHandler(classClient)
+	// classRepo := class.NewClassRepository(db)
+	// classService := class.NewClassService(classRepo)
+	// classHandler := class.NewClassHandler(classService)
 
 	classRoutes := api.Group("/class")
 	classRoutes.GET("", classHandler.GetClassesAndAscendanciesHandler)
