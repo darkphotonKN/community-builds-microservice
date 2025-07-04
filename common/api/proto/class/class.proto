@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package class;
+
+option go_package = "github.com/darkphotonKN/community-builds-microservices/common/api/proto/class";
+
+service ClassService {
+  rpc GetClassesAndAscendancies(GetClassesAndAscendanciesRequest) returns (GetClassesAndAscendanciesResponse) {}
+}
+
+message Class {
+	string id = 1;
+  string name = 2;
+  string description = 3;
+  string imageUrl = 4;
+	string createdAt = 5;
+	string updatedAt = 6;
+
+}
+message Ascendancy {
+	string id = 1;
+  string classId = 2;
+  string name = 3;
+  string description = 4;
+  string imageUrl = 5;
+	string createdAt = 6;
+	string updatedAt = 7;
+
+}
+message GetClassesAndAscendanciesRequest {
+  string MemberId = 1;
+}
+
+message GetClassesAndAscendanciesResponse {
+  repeated Class classes = 1;
+  repeated Ascendancy ascendancies = 2;
+}

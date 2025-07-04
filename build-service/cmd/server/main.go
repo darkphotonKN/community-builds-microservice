@@ -8,12 +8,16 @@ import (
 
 	"github.com/darkphotonKN/community-builds-microservice/build-service/config"
 	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/build"
+	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/class"
+	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/rating"
 	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/skill"
 	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/tag"
 	"github.com/darkphotonKN/community-builds-microservice/common/broker"
 	commonconstants "github.com/darkphotonKN/community-builds-microservice/common/constants"
 
 	buildPb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/build"
+	classPb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/class"
+	ratingPb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/rating"
 	skillPb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/skill"
 	tagPb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/tag"
 	"github.com/darkphotonKN/community-builds-microservice/common/discovery"
@@ -94,11 +98,24 @@ func main() {
 		ch.Close()
 	}()
 
+	// rating no used
+	ratingRepo := rating.NewRepository(db)
+	ratingService := rating.NewService(ratingRepo)
+	ratingHandler := rating.NewHandler(ratingService)
+
+	ratingPb.RegisterRatingServiceServer(grpcServer, ratingHandler)
+
 	skillRepo := skill.NewRepository(db)
 	skillService := skill.NewService(skillRepo)
 	skillHandler := skill.NewHandler(skillService)
 
 	skillPb.RegisterSkillServiceServer(grpcServer, skillHandler)
+
+	classRepo := class.NewRepository(db)
+	classService := class.NewService(classRepo)
+	classHandler := class.NewHandler(classService)
+
+	classPb.RegisterClassServiceServer(grpcServer, classHandler)
 
 	tagRepo := tag.NewRepository(db)
 	tagService := tag.NewService(tagRepo)
