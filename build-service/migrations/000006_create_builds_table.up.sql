@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS builds (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    member_id UUID,
+    member_id UUID NOT NULL,
     title TEXT NOT NULL,
     description TEXT NOT NULL,
     main_skill_id UUID NOT NULL REFERENCES skills(id) ON DELETE RESTRICT,
