@@ -12,6 +12,7 @@ type Handler struct {
 }
 
 type Service interface {
+	CreateDefaultClassesAndAscendancies(classes []CreateDefaultClass, ascendancies []CreateDefaultAscendancy) error
 	GetClassesAndAscendancies(ctx context.Context, req *pb.GetClassesAndAscendanciesRequest) (*pb.GetClassesAndAscendanciesResponse, error)
 }
 

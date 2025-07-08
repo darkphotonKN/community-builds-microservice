@@ -17,6 +17,7 @@ type Repository interface {
 	GetSkills() (*[]models.Skill, error)
 	GetSkill(id uuid.UUID) (*models.Skill, error)
 	GetSkillsAndLinksByBuildId(buildId uuid.UUID) (*[]models.SkillRow, error)
+	BatchCreateSkills(skills []SeedSkill) error
 }
 
 func NewService(repo Repository) Service {
@@ -72,14 +73,14 @@ func (s *service) GetSkills(ctx context.Context, req *pb.GetSkillsRequest) (*pb.
 /**
 * Creates a list of skills.
 **/
-// func (s *SkillService) BatchCreateSkillsService(createSkills []SeedSkill) error {
+func (s *service) BatchCreateSkills(createSkills []SeedSkill) error {
 
-// 	if err := s.Repo.BatchCreateSkills(createSkills); err != nil {
-// 		return err
-// 	}
+	if err := s.repo.BatchCreateSkills(createSkills); err != nil {
+		return err
+	}
 
-// 	return nil
-// }
+	return nil
+}
 
 /**
 * Gets a list of skills belonging to a build by id.

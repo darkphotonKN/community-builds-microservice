@@ -30,21 +30,21 @@ func (s *repository) CreateSkill(createSkillRequest CreateSkillRequest) error {
 	return nil
 }
 
-// func (s *SkillRepository) BatchCreateSkills(skills []SeedSkill) error {
-// 	query := `
-// 	INSERT INTO skills (id, name, type)
-// 	VALUES (:id, :name, :type)
-//   ON CONFLICT (name) DO NOTHING
-//   `
-// 	// batch insert skills with a slice of structs via sqlx
-// 	_, err := s.DB.NamedExec(query, skills)
+func (s *repository) BatchCreateSkills(skills []SeedSkill) error {
+	query := `
+	INSERT INTO skills (id, name, type)
+	VALUES (:id, :name, :type)
+  ON CONFLICT (name) DO NOTHING
+  `
+	// batch insert skills with a slice of structs via sqlx
+	_, err := s.db.NamedExec(query, skills)
 
-// 	if err != nil {
-// 		return err
-// 	}
+	if err != nil {
+		return err
+	}
 
-// 	return nil
-// }
+	return nil
+}
 
 func (r *repository) GetSkill(id uuid.UUID) (*models.Skill, error) {
 	var skill models.Skill

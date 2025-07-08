@@ -1,6 +1,8 @@
 package build
 
 import (
+	"fmt"
+
 	"golang.org/x/net/context"
 
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/build"
@@ -33,6 +35,7 @@ func NewHandler(service Service) *Handler {
 }
 
 func (h *Handler) CreateBuild(ctx context.Context, req *pb.CreateBuildRequest) (*pb.CreateBuildResponse, error) {
+	fmt.Println("CreateBuild handler")
 	return h.service.CreateBuild(ctx, req)
 }
 
