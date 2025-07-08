@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/darkphotonKN/community-builds-microservice/auth-service/internal/constants"
+	"github.com/darkphotonKN/community-builds-microservice/auth-service/internal/member"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -67,4 +69,19 @@ func runMigrations(db *sqlx.DB) error {
 
 	fmt.Printf("Successfully ran all migrations.\n\n")
 	return nil
+}
+
+func SeedDefaults(db *sqlx.DB) {
+	// --- default members ---
+	memberRepo := member.NewRepository(db)
+	memberService := member.NewService(memberRepo, nil)
+
+	err := memberService.CreateDefaultMembers(constants.DefaultMembers)
+
+	if err != nil {
+		log.Fatal("Error when attempting to create default members:", err)
+	}
+
+	fmt.Printf("Successfully created all default members.\n\n")
+
 }
