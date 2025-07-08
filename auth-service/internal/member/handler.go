@@ -19,6 +19,7 @@ type Service interface {
 	UpdateMemberInfo(ctx context.Context, req *pb.UpdateMemberInfoRequest) (*pb.Member, error)
 	UpdateMemberPassword(ctx context.Context, req *pb.UpdatePasswordRequest) (*pb.UpdatePasswordResponse, error)
 	ValidateToken(ctx context.Context, req *pb.ValidateTokenRequest) (*pb.ValidateTokenResponse, error)
+	CreateDefaultMembers(members []CreateDefaultMember) error
 }
 
 func NewHandler(service Service) *Handler {

@@ -271,7 +271,9 @@ func (s *service) ComparePasswords(storedPassword string, inputPassword string) 
 	return true, nil // Passwords match
 }
 
-// CreateDefaultMembers creates default members for setup purposes.
+/**
+* Create Default Members.
+**/
 func (s *service) CreateDefaultMembers(members []CreateDefaultMember) error {
 	var hashedPwMembers []CreateDefaultMember
 

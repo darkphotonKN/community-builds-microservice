@@ -18,6 +18,7 @@ type Service interface {
 	GetSkills(ctx context.Context, req *pb.GetSkillsRequest) (*pb.GetSkillsResponse, error)
 	GetSkillById(id uuid.UUID) (*models.Skill, error)
 	GetSkillsByBuildId(buildId uuid.UUID) (*[]models.SkillRow, error)
+	BatchCreateSkills(createSkills []SeedSkill) error
 }
 
 func NewHandler(service Service) *Handler {

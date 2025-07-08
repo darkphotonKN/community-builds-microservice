@@ -64,3 +64,18 @@ func (r *repository) UpdateTag(payload UpdateTagRequest) error {
 	}
 	return nil
 }
+
+func (r *repository) BatchCreateTags(tags []models.Tag) error {
+	query := `
+	INSERT INTO tags(id, name)
+	VALUES(:id, :name)
+	ON CONFLICT DO NOTHING
+	`
+	_, err := r.db.NamedExec(query, tags)
+
+	if err != nil {
+		return commonhelpers.AnalyzeDBErr(err)
+	}
+
+	return nil
+}

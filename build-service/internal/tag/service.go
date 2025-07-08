@@ -16,6 +16,7 @@ type Repository interface {
 	CreateTag(createBuildRequest CreateTagRequest) error
 	GetTags() (*[]models.Tag, error)
 	UpdateTag(updateTagRequest UpdateTagRequest) error
+	BatchCreateTags(tags []models.Tag) error
 }
 
 func NewService(repo Repository) Service {
@@ -71,6 +72,6 @@ func (s *service) GetTags(ctx context.Context, req *pb.GetTagsRequest) (*pb.GetT
 // 	return tags, nil
 // }
 
-// func (s *service) CreateDefaultTags(tags []models.Tag) error {
-// 	return s.repo.BatchCreateTags(tags)
-// }
+func (s *service) CreateDefaultTags(tags []models.Tag) error {
+	return s.repo.BatchCreateTags(tags)
+}
