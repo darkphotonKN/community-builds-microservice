@@ -2,6 +2,7 @@ package class
 
 import (
 	"context"
+	"fmt"
 
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/class"
 )
@@ -27,20 +28,20 @@ func NewService(repo Repository) Service {
 /**
 * Creates all base classes and ascendancies
 **/
-// func (s *service) CreateDefaultClassesAndAscendancies(classes []CreateDefaultClass, ascendancies []CreateDefaultAscendancy) error {
+func (s *service) CreateDefaultClassesAndAscendancies(classes []CreateDefaultClass, ascendancies []CreateDefaultAscendancy) error {
 
-// 	if err := s.repo.BatchCreateDefaultClasses(classes); err != nil {
-// 		fmt.Println("Error when creating class:", err)
-// 		return err
-// 	}
+	if err := s.repo.BatchCreateDefaultClasses(classes); err != nil {
+		fmt.Println("Error when creating class:", err)
+		return err
+	}
 
-// 	if err := s.repo.BatchCreateDefaultAscendancies(ascendancies); err != nil {
-// 		fmt.Println("Error when creating ascendancy:", err)
-// 		return err
-// 	}
+	if err := s.repo.BatchCreateDefaultAscendancies(ascendancies); err != nil {
+		fmt.Println("Error when creating ascendancy:", err)
+		return err
+	}
 
-// 	return nil
-// }
+	return nil
+}
 
 /**
 * Gets list of classes and ascendancies.

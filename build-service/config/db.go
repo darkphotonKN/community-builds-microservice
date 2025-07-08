@@ -5,6 +5,10 @@ import (
 	"log"
 	"os"
 
+	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/class"
+	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/constants"
+	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/skill"
+	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/tag"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -43,6 +47,8 @@ func InitDB() *sqlx.DB {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
 
+	SeedDefaults(db)
+
 	return db
 }
 
@@ -67,4 +73,50 @@ func runMigrations(db *sqlx.DB) error {
 
 	fmt.Printf("Successfully ran all migrations.\n\n")
 	return nil
+}
+
+func SeedDefaults(db *sqlx.DB) {
+
+	fmt.Printf("Successfully created all default members.\n\n")
+
+	// --- default classes ---
+	classRepo := class.NewRepository(db)
+	classService := class.NewService(classRepo)
+
+	err := classService.CreateDefaultClassesAndAscendancies(constants.DefaultClasses, constants.DefaultAscendancies)
+
+	if err != nil {
+		log.Fatal("Error when attempting to create default classes and ascendancies:", err)
+	}
+
+	fmt.Printf("Successfully created all default classes and ascendancies.\n\n")
+
+	// --- default skills ---
+	skillRepo := skill.NewRepository(db)
+	skillService := skill.NewService(skillRepo)
+
+	err = skillService.BatchCreateSkills(constants.ActiveSkills)
+	if err != nil {
+		log.Fatal("Error when attempting to create default active skills:", err)
+	}
+
+	err = skillService.BatchCreateSkills(constants.SupportSkills)
+	if err != nil {
+		log.Fatal("Error when attempting to create default support skills:", err)
+	}
+
+	// --- default tags ---
+	tagsRepo := tag.NewRepository(db)
+	tagsService := tag.NewService(tagsRepo)
+	err = tagsService.CreateDefaultTags(constants.DefaultTags)
+
+	// --- default items ---
+
+	fmt.Printf("Successfully created all default active and support skills.\n\n")
+
+	// itemRepo := item.NewItemRepository(db)
+	// itemService := item.NewItemService(itemRepo, skillService)
+	// itemService.CrawlingAndAddUniqueItemsService()
+	// itemService.CrawlingAndAddBaseItemsService()
+	// itemService.CrawlingAndAddItemModsService()
 }
