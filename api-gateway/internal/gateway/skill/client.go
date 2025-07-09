@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	serviceName = "skill-service"
+	serviceName = "build-service"
 )
 
 type Client struct {

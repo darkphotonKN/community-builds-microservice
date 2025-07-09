@@ -48,7 +48,7 @@ func (s *service) UpdateTag(ctx context.Context, req *pb.UpdateTagRequest) (*pb.
 func (s *service) GetTags(ctx context.Context, req *pb.GetTagsRequest) (*pb.GetTagsResponse, error) {
 	tags, err := s.repo.GetTags()
 
-	pbTags := make([]*pb.Tag, 0, len(*tags))
+	var pbTags []*pb.Tag
 	for _, tag := range *tags {
 		pbTags = append(pbTags, &pb.Tag{
 			Id:        tag.ID.String(),

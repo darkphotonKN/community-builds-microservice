@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	serviceName = "class-service"
+	serviceName = "build-service"
 )
 
 type Client struct {

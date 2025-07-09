@@ -107,7 +107,7 @@ func (h *BuildHandler) CreateBuildHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON: %s", err)})
 		return
 	}
-	tagIdsStr := make([]string, len(createBuildReq.TagIds))
+	var tagIdsStr []string
 	for i, tagId := range createBuildReq.TagIds {
 		tagIdsStr[i] = tagId.String()
 	}
@@ -155,7 +155,7 @@ func (h *BuildHandler) UpdateBuildHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON: %s", err)})
 		return
 	}
-	tags := make([]string, len(request.TagIds))
+	var tags []string
 	for _, tag := range request.TagIds {
 		tags = append(tags, tag.String())
 	}
@@ -284,37 +284,40 @@ func (h *BuildHandler) AddSkillLinksToBuildHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON: %s", err)})
 		return
 	}
-
-	links := make([]string, len(request.MainSkillLinks.Links))
+	fmt.Println("request.MainSkillLinks.Links len:", len(request.MainSkillLinks.Links))
+	var links []string
+	fmt.Println("prev Links len:", len(links))
 	for _, link := range request.MainSkillLinks.Links {
 		links = append(links, link.String())
 	}
-	MainSkillLinks := &pb.SkillLinks{
+	fmt.Println("mainSkillLinks links", len(links))
+	mainSkillLinks := &pb.SkillLinks{
 		SkillLinkName: request.MainSkillLinks.SkillLinkName,
 		Skill:         request.MainSkillLinks.Skill.String(),
 		Links:         links,
 	}
 
-	additionsLinks := make([]*pb.SkillLinks, len(request.AdditionalSkills))
+	var additionSkillLinks []*pb.SkillLinks
 	for _, additionsLink := range request.AdditionalSkills {
 
-		subLinks := make([]string, len(additionsLink.Links))
+		var subLinks []string
 		for _, subLink := range additionsLink.Links {
 			subLinks = append(subLinks, subLink.String())
 		}
-		additionsLinks = append(additionsLinks, &pb.SkillLinks{
+		additionSkillLinks = append(additionSkillLinks, &pb.SkillLinks{
 			SkillLinkName: additionsLink.SkillLinkName,
 			Skill:         additionsLink.Skill.String(),
 			Links:         subLinks,
 		})
 	}
-	AdditionalSkills := []*pb.SkillLinks{}
+
+	fmt.Println("mainSkillLinks", mainSkillLinks)
 
 	grpcReq := &pb.AddSkillLinksToBuildRequest{
 		MemberId:         userIdStr.(string),
 		Id:               id.String(),
-		MainSkillLinks:   MainSkillLinks,
-		AdditionalSkills: AdditionalSkills,
+		MainSkillLinks:   mainSkillLinks,
+		AdditionalSkills: additionSkillLinks,
 	}
 
 	_, err = h.Client.AddSkillLinksToBuild(c.Request.Context(), grpcReq)

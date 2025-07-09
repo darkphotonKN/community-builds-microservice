@@ -935,8 +935,8 @@ func (x *SkillLinkResponse) GetLinks() []*Skill {
 
 type SkillGroupResponse struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
-	MainSkillLinks   *SkillLinkResponse     `protobuf:"bytes,1,opt,name=MainSkillLinks,proto3" json:"MainSkillLinks,omitempty"`
-	AdditionalSkills []*SkillLinkResponse   `protobuf:"bytes,2,rep,name=AdditionalSkills,proto3" json:"AdditionalSkills,omitempty"`
+	MainSkillLinks   *SkillLinkResponse     `protobuf:"bytes,1,opt,name=mainSkillLinks,proto3" json:"mainSkillLinks,omitempty"`
+	AdditionalSkills []*SkillLinkResponse   `protobuf:"bytes,2,rep,name=additionalSkills,proto3" json:"additionalSkills,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -987,8 +987,8 @@ func (x *SkillGroupResponse) GetAdditionalSkills() []*SkillLinkResponse {
 
 type AddSkillsToBuildRequest struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
-	MainSkillLinks   *SkillLinkResponse     `protobuf:"bytes,1,opt,name=MainSkillLinks,proto3" json:"MainSkillLinks,omitempty"`
-	AdditionalSkills []*SkillLinkResponse   `protobuf:"bytes,2,rep,name=AdditionalSkills,proto3" json:"AdditionalSkills,omitempty"`
+	MainSkillLinks   *SkillLinkResponse     `protobuf:"bytes,1,opt,name=mainSkillLinks,proto3" json:"mainSkillLinks,omitempty"`
+	AdditionalSkills []*SkillLinkResponse   `protobuf:"bytes,2,rep,name=additionalSkills,proto3" json:"additionalSkills,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -2202,8 +2202,8 @@ type AddSkillLinksToBuildRequest struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	MemberId         string                 `protobuf:"bytes,1,opt,name=memberId,proto3" json:"memberId,omitempty"`
 	Id               string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
-	MainSkillLinks   *SkillLinks            `protobuf:"bytes,3,opt,name=MainSkillLinks,proto3" json:"MainSkillLinks,omitempty"`
-	AdditionalSkills []*SkillLinks          `protobuf:"bytes,4,rep,name=AdditionalSkills,proto3" json:"AdditionalSkills,omitempty"`
+	MainSkillLinks   *SkillLinks            `protobuf:"bytes,3,opt,name=mainSkillLinks,proto3" json:"mainSkillLinks,omitempty"`
+	AdditionalSkills []*SkillLinks          `protobuf:"bytes,4,rep,name=additionalSkills,proto3" json:"additionalSkills,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -2718,11 +2718,11 @@ const file_api_proto_build_build_proto_rawDesc = "" +
 	"\x05skill\x18\x02 \x01(\v2\f.build.skillR\x05skill\x12\"\n" +
 	"\x05links\x18\x03 \x03(\v2\f.build.skillR\x05links\"\x9c\x01\n" +
 	"\x12skillGroupResponse\x12@\n" +
-	"\x0eMainSkillLinks\x18\x01 \x01(\v2\x18.build.skillLinkResponseR\x0eMainSkillLinks\x12D\n" +
-	"\x10AdditionalSkills\x18\x02 \x03(\v2\x18.build.skillLinkResponseR\x10AdditionalSkills\"\xa1\x01\n" +
+	"\x0emainSkillLinks\x18\x01 \x01(\v2\x18.build.skillLinkResponseR\x0emainSkillLinks\x12D\n" +
+	"\x10additionalSkills\x18\x02 \x03(\v2\x18.build.skillLinkResponseR\x10additionalSkills\"\xa1\x01\n" +
 	"\x17AddSkillsToBuildRequest\x12@\n" +
-	"\x0eMainSkillLinks\x18\x01 \x01(\v2\x18.build.skillLinkResponseR\x0eMainSkillLinks\x12D\n" +
-	"\x10AdditionalSkills\x18\x02 \x03(\v2\x18.build.skillLinkResponseR\x10AdditionalSkills\"\xf5\x03\n" +
+	"\x0emainSkillLinks\x18\x01 \x01(\v2\x18.build.skillLinkResponseR\x0emainSkillLinks\x12D\n" +
+	"\x10additionalSkills\x18\x02 \x03(\v2\x18.build.skillLinkResponseR\x10additionalSkills\"\xf5\x03\n" +
 	"\tBuildList\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12 \n" +
@@ -2818,8 +2818,8 @@ const file_api_proto_build_build_proto_rawDesc = "" +
 	"\x1bAddSkillLinksToBuildRequest\x12\x1a\n" +
 	"\bmemberId\x18\x01 \x01(\tR\bmemberId\x12\x0e\n" +
 	"\x02id\x18\x02 \x01(\tR\x02id\x129\n" +
-	"\x0eMainSkillLinks\x18\x03 \x01(\v2\x11.build.SkillLinksR\x0eMainSkillLinks\x12=\n" +
-	"\x10AdditionalSkills\x18\x04 \x03(\v2\x11.build.SkillLinksR\x10AdditionalSkills\"\x1e\n" +
+	"\x0emainSkillLinks\x18\x03 \x01(\v2\x11.build.SkillLinksR\x0emainSkillLinks\x12=\n" +
+	"\x10additionalSkills\x18\x04 \x03(\v2\x11.build.SkillLinksR\x10additionalSkills\"\x1e\n" +
 	"\x1cAddSkillLinksToBuildResponse\"\xc6\x02\n" +
 	"\x1cUpdateItemSetsToBuildRequest\x12\x1a\n" +
 	"\bmemberId\x18\x01 \x01(\tR\bmemberId\x12\x0e\n" +
@@ -2905,10 +2905,10 @@ var file_api_proto_build_build_proto_goTypes = []any{
 var file_api_proto_build_build_proto_depIdxs = []int32{
 	2,  // 0: build.skillLinkResponse.skill:type_name -> build.skill
 	2,  // 1: build.skillLinkResponse.links:type_name -> build.skill
-	5,  // 2: build.skillGroupResponse.MainSkillLinks:type_name -> build.skillLinkResponse
-	5,  // 3: build.skillGroupResponse.AdditionalSkills:type_name -> build.skillLinkResponse
-	5,  // 4: build.AddSkillsToBuildRequest.MainSkillLinks:type_name -> build.skillLinkResponse
-	5,  // 5: build.AddSkillsToBuildRequest.AdditionalSkills:type_name -> build.skillLinkResponse
+	5,  // 2: build.skillGroupResponse.mainSkillLinks:type_name -> build.skillLinkResponse
+	5,  // 3: build.skillGroupResponse.additionalSkills:type_name -> build.skillLinkResponse
+	5,  // 4: build.AddSkillsToBuildRequest.mainSkillLinks:type_name -> build.skillLinkResponse
+	5,  // 5: build.AddSkillsToBuildRequest.additionalSkills:type_name -> build.skillLinkResponse
 	3,  // 6: build.BuildList.tags:type_name -> build.tag
 	8,  // 7: build.GetBuildsByMemberIdResponse.builds:type_name -> build.BuildList
 	8,  // 8: build.GetCommunityBuildsResponse.builds:type_name -> build.BuildList
@@ -2919,8 +2919,8 @@ var file_api_proto_build_build_proto_depIdxs = []int32{
 	6,  // 13: build.GetBuildInfoForMemberResponse.skills:type_name -> build.skillGroupResponse
 	3,  // 14: build.GetBuildInfoForMemberResponse.tags:type_name -> build.tag
 	0,  // 15: build.GetBuildInfoForMemberResponse.sets:type_name -> build.buildItemSetResponse
-	4,  // 16: build.AddSkillLinksToBuildRequest.MainSkillLinks:type_name -> build.SkillLinks
-	4,  // 17: build.AddSkillLinksToBuildRequest.AdditionalSkills:type_name -> build.SkillLinks
+	4,  // 16: build.AddSkillLinksToBuildRequest.mainSkillLinks:type_name -> build.SkillLinks
+	4,  // 17: build.AddSkillLinksToBuildRequest.additionalSkills:type_name -> build.SkillLinks
 	9,  // 18: build.BuildService.CreateBuild:input_type -> build.CreateBuildRequest
 	11, // 19: build.BuildService.GetBuildsByMemberId:input_type -> build.GetBuildsByMemberIdRequest
 	13, // 20: build.BuildService.GetCommunityBuilds:input_type -> build.GetCommunityBuildsRequest

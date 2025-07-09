@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	serviceName = "tag-service"
+	serviceName = "build-service"
 )
 
 type Client struct {

@@ -202,7 +202,7 @@ func (c *Client) AddSkillLinksToBuild(ctx context.Context, req *pb.AddSkillLinks
 
 	build, err := client.AddSkillLinksToBuild(ctx, req)
 
-	fmt.Printf("Update build %+v through gateway after service discovery\n", build)
+	fmt.Printf("Add skill links to build %+v through gateway after service discovery\n", build)
 
 	return build, nil
 }

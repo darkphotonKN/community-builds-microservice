@@ -276,7 +276,7 @@ func (s *service) CreateBuild(ctx context.Context, req *pb.CreateBuildRequest) (
 		return nil, err
 	}
 
-	TagIds := make([]uuid.UUID, len(req.TagIds))
+	var TagIds []uuid.UUID
 	for _, tagId := range req.TagIds {
 		TagIds = append(TagIds, uuid.Must(uuid.Parse(tagId)))
 	}
@@ -743,7 +743,7 @@ func (s *service) UpdateBuild(ctx context.Context, req *pb.UpdateBuildRequest) (
 	if err != nil {
 		return nil, err
 	}
-	tags := make([]uuid.UUID, len(req.Tags))
+	var tags []uuid.UUID
 	for _, tag := range req.Tags {
 
 		uuidTag, _ := uuid.Parse(tag)

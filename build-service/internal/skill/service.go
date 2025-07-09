@@ -57,7 +57,7 @@ func (s *service) GetSkills(ctx context.Context, req *pb.GetSkillsRequest) (*pb.
 	if err != nil {
 		return nil, err
 	}
-	pbSkills := make([]*pb.Skill, 0, len(*skills))
+	var pbSkills []*pb.Skill
 	for _, skill := range *skills {
 		pbSkills = append(pbSkills, &pb.Skill{
 			Id:        skill.Id.String(),

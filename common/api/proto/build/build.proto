@@ -137,12 +137,12 @@ message skillLinkResponse {
 }
 
 message skillGroupResponse {
-  skillLinkResponse MainSkillLinks = 1;
-  repeated skillLinkResponse AdditionalSkills = 2;
+  skillLinkResponse mainSkillLinks = 1;
+  repeated skillLinkResponse additionalSkills = 2;
 }
 message AddSkillsToBuildRequest {
-  skillLinkResponse MainSkillLinks = 1;
-  repeated skillLinkResponse AdditionalSkills = 2;
+  skillLinkResponse mainSkillLinks = 1;
+  repeated skillLinkResponse additionalSkills = 2;
 }
 
 message BuildList {
@@ -270,8 +270,8 @@ message UpdateBuildResponse {
 message AddSkillLinksToBuildRequest {
   string memberId = 1;
   string id = 2;
-  SkillLinks MainSkillLinks = 3;
-  repeated SkillLinks AdditionalSkills = 4;
+  SkillLinks mainSkillLinks = 3;
+  repeated SkillLinks additionalSkills = 4;
 
 }
 message AddSkillLinksToBuildResponse {
