@@ -17,6 +17,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type service struct {
@@ -233,7 +235,7 @@ func (s *service) GetCommunityBuilds(ctx context.Context, req *pb.GetCommunityBu
 }
 
 func (s *service) CreateBuild(ctx context.Context, req *pb.CreateBuildRequest) (*pb.CreateBuildResponse, error) {
-	fmt.Println("req", req)
+
 	memberId, err := uuid.Parse(req.MemberId)
 	if err != nil {
 		return nil, err
@@ -245,7 +247,6 @@ func (s *service) CreateBuild(ctx context.Context, req *pb.CreateBuildRequest) (
 	}
 	// confirm skill exists
 	_, err = s.skillService.GetSkillById(skillId)
-
 	if err != nil {
 		return nil, fmt.Errorf("main skill id could not be found when attempting to create build for it.")
 	}
@@ -293,13 +294,12 @@ func (s *service) CreateBuild(ctx context.Context, req *pb.CreateBuildRequest) (
 
 	// create build with this skill and for this member
 	buildId, err := s.repo.CreateBuild(memberId, *createBuild)
-	fmt.Println("buildId:", buildId)
 	if err != nil {
 		return nil, err
 	}
 
 	// create build tags
-	var tagIds = make([]uuid.UUID, len(req.TagIds))
+	var tagIds []uuid.UUID
 	for _, tag := range req.TagIds {
 		parseTag, err := uuid.Parse(tag)
 		if err == nil {
@@ -309,7 +309,7 @@ func (s *service) CreateBuild(ctx context.Context, req *pb.CreateBuildRequest) (
 	err = s.repo.CreateBuildTags(*buildId, tagIds)
 
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
 	// create build default set
@@ -318,8 +318,6 @@ func (s *service) CreateBuild(ctx context.Context, req *pb.CreateBuildRequest) (
 	if err != nil {
 		return nil, err
 	}
-
-	// return nil
 
 	// publish rabbit mq message after succesfuly creating
 	marshalledBuild, err := json.Marshal(createBuild)
@@ -460,14 +458,14 @@ func (s *service) CreateDefaultItemSetsToBuild(memberId uuid.UUID, buildId uuid.
 
 	return dbutils.ExecTx(s.db, func(tx *sqlx.Tx) error {
 		// get build and check if it exists
-		_, err := s.GetBuildForMemberById(memberId, buildId)
-
+		build, err := s.GetBuildForMemberById(memberId, buildId)
+		fmt.Println("CreateDefaultItemSetsToBuild", build)
 		if err != nil {
 			return err
 		}
 
 		itemSetId, err := s.repo.CreateBuildItemSetTx(tx, buildId)
-
+		fmt.Println("itemSetId", itemSetId)
 		if err != nil {
 			return err
 		}

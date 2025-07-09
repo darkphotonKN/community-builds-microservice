@@ -25,15 +25,14 @@ func NewHandler(service Service) *Handler {
 }
 
 // --- ADMIN HANDLERS ---
-func (h *Handler) CreateHandler(ctx context.Context, req *pb.CreateTagRequest) (*pb.CreateTagResponse, error) {
+func (h *Handler) Create(ctx context.Context, req *pb.CreateTagRequest) (*pb.CreateTagResponse, error) {
 	return h.service.CreateTag(ctx, req)
 }
 
-func (h *Handler) GetTagsHandler(ctx context.Context, req *pb.GetTagsRequest) (*pb.GetTagsResponse, error) {
+func (h *Handler) GetTags(ctx context.Context, req *pb.GetTagsRequest) (*pb.GetTagsResponse, error) {
 	return h.service.GetTags(ctx, req)
-
 }
 
-func (h *Handler) UpdateTagsHandler(ctx context.Context, req *pb.UpdateTagRequest) (*pb.UpdateTagResponse, error) {
+func (h *Handler) UpdateTags(ctx context.Context, req *pb.UpdateTagRequest) (*pb.UpdateTagResponse, error) {
 	return h.service.UpdateTag(ctx, req)
 }
