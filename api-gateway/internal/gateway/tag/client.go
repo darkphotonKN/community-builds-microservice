@@ -60,7 +60,9 @@ func (c *Client) GetTags(ctx context.Context, req *pb.GetTagsRequest) (*pb.GetTa
 	tags, err := client.GetTags(ctx, req)
 
 	fmt.Printf("Get tags %+v through gateway after service discovery\n", tags)
-
+	if err != nil {
+		return nil, fmt.Errorf("failed to get tags: %w", err)
+	}
 	return tags, nil
 }
 
@@ -81,6 +83,8 @@ func (c *Client) UpdateTag(ctx context.Context, req *pb.UpdateTagRequest) (*pb.U
 	tag, err := client.UpdateTag(ctx, req)
 
 	fmt.Printf("Creating tag %+v through gateway after service discovery\n", tag)
-
+	if err != nil {
+		return nil, fmt.Errorf("failed to update tag: %w", err)
+	}
 	return tag, nil
 }

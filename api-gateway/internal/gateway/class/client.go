@@ -39,6 +39,8 @@ func (c *Client) GetClassesAndAscendancies(ctx context.Context, req *pb.GetClass
 	item, err := client.GetClassesAndAscendancies(ctx, req)
 
 	fmt.Printf("Creating item %+v through gateway after service discovery\n", item)
-
+	if err != nil {
+		return nil, fmt.Errorf("failed to get classes and ascendancies: %w", err)
+	}
 	return item, nil
 }

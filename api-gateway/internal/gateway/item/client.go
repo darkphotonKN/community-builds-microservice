@@ -42,7 +42,9 @@ func (c *Client) CreateItem(ctx context.Context, req *pb.CreateItemRequest) (*pb
 	item, err := client.CreateItem(ctx, req)
 
 	fmt.Printf("Creating item %+v through gateway after service discovery\n", item)
-
+	if err != nil {
+		return nil, fmt.Errorf("failed to create item: %w", err)
+	}
 	return item, nil
 }
 
@@ -69,7 +71,9 @@ func (c *Client) UpdateItem(ctx context.Context, req *pb.UpdateItemRequest) (*pb
 	})
 
 	fmt.Printf("Creating item %+v through gateway after service discovery\n", item)
-
+	if err != nil {
+		return nil, fmt.Errorf("failed to update item: %w", err)
+	}
 	return item, nil
 }
 
@@ -93,7 +97,9 @@ func (c *Client) GetItems(ctx context.Context, req *pb.GetItemsRequest) (*pb.Get
 	})
 
 	fmt.Printf("Get items %+v through gateway after service discovery\n", items)
-
+	if err != nil {
+		return nil, fmt.Errorf("failed to get items: %w", err)
+	}
 	return items, nil
 }
 
@@ -126,6 +132,8 @@ func (c *Client) CreateRareItem(ctx context.Context, req *pb.CreateRareItemReque
 	}
 
 	fmt.Printf("Get items %+v through gateway after service discovery\n", res)
-
+	if err != nil {
+		return nil, fmt.Errorf("failed to create rare item: %w", err)
+	}
 	return res, nil
 }

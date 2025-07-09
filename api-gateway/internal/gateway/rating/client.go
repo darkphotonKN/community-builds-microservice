@@ -39,6 +39,8 @@ func (c *Client) CreateRatingByBuildId(ctx context.Context, req *pb.CreateRating
 	item, err := client.CreateRatingByBuildId(ctx, req)
 
 	fmt.Printf("Creating rating by build id %+v through gateway after service discovery\n", item)
-
+	if err != nil {
+		return nil, fmt.Errorf("failed to create rating by build id: %w", err)
+	}
 	return item, nil
 }

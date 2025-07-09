@@ -87,6 +87,7 @@ func (h *BuildHandler) GetCommunityBuildsHandler(c *gin.Context) {
 * Create build for a signed-in member.
 **/
 func (h *BuildHandler) CreateBuildHandler(c *gin.Context) {
+
 	memberId, _ := c.Get("userId")
 	var createBuildReq CreateBuildRequest
 

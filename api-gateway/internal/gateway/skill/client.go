@@ -40,7 +40,9 @@ func (c *Client) CreateSkill(ctx context.Context, req *pb.CreateSkillRequest) (*
 	skill, err := client.CreateSkill(ctx, req)
 
 	fmt.Printf("Creating skill %+v through gateway after service discovery\n", skill)
-
+	if err != nil {
+		return nil, fmt.Errorf("failed to create skill: %w", err)
+	}
 	return skill, nil
 }
 
@@ -61,6 +63,8 @@ func (c *Client) GetSkills(ctx context.Context, req *pb.GetSkillsRequest) (*pb.G
 	items, err := client.GetSkills(ctx, &pb.GetSkillsRequest{})
 
 	fmt.Printf("Get items %+v through gateway after service discovery\n", items)
-
+	if err != nil {
+		return nil, fmt.Errorf("failed to get skills: %w", err)
+	}
 	return items, nil
 }

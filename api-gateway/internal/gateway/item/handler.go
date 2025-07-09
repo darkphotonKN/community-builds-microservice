@@ -115,3 +115,27 @@ func (h *ItemHandler) CreateRareItemHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully create rare item.", "result": res})
 }
+
+// func (h *ItemHandler) GetAllDataHandler(c *gin.Context) {
+// 	userIdStr, _ := c.Get("userIdStr")
+// 	// update item payload
+// 	var createRareItemRequest pb.CreateRareItemRequest
+// 	if err := c.ShouldBindJSON(&createRareItemRequest); err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when parsing payload as JSON.")})
+// 		return
+// 	}
+
+// 	// Convert REST request to gRPC request
+// 	grpcReq := &pb.CreateRareItemRequest{
+// 		MemberId:     userIdStr.(string),
+// 	}
+
+// 	items, err := h.Client.GetAllDataService(c.Request.Context(), grpcReq)
+
+// 	if err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to retrieve all items: %s\n", err.Error())})
+// 		return
+// 	}
+
+// 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all items.", "result": items})
+// }

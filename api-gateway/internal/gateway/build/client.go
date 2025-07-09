@@ -40,6 +40,10 @@ func (c *Client) CreateBuild(ctx context.Context, req *pb.CreateBuildRequest) (*
 
 	fmt.Printf("Creating build %+v through gateway after service discovery\n", build)
 
+	if err != nil {
+		return nil, fmt.Errorf("failed to create build: %w", err)
+	}
+
 	return build, nil
 }
 
@@ -84,6 +88,10 @@ func (c *Client) GetCommunityBuilds(ctx context.Context, req *pb.GetCommunityBui
 
 	fmt.Printf("Get community builds %+v through gateway after service discovery\n", builds)
 
+	if err != nil {
+		return nil, fmt.Errorf("failed to get community builds: %w", err)
+	}
+
 	return builds, nil
 }
 
@@ -103,6 +111,10 @@ func (c *Client) GetBuildInfo(ctx context.Context, req *pb.GetBuildInfoRequest) 
 	info, err := client.GetBuildInfo(ctx, req)
 
 	fmt.Printf("Get build info %+v through gateway after service discovery\n", info)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get build info: %w", err)
+	}
 
 	return info, nil
 }
@@ -124,6 +136,10 @@ func (c *Client) GetBuildsForMember(ctx context.Context, req *pb.GetBuildsForMem
 
 	fmt.Printf("Get builds %+v through gateway after service discovery\n", builds)
 
+	if err != nil {
+		return nil, fmt.Errorf("failed to get builds for member: %w", err)
+	}
+
 	return builds, nil
 }
 
@@ -143,6 +159,10 @@ func (c *Client) GetBuildInfoForMember(ctx context.Context, req *pb.GetBuildInfo
 	build, err := client.GetBuildInfoForMember(ctx, req)
 
 	fmt.Printf("Get build info %+v through gateway after service discovery\n", build)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get build info for member: %w", err)
+	}
 
 	return build, nil
 }
@@ -164,6 +184,10 @@ func (c *Client) PublishBuild(ctx context.Context, req *pb.PublishBuildRequest) 
 
 	fmt.Printf("Pubishe build %+v through gateway after service discovery\n", build)
 
+	if err != nil {
+		return nil, fmt.Errorf("failed to publish build: %w", err)
+	}
+
 	return build, nil
 }
 
@@ -183,6 +207,10 @@ func (c *Client) UpdateBuild(ctx context.Context, req *pb.UpdateBuildRequest) (*
 	build, err := client.UpdateBuild(ctx, req)
 
 	fmt.Printf("Update build %+v through gateway after service discovery\n", build)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to update build: %w", err)
+	}
 
 	return build, nil
 }
@@ -204,6 +232,10 @@ func (c *Client) AddSkillLinksToBuild(ctx context.Context, req *pb.AddSkillLinks
 
 	fmt.Printf("Add skill links to build %+v through gateway after service discovery\n", build)
 
+	if err != nil {
+		return nil, fmt.Errorf("failed to add skill links to build: %w", err)
+	}
+
 	return build, nil
 }
 
@@ -224,6 +256,10 @@ func (c *Client) UpdateItemSetsToBuild(ctx context.Context, req *pb.UpdateItemSe
 
 	fmt.Printf("Update build %+v through gateway after service discovery\n", build)
 
+	if err != nil {
+		return nil, fmt.Errorf("failed to update item sets to build: %w", err)
+	}
+
 	return build, nil
 }
 
@@ -243,6 +279,10 @@ func (c *Client) DeleteBuildByMember(ctx context.Context, req *pb.DeleteBuildByM
 	build, err := client.DeleteBuildByMember(ctx, req)
 
 	fmt.Printf("Update build %+v through gateway after service discovery\n", build)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to delete build by member: %w", err)
+	}
 
 	return build, nil
 }

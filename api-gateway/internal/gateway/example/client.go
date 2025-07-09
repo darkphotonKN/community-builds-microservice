@@ -62,7 +62,9 @@ func (c *Client) CreateExample(ctx context.Context, req *pb.CreateExampleRequest
 	exampleItem, err := client.CreateExample(ctx, req)
 
 	fmt.Printf("Creating example %+v through gateway after service discovery\n", exampleItem)
-
+	if err != nil {
+		return nil, fmt.Errorf("failed to create example: %w", err)
+	}
 	return exampleItem, nil
 }
 
@@ -81,6 +83,8 @@ func (c *Client) GetExample(ctx context.Context, req *pb.GetExampleRequest) (*pb
 	})
 
 	fmt.Printf("Creating order %+v through gateway after service discovery\n", order)
-
+	if err != nil {
+		return nil, fmt.Errorf("failed to get example: %w", err)
+	}
 	return order, nil
 }
