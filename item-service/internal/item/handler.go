@@ -20,6 +20,9 @@ type Service interface {
 	CreateItemService(ctx context.Context, req *pb.CreateItemRequest) (*pb.CreateItemResponse, error)
 	UpdateItemService(ctx context.Context, req *pb.UpdateItemRequest) (*pb.UpdateItemResponse, error)
 	CreateRareItemService(ctx context.Context, req *pb.CreateRareItemRequest) (*pb.CreateRareItemResponse, error)
+	CrawlingAndAddUniqueItemsService(db *sqlx.DB) error
+	CrawlingAndAddBaseItemsService(db *sqlx.DB) error
+	CrawlingAndAddItemModsService(db *sqlx.DB) error
 }
 
 func NewHandler(service Service) *Handler {

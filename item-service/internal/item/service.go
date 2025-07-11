@@ -48,7 +48,7 @@ func toPtr[T any](v T) *T {
 	return &v
 }
 
-func NewService(repo Repository, ch *amqp.Channel) *service {
+func NewService(repo Repository, ch *amqp.Channel) Service {
 	return &service{
 		Repo:      repo,
 		publishCh: ch,
