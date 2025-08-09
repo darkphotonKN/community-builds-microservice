@@ -143,6 +143,30 @@ func (s *service) LoginMember(ctx context.Context, req *pb.LoginRequest) (*pb.Lo
 
 	fmt.Println("generated tokens:", accessToken)
 
+	// publish to the analytics service to track member signed-in
+	memberSignInEventPayload := commonconstants.MemberSignedInEventPayload{
+		UserID: member.ID.String(),
+	}
+
+	memberSignInEventPayloadJSON, err := json.Marshal(memberSignInEventPayload)
+
+	if err != nil {
+		fmt.Printf("Error when marshalling payload for publishing member.signin event", err)
+	}
+
+	err = s.publishCh.PublishWithContext(
+		ctx,
+		commonconstants.MemberSignedInEvent,
+		"",
+		false,
+		false,
+		amqp.Publishing{
+			ContentType: "application/json",
+			Body:        memberSignInEventPayloadJSON,
+			// persist message
+			DeliveryMode: amqp.Persistent,
+		})
+
 	return &pb.LoginResponse{
 		AccessToken:      accessToken,
 		RefreshToken:     refreshToken,
