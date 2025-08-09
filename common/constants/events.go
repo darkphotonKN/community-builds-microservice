@@ -9,6 +9,7 @@ const (
 
 	// Member Events
 	MemberSignedUpEvent = "member.signedup"       // when user creates account
+	MemberSignedInEvent = "member.signedin"       // when user signs into their account
 	PasswordResetEvent  = "member.password_reset" // when password reset is requested
 
 	// Build events
@@ -39,6 +40,18 @@ type MemberSignedUpEventPayload struct {
 	Name       string `json:"name"`
 	Email      string `json:"email"`
 	SignedUpAt string `json:"signedUpAt"`
+}
+
+/**
+* MemberSignedInEventPayload
+*
+* Published by auth-service.
+* Consumed by:
+* - notification-service
+* - analytics-service
+**/
+type MemberSignedInEventPayload struct {
+	UserID string `json:"userId"`
 }
 
 /*

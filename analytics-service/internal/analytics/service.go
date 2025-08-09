@@ -36,14 +36,14 @@ func (s *service) CreateMemberActivityEvent(req *CreateMemberActivityEvent) (*Me
 		Date:         time.Now().Truncate(24 * time.Hour),
 	}
 
-	newMemberActivityEvent, err := s.repo.CreateMemberActivityEvent(entity)
+	newEvent, err := s.repo.CreateMemberActivityEvent(entity)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Println("MemberActivityEvent analytics was created:", newMemberActivityEvent)
+	fmt.Println("MemberActivityEvent analytics was created:", newEvent)
 
-	return newMemberActivityEvent, nil
+	return newEvent, nil
 }
 
 type EventType string
@@ -57,7 +57,7 @@ type ActivityType string
 
 const (
 	ActivityTypeMemberCreated  ActivityType = "member_created_activity"
-	ActivityTypeMemberLoggedOn ActivityType = "member_logged_on_activity"
+	ActivityTypeMemberSignedIn ActivityType = "member_signed_in_activity"
 	ActivityTypeBuildViewed    ActivityType = "build_viewed_activity"
 )
 
@@ -68,7 +68,7 @@ func (s *service) GetEventType(activityType ActivityType) (EventType, error) {
 	eventMap := map[ActivityType]EventType{
 		// member
 		ActivityTypeMemberCreated:  EventTypeMember,
-		ActivityTypeMemberLoggedOn: EventTypeMember,
+		ActivityTypeMemberSignedIn: EventTypeMember,
 
 		// build
 		ActivityTypeBuildViewed: EventTypeBuild,

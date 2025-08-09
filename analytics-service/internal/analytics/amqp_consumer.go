@@ -67,3 +67,47 @@ func (c *consumer) memberSignedUpEventListener() {
 		})
 	}
 }
+
+func (c *consumer) memberSignedInEventListener() {
+	queueName := fmt.Sprintf("analytics.%s", commonconstants.MemberSignedInEvent)
+
+	queue, err := c.publishCh.QueueDeclare(queueName, true, false, false, false, nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// bind to the exchange that will publish member.signedin events
+	err = c.publishCh.QueueBind(
+		queue.Name,
+		"",
+		commonconstants.MemberSignedInEvent,
+		false,
+		nil,
+	)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// consume messages, delivers messages from the queue
+	msgs, err := c.publishCh.Consume(queue.Name, "", true, false, false, false, nil)
+
+	// start a goroutine to listen for events
+	for msg := range msgs {
+		var memberSignedIn *commonconstants.MemberSignedInEventPayload
+
+		err := json.Unmarshal(msg.Body, &memberSignedIn)
+		if err != nil {
+			fmt.Printf("Error when unmarshalling member.signedin event body: %s\n", err.Error())
+		}
+
+		fmt.Printf("\nsuccessfully received event message: %+v\n\n", memberSignedIn)
+
+		// create analytics event
+		_, err = c.service.CreateMemberActivityEvent(&CreateMemberActivityEvent{
+			MemberID:     memberSignedIn.UserID,
+			ActivityType: ActivityTypeMemberSignedIn,
+		})
+	}
+}
