@@ -39,4 +39,7 @@ type ItemClient interface {
 	UpdateItem(ctx context.Context, req *pb.UpdateItemRequest) (*pb.UpdateItemResponse, error)
 	GetItems(ctx context.Context, req *pb.GetItemsRequest) (*pb.GetItemsResponse, error)
 	CreateRareItem(ctx context.Context, req *pb.CreateRareItemRequest) (*pb.CreateRareItemResponse, error)
+	GetBaseItems(ctx context.Context, req *pb.GetBaseItemsRequest) (*pb.GetBaseItemsResponse, error)
+	GetItemMods(ctx context.Context, req *pb.GetItemModsRequest) (*pb.GetItemModsResponse, error)
+	GetMemberRareItems(ctx context.Context, req *pb.GetMemberRareItemsRequest) (*pb.GetMemberRareItemsResponse, error)
 }

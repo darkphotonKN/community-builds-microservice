@@ -163,7 +163,7 @@ func (s *service) GetBuildsForMember(ctx context.Context, req *pb.GetBuildsForMe
 // }
 
 const (
-	maxBuildCount = 10
+	maxBuildCount = 40
 )
 
 /**

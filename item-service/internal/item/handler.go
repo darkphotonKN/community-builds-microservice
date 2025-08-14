@@ -20,6 +20,9 @@ type Service interface {
 	CreateItemService(ctx context.Context, req *pb.CreateItemRequest) (*pb.CreateItemResponse, error)
 	UpdateItemService(ctx context.Context, req *pb.UpdateItemRequest) (*pb.UpdateItemResponse, error)
 	CreateRareItemService(ctx context.Context, req *pb.CreateRareItemRequest) (*pb.CreateRareItemResponse, error)
+	GetBaseItems(ctx context.Context, req *pb.GetBaseItemsRequest) (*pb.GetBaseItemsResponse, error)
+	GetItemMods(ctx context.Context, req *pb.GetItemModsRequest) (*pb.GetItemModsResponse, error)
+	GetMemberRareItems(ctx context.Context, req *pb.GetMemberRareItemsRequest) (*pb.GetMemberRareItemsResponse, error)
 	CrawlingAndAddUniqueItemsService(db *sqlx.DB) error
 	CrawlingAndAddBaseItemsService(db *sqlx.DB) error
 	CrawlingAndAddItemModsService(db *sqlx.DB) error
@@ -43,4 +46,16 @@ func (h *Handler) UpdateItem(ctx context.Context, req *pb.UpdateItemRequest) (*p
 
 func (h *Handler) CreateRareItem(ctx context.Context, req *pb.CreateRareItemRequest) (*pb.CreateRareItemResponse, error) {
 	return h.service.CreateRareItemService(ctx, req)
+}
+
+func (h *Handler) GetBaseItems(ctx context.Context, req *pb.GetBaseItemsRequest) (*pb.GetBaseItemsResponse, error) {
+	return h.service.GetBaseItems(ctx, req)
+}
+
+func (h *Handler) GetItemMods(ctx context.Context, req *pb.GetItemModsRequest) (*pb.GetItemModsResponse, error) {
+	return h.service.GetItemMods(ctx, req)
+}
+
+func (h *Handler) GetMemberRareItems(ctx context.Context, req *pb.GetMemberRareItemsRequest) (*pb.GetMemberRareItemsResponse, error) {
+	return h.service.GetMemberRareItems(ctx, req)
 }

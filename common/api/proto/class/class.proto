@@ -28,7 +28,7 @@ message Ascendancy {
 
 }
 message GetClassesAndAscendanciesRequest {
-  string MemberId = 1;
+  // string MemberId = 1;
 }
 
 message GetClassesAndAscendanciesResponse {

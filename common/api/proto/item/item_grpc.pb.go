@@ -25,6 +25,9 @@ const (
 	ItemService_GenerateUniqueItems_FullMethodName = "/itemgrpc.ItemService/GenerateUniqueItems"
 	ItemService_UpdateItem_FullMethodName          = "/itemgrpc.ItemService/UpdateItem"
 	ItemService_CreateRareItem_FullMethodName      = "/itemgrpc.ItemService/CreateRareItem"
+	ItemService_GetBaseItems_FullMethodName        = "/itemgrpc.ItemService/GetBaseItems"
+	ItemService_GetItemMods_FullMethodName         = "/itemgrpc.ItemService/GetItemMods"
+	ItemService_GetMemberRareItems_FullMethodName  = "/itemgrpc.ItemService/GetMemberRareItems"
 )
 
 // ItemServiceClient is the client API for ItemService service.
@@ -36,6 +39,9 @@ type ItemServiceClient interface {
 	GenerateUniqueItems(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GenerateUniqueItemsResponse, error)
 	UpdateItem(ctx context.Context, in *UpdateItemRequest, opts ...grpc.CallOption) (*UpdateItemResponse, error)
 	CreateRareItem(ctx context.Context, in *CreateRareItemRequest, opts ...grpc.CallOption) (*CreateRareItemResponse, error)
+	GetBaseItems(ctx context.Context, in *GetBaseItemsRequest, opts ...grpc.CallOption) (*GetBaseItemsResponse, error)
+	GetItemMods(ctx context.Context, in *GetItemModsRequest, opts ...grpc.CallOption) (*GetItemModsResponse, error)
+	GetMemberRareItems(ctx context.Context, in *GetMemberRareItemsRequest, opts ...grpc.CallOption) (*GetMemberRareItemsResponse, error)
 }
 
 type itemServiceClient struct {
@@ -96,6 +102,36 @@ func (c *itemServiceClient) CreateRareItem(ctx context.Context, in *CreateRareIt
 	return out, nil
 }
 
+func (c *itemServiceClient) GetBaseItems(ctx context.Context, in *GetBaseItemsRequest, opts ...grpc.CallOption) (*GetBaseItemsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetBaseItemsResponse)
+	err := c.cc.Invoke(ctx, ItemService_GetBaseItems_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *itemServiceClient) GetItemMods(ctx context.Context, in *GetItemModsRequest, opts ...grpc.CallOption) (*GetItemModsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetItemModsResponse)
+	err := c.cc.Invoke(ctx, ItemService_GetItemMods_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *itemServiceClient) GetMemberRareItems(ctx context.Context, in *GetMemberRareItemsRequest, opts ...grpc.CallOption) (*GetMemberRareItemsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetMemberRareItemsResponse)
+	err := c.cc.Invoke(ctx, ItemService_GetMemberRareItems_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ItemServiceServer is the server API for ItemService service.
 // All implementations must embed UnimplementedItemServiceServer
 // for forward compatibility.
@@ -105,6 +141,9 @@ type ItemServiceServer interface {
 	GenerateUniqueItems(context.Context, *emptypb.Empty) (*GenerateUniqueItemsResponse, error)
 	UpdateItem(context.Context, *UpdateItemRequest) (*UpdateItemResponse, error)
 	CreateRareItem(context.Context, *CreateRareItemRequest) (*CreateRareItemResponse, error)
+	GetBaseItems(context.Context, *GetBaseItemsRequest) (*GetBaseItemsResponse, error)
+	GetItemMods(context.Context, *GetItemModsRequest) (*GetItemModsResponse, error)
+	GetMemberRareItems(context.Context, *GetMemberRareItemsRequest) (*GetMemberRareItemsResponse, error)
 	mustEmbedUnimplementedItemServiceServer()
 }
 
@@ -129,6 +168,15 @@ func (UnimplementedItemServiceServer) UpdateItem(context.Context, *UpdateItemReq
 }
 func (UnimplementedItemServiceServer) CreateRareItem(context.Context, *CreateRareItemRequest) (*CreateRareItemResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateRareItem not implemented")
+}
+func (UnimplementedItemServiceServer) GetBaseItems(context.Context, *GetBaseItemsRequest) (*GetBaseItemsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBaseItems not implemented")
+}
+func (UnimplementedItemServiceServer) GetItemMods(context.Context, *GetItemModsRequest) (*GetItemModsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetItemMods not implemented")
+}
+func (UnimplementedItemServiceServer) GetMemberRareItems(context.Context, *GetMemberRareItemsRequest) (*GetMemberRareItemsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMemberRareItems not implemented")
 }
 func (UnimplementedItemServiceServer) mustEmbedUnimplementedItemServiceServer() {}
 func (UnimplementedItemServiceServer) testEmbeddedByValue()                     {}
@@ -241,6 +289,60 @@ func _ItemService_CreateRareItem_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ItemService_GetBaseItems_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBaseItemsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ItemServiceServer).GetBaseItems(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ItemService_GetBaseItems_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ItemServiceServer).GetBaseItems(ctx, req.(*GetBaseItemsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ItemService_GetItemMods_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetItemModsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ItemServiceServer).GetItemMods(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ItemService_GetItemMods_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ItemServiceServer).GetItemMods(ctx, req.(*GetItemModsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ItemService_GetMemberRareItems_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMemberRareItemsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ItemServiceServer).GetMemberRareItems(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ItemService_GetMemberRareItems_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ItemServiceServer).GetMemberRareItems(ctx, req.(*GetMemberRareItemsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ItemService_ServiceDesc is the grpc.ServiceDesc for ItemService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -267,6 +369,18 @@ var ItemService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateRareItem",
 			Handler:    _ItemService_CreateRareItem_Handler,
+		},
+		{
+			MethodName: "GetBaseItems",
+			Handler:    _ItemService_GetBaseItems_Handler,
+		},
+		{
+			MethodName: "GetItemMods",
+			Handler:    _ItemService_GetItemMods_Handler,
+		},
+		{
+			MethodName: "GetMemberRareItems",
+			Handler:    _ItemService_GetMemberRareItems_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

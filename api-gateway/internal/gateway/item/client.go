@@ -131,9 +131,79 @@ func (c *Client) CreateRareItem(ctx context.Context, req *pb.CreateRareItemReque
 		}
 	}
 
-	fmt.Printf("Get items %+v through gateway after service discovery\n", res)
+	// fmt.Printf("Get items %+v through gateway after service discovery\n", res)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create rare item: %w", err)
 	}
+	return res, nil
+}
+
+func (c *Client) GetBaseItems(ctx context.Context, req *pb.GetBaseItemsRequest) (*pb.GetBaseItemsResponse, error) {
+
+	// connection instance created through service discovery first
+	// searches for the service registered as "orders"
+	conn, err := discovery.ServiceConnection(ctx, serviceName, c.registry)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to item service: %w", err)
+	}
+	defer conn.Close()
+
+	client := pb.NewItemServiceClient(conn)
+
+	// create client to interface with through service discovery connection
+	items, err := client.GetBaseItems(ctx, req)
+
+	// fmt.Printf("Get items %+v through gateway after service discovery\n", items)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get items: %w", err)
+	}
+	return items, nil
+}
+
+func (c *Client) GetItemMods(ctx context.Context, req *pb.GetItemModsRequest) (*pb.GetItemModsResponse, error) {
+
+	// connection instance created through service discovery first
+	// searches for the service registered as "orders"
+	conn, err := discovery.ServiceConnection(ctx, serviceName, c.registry)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to item service: %w", err)
+	}
+	defer conn.Close()
+
+	client := pb.NewItemServiceClient(conn)
+
+	// create client to interface with through service discovery connection
+	items, err := client.GetItemMods(ctx, req)
+
+	// fmt.Printf("Get item mods %+v through gateway after service discovery\n", items)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get item mods: %w", err)
+	}
+	return items, nil
+}
+
+func (c *Client) GetMemberRareItems(ctx context.Context, req *pb.GetMemberRareItemsRequest) (*pb.GetMemberRareItemsResponse, error) {
+
+	// connection instance created through service discovery first
+	// searches for the service registered as "orders"
+	conn, err := discovery.ServiceConnection(ctx, serviceName, c.registry)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to item service: %w", err)
+	}
+	defer conn.Close()
+
+	client := pb.NewItemServiceClient(conn)
+
+	// create client to interface with through service discovery connection
+	res, err := client.GetMemberRareItems(ctx, req)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get member rare item: %w", err)
+	}
+
+	fmt.Printf("Get member rare item %+v through gateway after service discovery\n", res)
 	return res, nil
 }

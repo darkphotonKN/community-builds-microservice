@@ -151,9 +151,9 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	// itemRoutes.PATCH("/:id", itemHandler.UpdateItemsHandler)
 	// itemRoutes.POST("/rare-item", itemHandler.CreateRareItemHandler)
 
-	// itemRoutes.GET("/base-items", itemHandler.GetBaseItemsHandler)
-	// itemRoutes.GET("/item-mods", itemHandler.GetItemModsHandler)
-	// itemRoutes.GET("/member-rare-item", itemHandler.GetMemberRareItemHandler)
+	itemRoutes.GET("/base-items", itemHandler.GetBaseItemsHandler)
+	itemRoutes.GET("/item-mods", itemHandler.GetItemModsHandler)
+	itemRoutes.GET("/member-rare-item", itemHandler.GetMemberRareItemsHandler)
 
 	// // base-item, items. skills,
 	// itemRoutes.GET("/all-data", itemHandler.GetAllDataHandler)

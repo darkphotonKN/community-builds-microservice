@@ -199,7 +199,6 @@ func (x *Ascendancy) GetUpdatedAt() string {
 
 type GetClassesAndAscendanciesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	MemberId      string                 `protobuf:"bytes,1,opt,name=MemberId,proto3" json:"MemberId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -232,13 +231,6 @@ func (x *GetClassesAndAscendanciesRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use GetClassesAndAscendanciesRequest.ProtoReflect.Descriptor instead.
 func (*GetClassesAndAscendanciesRequest) Descriptor() ([]byte, []int) {
 	return file_api_proto_class_class_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *GetClassesAndAscendanciesRequest) GetMemberId() string {
-	if x != nil {
-		return x.MemberId
-	}
-	return ""
 }
 
 type GetClassesAndAscendanciesResponse struct {
@@ -313,9 +305,8 @@ const file_api_proto_class_class_proto_rawDesc = "" +
 	"\vdescription\x18\x04 \x01(\tR\vdescription\x12\x1a\n" +
 	"\bimageUrl\x18\x05 \x01(\tR\bimageUrl\x12\x1c\n" +
 	"\tcreatedAt\x18\x06 \x01(\tR\tcreatedAt\x12\x1c\n" +
-	"\tupdatedAt\x18\a \x01(\tR\tupdatedAt\">\n" +
-	" GetClassesAndAscendanciesRequest\x12\x1a\n" +
-	"\bMemberId\x18\x01 \x01(\tR\bMemberId\"\x82\x01\n" +
+	"\tupdatedAt\x18\a \x01(\tR\tupdatedAt\"\"\n" +
+	" GetClassesAndAscendanciesRequest\"\x82\x01\n" +
 	"!GetClassesAndAscendanciesResponse\x12&\n" +
 	"\aclasses\x18\x01 \x03(\v2\f.class.ClassR\aclasses\x125\n" +
 	"\fascendancies\x18\x02 \x03(\v2\x11.class.AscendancyR\fascendancies2\x80\x01\n" +

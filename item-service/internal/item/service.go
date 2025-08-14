@@ -32,6 +32,9 @@ type service struct {
 
 type Repository interface {
 	GetItems(slot string) (*[]models.Item, error)
+	GetBaseItems() (*[]models.BaseItem, error)
+	GetItemMods() (*[]models.ItemMod, error)
+	GetMemberRareItems(id uuid.UUID) (*[]models.Item, error)
 	CreateItem(createItem *CreateItemRequest) error
 	CreateRareItem(createRareItem *CreateRareItemReq) error
 	CreateRareItemToList(createRareItemReq *CreateRareItemReq) error
@@ -106,10 +109,144 @@ func (s *service) GetItemsService(ctx context.Context, req *pb.GetItemsRequest) 
 	}
 
 	return &pb.GetItemsResponse{
-		Message: "成功取得items",
-		Items:   pbItems,
+		Items: pbItems,
 	}, nil
 }
+
+func (s *service) GetBaseItems(ctx context.Context, req *pb.GetBaseItemsRequest) (*pb.GetBaseItemsResponse, error) {
+
+	items, err := s.Repo.GetBaseItems()
+
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "取得 items 時發生錯誤: %v", err)
+	}
+
+	var pbItems []*pb.BaseItem
+
+	for _, item := range *items {
+		pbItems = append(pbItems, &pb.BaseItem{
+			Id:                   item.ID.String(),
+			ImageUrl:             item.ImageUrl,
+			Category:             item.Category,
+			Class:                item.Class,
+			Name:                 item.Name,
+			Type:                 item.Type,
+			EquipType:            item.EquipType,
+			IsTwoHands:           item.IsTwoHands,
+			Slot:                 item.Slot,
+			RequiredLevel:        item.RequiredLevel,
+			RequiredStrength:     item.RequiredStrength,
+			RequiredDexterity:    item.RequiredDexterity,
+			RequiredIntelligence: item.RequiredIntelligence,
+			Armour:               item.Armour,
+			EnergyShield:         item.EnergyShield,
+			Evasion:              item.Evasion,
+			Ward:                 item.Ward,
+			Damage:               item.Damage,
+			Aps:                  item.APS,
+			Crit:                 item.Crit,
+			DPS:                  item.DPS,
+			Implicit:             item.Implicit,
+			CreatedAt:            item.CreatedAt.Format(time.RFC3339),
+			UpdatedAt:            item.UpdatedAt.Format(time.RFC3339),
+		})
+	}
+
+	return &pb.GetBaseItemsResponse{
+		BaseItems: pbItems,
+	}, nil
+}
+
+func (s *service) GetItemMods(ctx context.Context, req *pb.GetItemModsRequest) (*pb.GetItemModsResponse, error) {
+
+	itemMods, err := s.Repo.GetItemMods()
+
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "取得 items 時發生錯誤: %v", err)
+	}
+
+	var pbItemMods []*pb.ItemMod
+
+	for _, itemMod := range *itemMods {
+		pbItemMods = append(pbItemMods, &pb.ItemMod{
+			Id:        itemMod.ID.String(),
+			Affix:     itemMod.Affix,
+			Name:      itemMod.Name,
+			Level:     itemMod.Level,
+			Stat:      itemMod.Stat,
+			Tags:      itemMod.Tags,
+			CreatedAt: itemMod.CreatedAt.Format(time.RFC3339),
+			UpdatedAt: itemMod.UpdatedAt.Format(time.RFC3339),
+		})
+	}
+
+	return &pb.GetItemModsResponse{
+		ItemMods: pbItemMods,
+	}, nil
+}
+
+func (s *service) GetMemberRareItems(ctx context.Context, req *pb.GetMemberRareItemsRequest) (*pb.GetMemberRareItemsResponse, error) {
+
+	memberId, err := uuid.Parse(req.MemberId)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "無效的 ID 格式: %v", err)
+	}
+	fmt.Println("Getting member rare items for memberId:", memberId)
+	items, err := s.Repo.GetMemberRareItems(memberId)
+
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "取得 items 時發生錯誤: %v", err)
+	}
+
+	var pbRareItems []*pb.Item
+
+	for _, item := range *items {
+		pbRareItems = append(pbRareItems, &pb.Item{
+			Id:                   toPtr(item.ID.String()),
+			MemberId:             item.MemberID.String(),
+			BaseItemId:           item.BaseItemId.String(),
+			ImageUrl:             item.ImageUrl,
+			Category:             item.Category,
+			Class:                item.Class,
+			Name:                 item.Name,
+			Type:                 item.Type,
+			Description:          item.Description,
+			UniqueItem:           item.UniqueItem,
+			Slot:                 item.Slot,
+			RequiredLevel:        toPtr(item.RequiredLevel),
+			RequiredStrength:     toPtr(item.RequiredStrength),
+			RequiredDexterity:    toPtr(item.RequiredDexterity),
+			RequiredIntelligence: toPtr(item.RequiredIntelligence),
+			Armour:               toPtr(item.Armour),
+			EnergyShield:         toPtr(item.EnergyShield),
+			Evasion:              toPtr(item.Evasion),
+			Block:                toPtr(item.Block),
+			Ward:                 toPtr(item.Ward),
+			Damage:               toPtr(item.Damage),
+			APS:                  toPtr(item.APS),
+			Crit:                 toPtr(item.Crit),
+			PDPS:                 toPtr(item.PDPS),
+			EDPS:                 toPtr(item.EDPS),
+			DPS:                  toPtr(item.DPS),
+			Life:                 toPtr(item.Life),
+			Mana:                 toPtr(item.Mana),
+			Duration:             toPtr(item.Duration),
+			Usage:                toPtr(item.Usage),
+			Capacity:             toPtr(item.Capacity),
+			Additional:           toPtr(item.Additional),
+			Stats:                item.Stats,
+			Implicit:             item.Implicit,
+			CreatedAt:            toPtr(item.CreatedAt.Format(time.RFC3339)),
+			UpdatedAt:            toPtr(item.UpdatedAt.Format(time.RFC3339)),
+		})
+	}
+
+	fmt.Println("Returning member rare items:", pbRareItems)
+	return &pb.GetMemberRareItemsResponse{
+		Items: pbRareItems,
+	}, nil
+}
+
 func (s *service) CreateItemService(ctx context.Context, req *pb.CreateItemRequest) (*pb.CreateItemResponse, error) {
 
 	err := s.Repo.CreateItem(&CreateItemRequest{

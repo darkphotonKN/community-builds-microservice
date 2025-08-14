@@ -59,7 +59,7 @@ func (h *ItemHandler) GetItemsHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to create item: %s", err.Error())})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusCreated, "message": "Successfully created item.", "item": item})
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully created item.", "result": item})
 
 }
 
@@ -84,7 +84,7 @@ func (h *ItemHandler) UpdateItemHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to create item: %s", err.Error())})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"statusCode": http.StatusCreated, "message": "Successfully created item.", "item": item})
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully created item.", "result": item})
 
 }
 
@@ -114,6 +114,50 @@ func (h *ItemHandler) CreateRareItemHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully create rare item.", "result": res})
+}
+
+func (h *ItemHandler) GetBaseItemsHandler(c *gin.Context) {
+
+	items, err := h.Client.GetBaseItems(c.Request.Context(), &pb.GetBaseItemsRequest{})
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to retrieve all items: %s\n", err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all base items.", "result": items})
+}
+
+func (h *ItemHandler) GetItemModsHandler(c *gin.Context) {
+
+	items, err := h.Client.GetItemMods(c.Request.Context(), &pb.GetItemModsRequest{})
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to retrieve all items: %s\n", err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all item mods.", "result": items})
+}
+
+func (h *ItemHandler) GetMemberRareItemsHandler(c *gin.Context) {
+	userIdStr, ok := c.Get("userIdStr")
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"statusCode": http.StatusUnauthorized, "message": "Unauthorized"})
+		return
+	}
+	payload := &pb.GetMemberRareItemsRequest{
+		MemberId: userIdStr.(string),
+	}
+
+	items, err := h.Client.GetMemberRareItems(c.Request.Context(), payload)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": fmt.Sprintf("Error when attempting to retrieve all items: %s\n", err.Error())})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"statusCode": http.StatusOK, "message": "Successfully retrieved all item mods.", "result": items})
 }
 
 // func (h *ItemHandler) GetAllDataHandler(c *gin.Context) {

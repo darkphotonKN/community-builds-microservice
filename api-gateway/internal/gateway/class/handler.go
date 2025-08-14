@@ -22,12 +22,15 @@ func NewHandler(client ClassClient) *ClassHandler {
 * Retrievs all classes and ascendancies.
 **/
 func (h *ClassHandler) GetClassesAndAscendanciesHandler(c *gin.Context) {
-
-	userIdStr, _ := c.Get("userIdStr")
-
+	// userIdStr, ok := c.Get("userIdStr")
+	// fmt.Printf("User ID: %s\n", userIdStr)
+	// if !ok {
+	// 	c.JSON(http.StatusUnauthorized, gin.H{"statusCode": http.StatusUnauthorized, "message": "Unauthorized"})
+	// 	return
+	// }
 	// Convert REST request to gRPC request
 	grpcReq := &pb.GetClassesAndAscendanciesRequest{
-		MemberId: userIdStr.(string),
+		// MemberId: userIdStr.(string),
 	}
 	response, err := h.Client.GetClassesAndAscendancies(c.Request.Context(), grpcReq)
 

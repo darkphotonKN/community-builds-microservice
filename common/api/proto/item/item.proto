@@ -12,6 +12,9 @@ service ItemService {
   rpc GenerateUniqueItems(google.protobuf.Empty) returns (GenerateUniqueItemsResponse) {}
   rpc UpdateItem(UpdateItemRequest) returns (UpdateItemResponse) {}
   rpc CreateRareItem(CreateRareItemRequest) returns (CreateRareItemResponse) {}
+  rpc GetBaseItems(GetBaseItemsRequest) returns (GetBaseItemsResponse) {}
+  rpc GetItemMods(GetItemModsRequest) returns (GetItemModsResponse) {}
+  rpc GetMemberRareItems(GetMemberRareItemsRequest) returns (GetMemberRareItemsResponse) {}
 }
 
 message Item {
@@ -61,6 +64,46 @@ message Item {
   optional string updatedAt = 37;
 }
 
+message BaseItem {
+  string id = 1;
+  string imageUrl = 2;
+  string category = 3;
+  string class = 4;
+  string name = 5;
+  string type = 6;
+  string equipType = 7;
+  bool isTwoHands = 8;
+  string slot = 9;
+  string requiredLevel = 10;
+  string requiredStrength = 11;
+  string requiredDexterity = 12;
+  string requiredIntelligence = 13;
+  string damage = 14;
+  string aps = 15;
+  string crit = 16;
+  string DPS = 17;
+  string armour = 18;
+  string evasion = 19;
+  string energyShield = 20;
+  string ward = 21;
+  repeated string implicit = 22;
+  string updatedAt = 23;
+  string createdAt = 24;
+
+}
+
+message ItemMod {
+  string id = 1;
+  string affix = 2;
+  string name = 3;
+  string level = 4;
+  string stat = 5;
+  string tags = 6;
+  string createdAt = 7;
+  string updatedAt = 8;
+
+}
+
 message CreateItemRequest {
   string id = 1;
   string category = 2;
@@ -81,8 +124,7 @@ message GetItemsRequest {
 }
 
 message GetItemsResponse {
-  string message = 1;
-  repeated Item items = 2; // array of items
+  repeated Item items = 1; // array of items
 }
 
 message GenerateUniqueItemsResponse {
@@ -114,4 +156,25 @@ message CreateRareItemRequest {
 
 message CreateRareItemResponse {
   string message = 1;
+}
+
+message GetBaseItemsRequest {
+}
+
+message GetBaseItemsResponse {
+  repeated BaseItem baseItems = 1;
+}
+
+message GetItemModsRequest {}
+
+message GetItemModsResponse {
+  repeated ItemMod itemMods = 1;
+}
+
+message GetMemberRareItemsRequest {
+  string memberId = 1;
+}
+
+message GetMemberRareItemsResponse {
+  repeated Item items = 1;
 }

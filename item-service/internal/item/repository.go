@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
 	"github.com/darkphotonKN/community-builds-microservice/item-service/internal/models"
 	"github.com/darkphotonKN/community-builds-microservice/item-service/internal/utils/errorutils"
 	"github.com/google/uuid"
@@ -688,4 +689,78 @@ func (r *repository) AddItemMods(tx *sqlx.Tx, items *[]models.ItemMod) error {
 	}
 
 	return nil
+}
+
+func (r *repository) GetBaseItems() (*[]models.BaseItem, error) {
+	var items []models.BaseItem
+
+	query := `
+	SELECT * FROM base_items
+	`
+
+	err := r.db.Select(&items, query)
+
+	if err != nil {
+		return nil, commonhelpers.AnalyzeDBErr(err)
+	}
+
+	return &items, nil
+}
+
+func (r *repository) GetItemMods() (*[]models.ItemMod, error) {
+	var items []models.ItemMod
+
+	query := `
+	SELECT * FROM item_mods
+	`
+
+	err := r.db.Select(&items, query)
+
+	if err != nil {
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	return &items, nil
+}
+
+func (r *repository) GetMemberRareItems(id uuid.UUID) (*[]models.Item, error) {
+	var items []models.Item
+	query := `
+	SELECT 
+		id,
+		image_url, 
+		name, 
+		category, 
+		type, 
+		slot, 
+		unique_item, 
+		class, 
+		stats,
+		required_level,
+		required_intelligence,
+		required_strength,
+		required_dexterity,
+		damage,
+		crit,
+		aps,
+		dps,
+		implicit,
+		armour,
+		evasion,
+		energy_shield,
+		ward,
+		COALESCE(description, '') AS description
+	FROM items
+	WHERE member_id = $1
+	`
+
+	err := r.db.Select(&items, query, id)
+
+	if err != nil {
+		return nil, errorutils.AnalyzeDBErr(err)
+	}
+
+	fmt.Println("GetMemberRareItems items:", items)
+
+	return &items, nil
 }
