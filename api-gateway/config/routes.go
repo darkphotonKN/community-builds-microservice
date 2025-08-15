@@ -10,6 +10,7 @@ import (
 	authService "github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/auth"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/build"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/class"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/composite"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/example"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/item"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/notification"
@@ -186,6 +187,15 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	protectedBuildRoutes.PATCH(":id/update-set", buildHandler.UpdateItemSetsToBuildHandler)
 	protectedBuildRoutes.DELETE("/:id", buildHandler.DeleteBuildForMemberHandler)
 
+	// --- Composite ---
+
+	// -- Composite Setup --
+	compositeClient := composite.NewClient(registry)
+	compositeHandler := composite.NewHandler(compositeClient)
+
+	compositeRoutes := api.Group("/composite")
+
+	compositeRoutes.GET("/game-data", compositeHandler.GetGameDataHandler)
 	// --- TAG ---
 
 	// -- Tag Setup --
