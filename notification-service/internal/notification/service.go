@@ -100,6 +100,9 @@ func (s *service) GetAllByMemberId(ctx context.Context, request *pb.GetNotificat
 	notificationsData := make([]*pb.Notification, len(notifications))
 
 	for index, notification := range notifications {
+
+		fmt.Printf("\nnotifications Read Field from DB, service layer before constructing grpc version: %+v\n\n", notification.Read)
+
 		notificationsData[index] = &pb.Notification{
 			Id:        notification.ID.String(),
 			MemberId:  notification.MemberID.String(),
@@ -114,6 +117,15 @@ func (s *service) GetAllByMemberId(ctx context.Context, request *pb.GetNotificat
 		if notification.SourceID != nil {
 			notificationsData[index].SourceId = notification.SourceID.String()
 		}
+	}
+
+	// TEST: remove after
+
+	fmt.Printf("\nAll Notifications from DB, service layer after constructing grpc version: %+v\n\n", notificationsData)
+
+	for _, notification := range notificationsData {
+		fmt.Printf("\nsingle Notification from DB, service layer after constructing grpc version, READ FIELD: %+v\n\n", notification.Read)
+
 	}
 
 	notificationsResponse := &pb.GetNotificationsResponse{
