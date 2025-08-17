@@ -112,7 +112,7 @@ func (h *Handler) ReadNotificationsByMemberIdHandler(c *gin.Context) {
 		return
 	}
 
-	notificationIdParam, exists := c.Get("notificationId")
+	notificationIdParam := c.Param("notificationId")
 
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -124,7 +124,7 @@ func (h *Handler) ReadNotificationsByMemberIdHandler(c *gin.Context) {
 
 	req := &pb.ReadNotificationRequest{
 		MemberId:       memberIdStr.(string),
-		NotificationId: notificationIdParam.(string),
+		NotificationId: notificationIdParam,
 	}
 
 	response, err := h.client.ReadNotifications(c.Request.Context(), req)
