@@ -98,36 +98,40 @@ func main() {
 		ch.Close()
 	}()
 
-	// rating no used
-	ratingRepo := rating.NewRepository(db)
-	ratingService := rating.NewService(ratingRepo)
-	ratingHandler := rating.NewHandler(ratingService)
-
-	ratingPb.RegisterRatingServiceServer(grpcServer, ratingHandler)
-
+	// skill
 	skillRepo := skill.NewRepository(db)
 	skillService := skill.NewService(skillRepo)
 	skillHandler := skill.NewHandler(skillService)
 
 	skillPb.RegisterSkillServiceServer(grpcServer, skillHandler)
 
-	classRepo := class.NewRepository(db)
-	classService := class.NewService(classRepo)
-	classHandler := class.NewHandler(classService)
-
-	classPb.RegisterClassServiceServer(grpcServer, classHandler)
-
+	// tag
 	tagRepo := tag.NewRepository(db)
 	tagService := tag.NewService(tagRepo)
 	tagHandler := tag.NewHandler(tagService)
 
 	tagPb.RegisterTagServiceServer(grpcServer, tagHandler)
 
+	// build
 	buildRepo := build.NewRepository(db)
 	buildService := build.NewService(db, buildRepo, ch, skillService, tagService)
 	buildHandler := build.NewHandler(buildService)
 
 	buildPb.RegisterBuildServiceServer(grpcServer, buildHandler)
+
+	// rating
+	ratingRepo := rating.NewRepository(db)
+	ratingService := rating.NewService(ratingRepo, buildService)
+	ratingHandler := rating.NewHandler(ratingService)
+
+	ratingPb.RegisterRatingServiceServer(grpcServer, ratingHandler)
+
+	// class
+	classRepo := class.NewRepository(db)
+	classService := class.NewService(classRepo)
+	classHandler := class.NewHandler(classService)
+
+	classPb.RegisterClassServiceServer(grpcServer, classHandler)
 
 	log.Printf("grpc Order Server started on PORT: %s\n", grpcAddr)
 

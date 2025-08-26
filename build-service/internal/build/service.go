@@ -14,6 +14,7 @@ import (
 	commonconstants "github.com/darkphotonKN/community-builds-microservice/common/constants"
 	"github.com/darkphotonKN/community-builds-microservice/common/constants/models"
 	"github.com/darkphotonKN/community-builds-microservice/common/constants/types"
+	commonhelpers "github.com/darkphotonKN/community-builds-microservice/common/utils"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -51,6 +52,7 @@ type Repository interface {
 	GetBuildItemSetIdTx(tx *sqlx.Tx, buildId uuid.UUID) (uuid.UUID, error)
 	UpdateItemToSetTx(tx *sqlx.Tx, buildItemSetId uuid.UUID, slot string, itemId interface{}) error
 	DeleteBuildByIdForMember(memberId uuid.UUID, buildId uuid.UUID) error
+	GetBuildById(buildId uuid.UUID) (*models.Build, error)
 }
 
 func NewService(db *sqlx.DB, repo Repository, publishCh *amqp.Channel, skillService skill.Service, tagService tag.Service) Service {
@@ -948,4 +950,14 @@ func (s *service) DeleteBuildByMember(ctx context.Context, req *pb.DeleteBuildBy
 	}
 
 	return &pb.DeleteBuildByMemberResponse{}, nil
+}
+
+func (s *service) GetBuildById(buildId uuid.UUID) (*models.Build, error) {
+	fmt.Println("GetBuildById", buildId)
+	build, err := s.repo.GetBuildById(buildId)
+	if err != nil {
+		return nil, commonhelpers.AnalyzeDBErr(err)
+	}
+	fmt.Println("build", build)
+	return build, nil
 }

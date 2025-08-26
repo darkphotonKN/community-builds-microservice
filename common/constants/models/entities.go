@@ -170,6 +170,7 @@ type Build struct {
 	AvgCreativeRating  *float32  `db:"avg_creative_rating" json:"avgCreativeRating,omitempty"`
 	AvgSpeedFarmRating *float32  `db:"avg_speed_farm_rating" json:"avgSpeedFarmRating,omitempty"`
 	AvgBossingRating   *float32  `db:"avg_bossing_rating" json:"avgBossingRating,omitempty"`
+	AvgRating          *float32  `db:"avg_rating" json:"avgRating,omitempty"`
 	Views              int       `db:"views" json:"views"`
 	Status             int       `db:"status" json:"status"` // 0: Edit, 1: Published, 2: Archived
 }

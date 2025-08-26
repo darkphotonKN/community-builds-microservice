@@ -117,6 +117,7 @@ type BasicBuildInfoResponse struct {
 	AverageFunRating       string    `json:"averageFunRating" db:"avg_fun_rating"`
 	AverageCreativeRating  string    `json:"averageCreativeRating" db:"avg_creative_rating"`
 	AverageSpeedFarmRating string    `json:"averageSpeedFarmRating" db:"avg_speed_farm_rating"`
+	AverageRating          string    `db:"avg_rating" json:"averageRating"`
 	Status                 string    `json:"status" db:"status"`
 	CreatedAt              time.Time `json:"createdAt" db:"created_at"`
 	UpdatedAt              time.Time `json:"updatedAt" db:"updated_at"`
@@ -136,6 +137,7 @@ type BuildListQuery struct {
 	AvgCreativeRating  *float32  `db:"avg_creative_rating" json:"avgCreativeRating,omitempty"`
 	AvgSpeedFarmRating *float32  `db:"avg_speed_farm_rating" json:"avgSpeedFarmRating,omitempty"`
 	AvgBossingRating   *float32  `db:"avg_bossing_rating" json:"avgBossingRating,omitempty"`
+	AvgRating          *float32  `db:"avg_rating" json:"avgRating,omitempty"`
 	Views              int       `db:"views" json:"views"`
 	Status             int       `db:"status" json:"status"`
 	CreatedAt          string    `db:"created_at" json:"createdAt"`
@@ -153,6 +155,7 @@ type BuildListResponse struct {
 	AvgCreativeRating  *float32     `json:"avgCreativeRating,omitempty"`
 	AvgSpeedFarmRating *float32     `json:"avgSpeedFarmRating,omitempty"`
 	AvgBossingRating   *float32     `json:"avgBossingRating,omitempty"`
+	AvgRating          *float32     `json:"avgRating,omitempty"`
 	Views              int          `json:"views"`
 	Tags               []models.Tag `json:"tags"`
 	Status             int          `json:"status"`

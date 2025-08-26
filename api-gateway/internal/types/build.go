@@ -8,6 +8,7 @@ const (
 	Speedfarm RatingCategory = "speedfarm"
 	Fun       RatingCategory = "fun"
 	Creative  RatingCategory = "creative"
+	Rating    RatingCategory = "rating"
 )
 
 type Status int

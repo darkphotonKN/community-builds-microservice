@@ -44,6 +44,7 @@ func (r *BuildRepository) GetAllBuilds(
 		"avg_fun_rating":       true,
 		"avg_creative_rating":  true,
 		"avg_speedfarm_rating": true,
+		"avg_rating":           true,
 		"main_skill_id":        true,
 	}
 
@@ -73,6 +74,7 @@ func (r *BuildRepository) GetAllBuilds(
 			avg_creative_rating,
 			avg_speed_farm_rating,
 			avg_bossing_rating,
+			avg_rating,
 			views,
 			status,
 			builds.created_at as created_at
@@ -186,7 +188,7 @@ func (r *BuildRepository) CreateBuild(memberId uuid.UUID, createBuildRequest Cre
 
 	query := baseQuery + endQuery + finalQuery
 
-	fmt.Printf("\nFinal query: %+v\n\n", query)
+	// fmt.Printf("\nFinal query: %+v\n\n", query)
 
 	var buildId uuid.UUID
 
@@ -273,6 +275,7 @@ func (r *BuildRepository) GetBuildsByMemberId(memberId uuid.UUID) (*[]BuildListQ
 		avg_creative_rating,
 		avg_speed_farm_rating,
 		avg_bossing_rating,
+		avg_rating,
 		views,
 		status,
 		builds.created_at as created_at
@@ -663,6 +666,7 @@ func (r *BuildRepository) UpdateAvgRatingForBuild(buildId string, category types
 		types.Creative:  "avg_creative_rating",
 		types.Speedfarm: "avg_speedfarm_rating",
 		types.Bossing:   "avg_bossing_rating",
+		types.Rating:    "avg_rating",
 	}
 
 	// package parameters

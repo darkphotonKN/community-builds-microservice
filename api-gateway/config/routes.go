@@ -196,6 +196,7 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	compositeRoutes := api.Group("/composite")
 
 	compositeRoutes.GET("/game-data", compositeHandler.GetGameDataHandler)
+
 	// --- TAG ---
 
 	// -- Tag Setup --
@@ -239,6 +240,7 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	// rating no used in build microservice
 	ratingClient := rating.NewClient(registry)
 	ratingHandler := rating.NewHandler(ratingClient)
+
 	// ratingRepo := rating.NewRatingRepository(db)
 	// ratingService := rating.NewRatingService(ratingRepo, buildService)
 	// ratingHandler := rating.NewRatingHandler(ratingService)
@@ -246,7 +248,7 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	ratingRoutes := api.Group("/rating")
 
 	ratingRoutes.Use(auth.AuthMiddleware())
-	ratingRoutes.POST("", ratingHandler.CreateRatingByBuildIdHandler)
+	ratingRoutes.POST("/", ratingHandler.CreateRatingByBuildIdHandler)
 
 	return router
 }

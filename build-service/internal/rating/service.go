@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	// "github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/build"
+	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/build"
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/rating"
 	"github.com/darkphotonKN/community-builds-microservice/common/constants/models"
 	"github.com/darkphotonKN/community-builds-microservice/common/constants/types"
@@ -12,17 +13,18 @@ import (
 )
 
 type service struct {
-	repo Repository
+	repo         Repository
+	buildService build.Service
 }
 
 type Repository interface {
-	CreateRatingForBuildById(memberId uuid.UUID, request CreateRatingRequest) error
+	CreateRatingForBuildById(request CreateRating) error
 	GetAllRatingsByMemberId(memberId uuid.UUID) (*[]models.Rating, error)
 	GetAllRatingsByCategoryForBuild(buildId string, category types.RatingCategory) ([]int, error)
 }
 
-func NewService(repo Repository) Service {
-	return &service{repo: repo}
+func NewService(repo Repository, buildService build.Service) Service {
+	return &service{repo: repo, buildService: buildService}
 }
 
 /**
@@ -30,47 +32,32 @@ func NewService(repo Repository) Service {
 **/
 func (s *service) CreateRatingByBuildId(ctx context.Context, req *pb.CreateRatingByBuildIdRequest) (*pb.CreateRatingByBuildIdResponse, error) {
 	// create rating for build
-
-	memberId, err := uuid.Parse(req.MemberId)
+	fmt.Println("CreateRatingByBuildId start", req)
+	fromMemberId, err := uuid.Parse(req.MemberId)
 	if err != nil {
 		return nil, err
 	}
 
-	request := CreateRatingRequest{
-		BuildId:  req.BuildId,
-		Category: req.Category,
-		Value:    int(req.Value),
-	}
-	err = s.repo.CreateRatingForBuildById(memberId, request)
-
+	// get build by id to find the owner (toMemberId)
+	buildId, err := uuid.Parse(req.BuildId)
 	if err != nil {
 		return nil, err
 	}
 
-	// update build's average rating.
+	build, err := s.buildService.GetBuildById(buildId)
 
-	// get all ratings of that category
-	ratings, err := s.repo.GetAllRatingsByCategoryForBuild(request.BuildId, types.RatingCategory(request.Category))
-
-	// average them
-	var avgRating float32
-	totalRating := 0
-	noOfRatings := float32(len(ratings))
-
-	for _, rating := range ratings {
-		totalRating += rating
+	request := CreateRating{
+		FromMemberId: fromMemberId,
+		ToMemberId:   build.MemberID,
+		BuildId:      build.ID,
+		Rating:       int(req.Value),
 	}
+	fmt.Printf("Creating rating for build %+v through service\n", request)
+	err = s.repo.CreateRatingForBuildById(request)
 
-	avgRating = float32(totalRating) / noOfRatings
-
-	fmt.Printf("ratings %+v, avgRating: %f\n", ratings, avgRating)
-
-	// err = s.BuildService.UpdateAvgRatingForBuildService(request.BuildId, types.RatingCategory(request.Category), avgRating)
-
-	// if err != nil {
-	// 	fmt.Println("Error updating average rating for build.", err)
-	// 	return nil, err
-	// }
+	if err != nil {
+		return nil, err
+	}
 
 	return nil, nil
 }

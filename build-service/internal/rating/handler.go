@@ -23,5 +23,6 @@ func NewHandler(service Service) *Handler {
 }
 
 func (h *Handler) CreateRatingByBuildId(ctx context.Context, req *pb.CreateRatingByBuildIdRequest) (*pb.CreateRatingByBuildIdResponse, error) {
+	// fmt.Println("Received CreateRatingByBuildId request:", req)
 	return h.service.CreateRatingByBuildId(ctx, req)
 }
