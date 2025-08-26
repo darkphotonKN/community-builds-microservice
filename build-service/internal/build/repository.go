@@ -43,6 +43,7 @@ func (r *repository) GetAllBuilds(
 		"avg_fun_rating":       true,
 		"avg_creative_rating":  true,
 		"avg_speedfarm_rating": true,
+		"avg_rating":           true,
 		"main_skill_id":        true,
 	}
 
@@ -72,6 +73,7 @@ func (r *repository) GetAllBuilds(
 			avg_creative_rating,
 			avg_speed_farm_rating,
 			avg_bossing_rating,
+			avg_rating,
 			views,
 			status,
 			builds.created_at as created_at
@@ -247,6 +249,7 @@ func (r *repository) GetBuildsForMember(memberId uuid.UUID) (*[]BuildListQuery, 
 		avg_creative_rating,
 		avg_speed_farm_rating,
 		avg_bossing_rating,
+		avg_rating,
 		views,
 		status,
 		builds.created_at as created_at
@@ -945,4 +948,21 @@ func (r *repository) DeleteBuildByIdForMember(memberId uuid.UUID, buildId uuid.U
 	}
 
 	return nil
+}
+
+func (r *repository) GetBuildById(buildId uuid.UUID) (*models.Build, error) {
+	var build models.Build
+
+	query := `
+	SELECT * FROM builds
+	WHERE id = $1
+	`
+
+	err := r.db.Get(&build, query, buildId)
+
+	if err != nil {
+		return nil, commonhelpers.AnalyzeDBErr(err)
+	}
+
+	return &build, nil
 }

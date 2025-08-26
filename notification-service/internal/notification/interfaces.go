@@ -9,6 +9,7 @@ import (
 type Creator interface {
 	Create(notification *MemberCreatedNotification) (*Notification, error)
 	CreateItem(notification *CreateNotification) (*Notification, error)
+	CreateRating(notification *RatingCreatedNotification) (*Notification, error)
 }
 
 type Reader interface {

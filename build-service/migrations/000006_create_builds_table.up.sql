@@ -29,5 +29,6 @@ CREATE TABLE IF NOT EXISTS builds (
     views INT DEFAULT 0 CHECK (views >= 0),
     status SMALLINT NOT NULL DEFAULT 0 CHECK (status IN (0, 1, 2)), -- 0: Draft, 1: Published, 2: Archived
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    avg_rating DECIMAL(3, 1)  DEFAULT 0 CHECK (avg_rating >= 0 AND avg_rating <= 10)
 ); 

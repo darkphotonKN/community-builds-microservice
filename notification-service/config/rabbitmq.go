@@ -24,6 +24,7 @@ func DeclareExchanges(ch *amqp.Channel) {
 		// {ExchangeName: commonconstants.ExampleCreatedEvent, ExchangeType: "fanout"},
 		{ExchangeName: commonconstants.MemberSignedUpEvent, ExchangeType: "fanout"},
 		{ExchangeName: commonconstants.ItemCreatedItemEvent, ExchangeType: "fanout"},
+		{ExchangeName: commonconstants.RatingCreatedEvent, ExchangeType: "fanout"},
 	}
 
 	for _, exchange := range exchangeList {

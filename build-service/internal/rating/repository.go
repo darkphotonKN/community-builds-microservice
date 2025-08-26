@@ -21,19 +21,20 @@ func NewRepository(db *sqlx.DB) Repository {
 /**
 * Creates a single rating of a single category type for a build by buildId.
 **/
-func (r *repository) CreateRatingForBuildById(memberId uuid.UUID, request CreateRatingRequest) error {
+func (r *repository) CreateRatingForBuildById(request CreateRating) error {
 
+	fmt.Println("Creating rating for build:", request)
 	// add a new rating under this member id and build id
 	query := `
-	INSERT INTO ratings (build_id, member_id, value, category)
-	VALUES (:build_id, :member_id, :value, :category)
+	INSERT INTO builds_members_rating (build_id, from_member_id, to_member_id, rating)
+	VALUES (:build_id, :from_member_id, :to_member_id, :rating)
 	`
 
 	params := map[string]interface{}{
-		"build_id":  request.BuildId,
-		"member_id": memberId,
-		"value":     request.Value,
-		"category":  request.Category,
+		"build_id":       request.BuildId,
+		"from_member_id": request.FromMemberId,
+		"to_member_id":   request.ToMemberId,
+		"rating":         request.Rating,
 	}
 
 	_, err := r.db.NamedExec(query, params)

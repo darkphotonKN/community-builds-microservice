@@ -19,6 +19,9 @@ const (
 	BuildDeletedEvent   = "build.deleted"   // when build is deleted
 	BuildRatedEvent     = "build.rated"     // when someone rates a build)
 
+	// Rating events
+	RatingCreatedEvent = "rating.created" // when someone rates a build
+
 	// Item events
 	ItemCreatedItemEvent = "item.created" // when item is created
 )
@@ -55,10 +58,6 @@ type MemberSignedInEventPayload struct {
 }
 
 /*
-*
-* type ItemCreatedItemEventPayload struct {
-
-*
 * Published by item-service.
 * Consumed by:
 * - notification-service
@@ -69,4 +68,14 @@ type ItemCreatedItemEventPayload struct {
 	Name   string `json:"name"`
 	// Email      string `json:"email"`
 	SignedUpAt string `json:"signedUpAt"`
+}
+
+/*
+* Published by build-service.
+* Consumed by:
+* - notification-service
+*
+ */
+type RatingCreatedEventPayload struct {
+	UserID string `json:"userId"`
 }

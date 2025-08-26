@@ -34,8 +34,11 @@ func (h *RatingHandler) CreateRatingByBuildIdHandler(c *gin.Context) {
 		return
 	}
 	// Convert REST request to gRPC request
+	buildId := request.BuildId.String()
 	grpcReq := &pb.CreateRatingByBuildIdRequest{
 		MemberId: userIdStr.(string),
+		BuildId:  buildId,
+		Value:    request.Value,
 	}
 
 	res, err := h.Client.CreateRatingByBuildId(c.Request.Context(), grpcReq)

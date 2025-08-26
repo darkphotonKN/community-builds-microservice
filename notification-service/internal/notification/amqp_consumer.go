@@ -22,8 +22,9 @@ func NewConsumer(service EventConsumerService, ch *amqp.Channel) *consumer {
 }
 
 func (c *consumer) Listen() {
-	go c.memberSignedUpEventListener()
+	go c.MemberSignedUpEventListener()
 	go c.ItemCreatedItemEventListener()
+	go c.RatingCreatedEventListener()
 
 	fmt.Println("Notification consumer started - listening for member signup events.")
 }
@@ -33,7 +34,7 @@ func (c *consumer) Listen() {
 * Handles:
 * - Member sign ups welcome notificiations
 **/
-func (c *consumer) memberSignedUpEventListener() {
+func (c *consumer) MemberSignedUpEventListener() {
 	queueName := fmt.Sprintf("notification.%s", commonconstants.MemberSignedUpEvent)
 
 	queue, err := c.publishCh.QueueDeclare(queueName, true, false, false, false, nil)
@@ -172,6 +173,94 @@ func (c *consumer) ItemCreatedItemEventListener() {
 				Message:  template.Message,
 				Type:     string(template.Type),
 				MemberID: memberId,
+			})
+
+			// retry on error
+			if err != nil {
+				fmt.Printf("Failed to create notification on %d try, err: %s", i+1, err.Error())
+
+				// progressive delay / back-off before retrying
+				time.Sleep(time.Duration(math.Pow(2, float64(i))) * time.Second)
+				continue
+			}
+
+			// otherwise exit
+			break
+		}
+
+		if err != nil {
+			fmt.Println("Failed to create notification, err:", err)
+			continue
+		}
+
+		fmt.Printf("Notification created:\nid: %s\nType: %s\nTitle: %s\nMessage: %s\n", notification.ID, notification.Type, notification.Title, notification.Message)
+	}
+}
+
+/**
+* Member Sign-Up Events Listener
+* Handles:
+* - Member sign ups welcome notificiations
+**/
+func (c *consumer) RatingCreatedEventListener() {
+	fmt.Println("Starting RatingCreatedEventListener...")
+	queueName := fmt.Sprintf("notification.%s", commonconstants.RatingCreatedEvent)
+
+	queue, err := c.publishCh.QueueDeclare(queueName, true, false, false, false, nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// bind to the exchange that will publish ExampleCreateEvent events
+	err = c.publishCh.QueueBind(
+		queue.Name,
+		"",
+		commonconstants.RatingCreatedEvent,
+		false,
+		nil,
+	)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// consume messages, delivers messages from the queue
+	msgs, err := c.publishCh.Consume(queue.Name, "", true, false, false, false, nil)
+
+	// start a goroutine to listen for events
+	for msg := range msgs {
+		var ratingCreated *commonconstants.RatingCreatedEventPayload
+
+		err := json.Unmarshal(msg.Body, &ratingCreated)
+		if err != nil {
+			fmt.Printf("Error when unmarshalling member.created event body: %s\n", err.Error())
+		}
+
+		fmt.Printf("\nsuccessfully received event message: %+v\n\n", ratingCreated)
+
+		// get the correct notification template
+		template, err := c.service.GetNotificationTemplate(NotificationRatingCreated)
+
+		if err != nil {
+			fmt.Println("Failed on getting notification template. Error:", err)
+			continue
+		}
+
+		var notification *Notification
+
+		for i := 0; i < 3; i++ {
+
+			memberId, err := uuid.Parse(ratingCreated.UserID)
+			if err != nil {
+				fmt.Println("invalid UUID: %w", err)
+			}
+			// create event TODO: sourceID missing, add later
+			notification, err = c.service.CreateRating(&RatingCreatedNotification{
+				MemberId: memberId,
+				Message:  template.Message,
+				Title:    template.Title,
+				Type:     string(template.Type),
 			})
 
 			// retry on error

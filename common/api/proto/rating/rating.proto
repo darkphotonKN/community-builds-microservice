@@ -11,8 +11,7 @@ service RatingService {
 message CreateRatingByBuildIdRequest {
   string memberId = 1;
   string buildId = 2;
-  string category = 3;
-  int32 value = 4;
+  int32 value = 3;
 }
 
 message CreateRatingByBuildIdResponse {
