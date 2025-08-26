@@ -93,6 +93,8 @@ func main() {
 	ch, close := broker.Connect(amqpUser, amqpPassword, amqpHost, amqpPort)
 
 	broker.DeclareExchange(ch, commonconstants.MemberSignedUpEvent, "fanout")
+
+	broker.DeclareExchange(ch, commonconstants.RatingCreatedEvent, "fanout")
 	defer func() {
 		close()
 		ch.Close()
@@ -121,7 +123,7 @@ func main() {
 
 	// rating
 	ratingRepo := rating.NewRepository(db)
-	ratingService := rating.NewService(ratingRepo, buildService)
+	ratingService := rating.NewService(ratingRepo, ch, buildService)
 	ratingHandler := rating.NewHandler(ratingService)
 
 	ratingPb.RegisterRatingServiceServer(grpcServer, ratingHandler)

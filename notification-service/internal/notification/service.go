@@ -162,6 +162,33 @@ func (s *service) CreateItem(itemCreated *CreateNotification) (*Notification, er
 	return newNotification, nil
 }
 
+func (s *service) CreateRating(ratingCreated *RatingCreatedNotification) (*Notification, error) {
+	// validation and error handling TODO: missing fields
+	if ratingCreated.Title == "" {
+		fmt.Println("Title is required for creating a new notification.")
+		return nil, status.Errorf(codes.InvalidArgument, "Name field is required")
+	}
+
+	// map it to notifications table entity
+	createNotification := &CreateNotification{
+		MemberID: ratingCreated.MemberId,
+		Type:     ratingCreated.Type,
+		Title:    "create_rating_message",
+		Message:  ratingCreated.Message,
+		SourceID: ratingCreated.SourceID,
+	}
+
+	newNotification, err := s.repo.Create(createNotification)
+	if err != nil {
+		fmt.Println("Error occured when creating new notification:", err)
+		return nil, err
+	}
+
+	fmt.Println("notification was created:", newNotification)
+
+	return newNotification, nil
+}
+
 func (s *service) ReadNotification(ctx context.Context, request *pb.ReadNotificationRequest) error {
 	// validate ids are legit uuids
 	memberId, err := uuid.Parse(request.MemberId)
@@ -195,9 +222,10 @@ func (s *service) ReadNotification(ctx context.Context, request *pb.ReadNotifica
 type NotificationType string
 
 const (
-	NotificationWelcome      NotificationType = "welcome"
-	NotificationBuildCreated NotificationType = "build_created"
-	NotificationItemCreated  NotificationType = "item_created"
+	NotificationWelcome       NotificationType = "welcome"
+	NotificationBuildCreated  NotificationType = "build_created"
+	NotificationItemCreated   NotificationType = "item_created"
+	NotificationRatingCreated NotificationType = "rating_created"
 )
 
 type NotificationTemplate struct {
@@ -224,11 +252,18 @@ var itemCreateNotificationMessage = NotificationTemplate{
 	Message: "Item was successfully created.",
 }
 
+var ratingCreateNotificationMessage = NotificationTemplate{
+	Type:    NotificationRatingCreated,
+	Title:   "Create Rating",
+	Message: "Someone rated your build!",
+}
+
 func (s *service) GetNotificationTemplate(notificationType NotificationType) (*NotificationTemplate, error) {
 	notificationTemplates := map[NotificationType]*NotificationTemplate{
-		NotificationWelcome:      &welcomeNotificationMessage,
-		NotificationBuildCreated: &buildNotificationMessage,
-		NotificationItemCreated:  &itemCreateNotificationMessage,
+		NotificationWelcome:       &welcomeNotificationMessage,
+		NotificationBuildCreated:  &buildNotificationMessage,
+		NotificationItemCreated:   &itemCreateNotificationMessage,
+		NotificationRatingCreated: &ratingCreateNotificationMessage,
 	}
 
 	template, exists := notificationTemplates[notificationType]

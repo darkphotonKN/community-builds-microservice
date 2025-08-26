@@ -2,18 +2,22 @@ package rating
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	// "github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/build"
 	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/build"
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/rating"
+	commonconstants "github.com/darkphotonKN/community-builds-microservice/common/constants"
 	"github.com/darkphotonKN/community-builds-microservice/common/constants/models"
 	"github.com/darkphotonKN/community-builds-microservice/common/constants/types"
 	"github.com/google/uuid"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type service struct {
 	repo         Repository
+	publishCh    *amqp.Channel
 	buildService build.Service
 }
 
@@ -23,8 +27,8 @@ type Repository interface {
 	GetAllRatingsByCategoryForBuild(buildId string, category types.RatingCategory) ([]int, error)
 }
 
-func NewService(repo Repository, buildService build.Service) Service {
-	return &service{repo: repo, buildService: buildService}
+func NewService(repo Repository, publishCh *amqp.Channel, buildService build.Service) Service {
+	return &service{repo: repo, publishCh: publishCh, buildService: buildService}
 }
 
 /**
@@ -56,6 +60,30 @@ func (s *service) CreateRatingByBuildId(ctx context.Context, req *pb.CreateRatin
 	err = s.repo.CreateRatingForBuildById(request)
 
 	if err != nil {
+		return nil, err
+	}
+
+	// publish to message broker
+	payload := commonconstants.RatingCreatedEventPayload{
+		UserID: build.MemberID.String(),
+	}
+
+	marshalledPayload, err := json.Marshal(payload)
+
+	err = s.publishCh.PublishWithContext(
+		ctx,
+		commonconstants.RatingCreatedEvent,
+		"",
+		false,
+		false,
+		amqp.Publishing{
+			ContentType: "application/json",
+			Body:        marshalledPayload,
+			// persist message
+			DeliveryMode: amqp.Persistent,
+		})
+	if err != nil {
+		fmt.Println("Failed to publish rating created event:", err)
 		return nil, err
 	}
 

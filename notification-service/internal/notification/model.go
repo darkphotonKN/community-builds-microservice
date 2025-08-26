@@ -45,3 +45,11 @@ type UpdateNotification struct {
 	MemberId uuid.UUID `json:"member_id" db:"member_id"`
 	Read     bool      `json:"read" db:"read"`
 }
+
+type RatingCreatedNotification struct {
+	Title    string     `json:"title" db:"title"`
+	Type     string     `json:"type" db:"type"`
+	MemberId uuid.UUID  `json:"member_id" db:"member_id"`
+	Message  string     `json:"message" db:"message"`
+	SourceID *uuid.UUID `json:"source_id" db:"source_id"`
+}
