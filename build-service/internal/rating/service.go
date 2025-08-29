@@ -25,6 +25,7 @@ type Repository interface {
 	CreateRatingForBuildById(request CreateRating) error
 	GetAllRatingsByMemberId(memberId uuid.UUID) (*[]models.Rating, error)
 	GetAllRatingsByCategoryForBuild(buildId string, category types.RatingCategory) ([]int, error)
+	GetAllRatingsByBuildId(buildId uuid.UUID) ([]BuildRating, error)
 }
 
 func NewService(repo Repository, publishCh *amqp.Channel, buildService build.Service) Service {
@@ -56,8 +57,25 @@ func (s *service) CreateRatingByBuildId(ctx context.Context, req *pb.CreateRatin
 		BuildId:      build.ID,
 		Rating:       int(req.Value),
 	}
-	fmt.Printf("Creating rating for build %+v through service\n", request)
+	// fmt.Printf("Creating rating for build %+v through service\n", request)
 	err = s.repo.CreateRatingForBuildById(request)
+
+	// get all ratings for this build
+	buildRatings, err := s.repo.GetAllRatingsByBuildId(buildId)
+
+	totalRating := 0
+	ratingLen := len(buildRatings)
+	if ratingLen > 0 {
+		for _, item := range buildRatings {
+			totalRating += item.Rating
+		}
+	}
+	avgRating := float32(totalRating) / float32(ratingLen)
+
+	fmt.Println("Average rating for build:", avgRating)
+
+	// update average rating to this build's avg_rating field
+	s.buildService.UpdateAvgRatingForBuild(buildId, avgRating)
 
 	if err != nil {
 		return nil, err

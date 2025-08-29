@@ -27,6 +27,7 @@ type Service interface {
 	UpdateItemSetsToBuild(ctx context.Context, req *pb.UpdateItemSetsToBuildRequest) (*pb.UpdateItemSetsToBuildResponse, error)
 	DeleteBuildByMember(ctx context.Context, req *pb.DeleteBuildByMemberRequest) (*pb.DeleteBuildByMemberResponse, error)
 	GetBuildById(uuid.UUID) (*models.Build, error)
+	UpdateAvgRatingForBuild(buildId uuid.UUID, avgRating float32) error
 }
 
 func NewHandler(service Service) *Handler {

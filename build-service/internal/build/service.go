@@ -54,6 +54,7 @@ type Repository interface {
 	DeleteBuildByIdForMember(memberId uuid.UUID, buildId uuid.UUID) error
 	GetBuildById(buildId uuid.UUID) (*models.Build, error)
 	UpdateStatus(buildId uuid.UUID, status types.Status) error
+	UpdateAvgRatingForBuild(buildId uuid.UUID, avgRating float32) error
 }
 
 func NewService(db *sqlx.DB, repo Repository, publishCh *amqp.Channel, skillService skill.Service, tagService tag.Service) Service {
@@ -188,7 +189,7 @@ func (s *service) GetCommunityBuilds(ctx context.Context, req *pb.GetCommunityBu
 	ratingCategory := types.RatingCategory(req.RatingCategory)
 
 	baseBuilds, err := s.repo.GetAllBuilds(pageNo, pageSize, sortOrder, sortBy, search, skillId, &minRating, ratingCategory)
-	fmt.Println("baseBuilds", baseBuilds)
+	// fmt.Println("baseBuilds", baseBuilds)
 	if err != nil {
 		return nil, err
 	}
@@ -213,6 +214,7 @@ func (s *service) GetCommunityBuilds(ctx context.Context, req *pb.GetCommunityBu
 				UpdatedAt: tag.UpdatedAt.String(),
 			}
 		}
+
 		pbBuilds[index] = &pb.BuildList{
 			Id:                 idStr,
 			Title:              build.Title,
@@ -225,12 +227,15 @@ func (s *service) GetCommunityBuilds(ctx context.Context, req *pb.GetCommunityBu
 			AvgCreativeRating:  *build.AvgCreativeRating,
 			AvgFunRating:       *build.AvgFunRating,
 			AvgSpeedFarmRating: *build.AvgSpeedFarmRating,
+			AvgRating:          *build.AvgRating,
 			Tags:               pbTags,
 			Views:              int32(build.Views),
 			Status:             int32(build.Status),
 			CreatedAt:          build.CreatedAt,
 		}
 	}
+
+	fmt.Println("pbBuilds:", pbBuilds)
 
 	return &pb.GetCommunityBuildsResponse{
 		Builds: pbBuilds,
@@ -968,4 +973,8 @@ func (s *service) GetBuildById(buildId uuid.UUID) (*models.Build, error) {
 	}
 	fmt.Println("build", build)
 	return build, nil
+}
+
+func (s *service) UpdateAvgRatingForBuild(buildId uuid.UUID, avgRating float32) error {
+	return s.repo.UpdateAvgRatingForBuild(buildId, avgRating)
 }

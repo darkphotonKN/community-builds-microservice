@@ -1050,10 +1050,11 @@ type BuildList struct {
 	AvgCreativeRating  float32                `protobuf:"fixed32,9,opt,name=avgCreativeRating,proto3" json:"avgCreativeRating,omitempty"`
 	AvgSpeedFarmRating float32                `protobuf:"fixed32,10,opt,name=avgSpeedFarmRating,proto3" json:"avgSpeedFarmRating,omitempty"`
 	AvgBossingRating   float32                `protobuf:"fixed32,11,opt,name=avgBossingRating,proto3" json:"avgBossingRating,omitempty"`
-	Views              int32                  `protobuf:"varint,12,opt,name=views,proto3" json:"views,omitempty"`
-	Tags               []*Tag                 `protobuf:"bytes,13,rep,name=tags,proto3" json:"tags,omitempty"`
-	Status             int32                  `protobuf:"varint,14,opt,name=status,proto3" json:"status,omitempty"`
-	CreatedAt          string                 `protobuf:"bytes,15,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	AvgRating          float32                `protobuf:"fixed32,12,opt,name=avgRating,proto3" json:"avgRating,omitempty"`
+	Views              int32                  `protobuf:"varint,13,opt,name=views,proto3" json:"views,omitempty"`
+	Tags               []*Tag                 `protobuf:"bytes,14,rep,name=tags,proto3" json:"tags,omitempty"`
+	Status             int32                  `protobuf:"varint,15,opt,name=status,proto3" json:"status,omitempty"`
+	CreatedAt          string                 `protobuf:"bytes,16,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -1161,6 +1162,13 @@ func (x *BuildList) GetAvgSpeedFarmRating() float32 {
 func (x *BuildList) GetAvgBossingRating() float32 {
 	if x != nil {
 		return x.AvgBossingRating
+	}
+	return 0
+}
+
+func (x *BuildList) GetAvgRating() float32 {
+	if x != nil {
+		return x.AvgRating
 	}
 	return 0
 }
@@ -2730,7 +2738,7 @@ const file_api_proto_build_build_proto_rawDesc = "" +
 	"\x10additionalSkills\x18\x02 \x03(\v2\x18.build.skillLinkResponseR\x10additionalSkills\"\xa1\x01\n" +
 	"\x17AddSkillsToBuildRequest\x12@\n" +
 	"\x0emainSkillLinks\x18\x01 \x01(\v2\x18.build.skillLinkResponseR\x0emainSkillLinks\x12D\n" +
-	"\x10additionalSkills\x18\x02 \x03(\v2\x18.build.skillLinkResponseR\x10additionalSkills\"\xf5\x03\n" +
+	"\x10additionalSkills\x18\x02 \x03(\v2\x18.build.skillLinkResponseR\x10additionalSkills\"\x93\x04\n" +
 	"\tBuildList\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12 \n" +
@@ -2745,12 +2753,13 @@ const file_api_proto_build_build_proto_rawDesc = "" +
 	"\x11avgCreativeRating\x18\t \x01(\x02R\x11avgCreativeRating\x12.\n" +
 	"\x12avgSpeedFarmRating\x18\n" +
 	" \x01(\x02R\x12avgSpeedFarmRating\x12*\n" +
-	"\x10avgBossingRating\x18\v \x01(\x02R\x10avgBossingRating\x12\x14\n" +
-	"\x05views\x18\f \x01(\x05R\x05views\x12\x1e\n" +
-	"\x04tags\x18\r \x03(\v2\n" +
+	"\x10avgBossingRating\x18\v \x01(\x02R\x10avgBossingRating\x12\x1c\n" +
+	"\tavgRating\x18\f \x01(\x02R\tavgRating\x12\x14\n" +
+	"\x05views\x18\r \x01(\x05R\x05views\x12\x1e\n" +
+	"\x04tags\x18\x0e \x03(\v2\n" +
 	".build.tagR\x04tags\x12\x16\n" +
-	"\x06status\x18\x0e \x01(\x05R\x06status\x12\x1c\n" +
-	"\tcreatedAt\x18\x0f \x01(\tR\tcreatedAt\"\xd8\x01\n" +
+	"\x06status\x18\x0f \x01(\x05R\x06status\x12\x1c\n" +
+	"\tcreatedAt\x18\x10 \x01(\tR\tcreatedAt\"\xd8\x01\n" +
 	"\x12CreateBuildRequest\x12\x1a\n" +
 	"\bmemberId\x18\x01 \x01(\tR\bmemberId\x12\x18\n" +
 	"\askillId\x18\x02 \x01(\tR\askillId\x12\x16\n" +

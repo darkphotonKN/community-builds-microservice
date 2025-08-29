@@ -13,3 +13,8 @@ type CreateRating struct {
 type RatingByCategoryRes struct {
 	Value int `db:"value"`
 }
+
+type BuildRating struct {
+	Id     uuid.UUID `db:"id"`
+	Rating int       `db:"rating"`
+}

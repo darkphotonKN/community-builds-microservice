@@ -979,6 +979,23 @@ func (r *repository) UpdateStatus(buildId uuid.UUID, status types.Status) error 
 	WHERE id = $2
 	`
 
-	r.db.Exec(query, status, buildId)
+	_, err := r.db.Exec(query, status, buildId)
+	if err != nil {
+		return commonhelpers.AnalyzeDBErr(err)
+	}
+	return nil
+}
+
+func (r *repository) UpdateAvgRatingForBuild(buildId uuid.UUID, avgRating float32) error {
+
+	query := `
+	UPDATE builds
+	SET avg_rating = $1
+	WHERE id = $2
+	`
+	_, err := r.db.Exec(query, avgRating, buildId)
+	if err != nil {
+		return commonhelpers.AnalyzeDBErr(err)
+	}
 	return nil
 }

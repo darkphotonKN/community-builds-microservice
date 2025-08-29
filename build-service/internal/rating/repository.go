@@ -85,3 +85,21 @@ func (r *repository) GetAllRatingsByCategoryForBuild(buildId string, category ty
 
 	return values, nil
 }
+
+func (r *repository) GetAllRatingsByBuildId(buildId uuid.UUID) ([]BuildRating, error) {
+	var values []BuildRating
+
+	query := `
+	SELECT id, rating
+	FROM builds_members_rating
+	WHERE build_id = $1
+	`
+
+	err := r.db.Select(&values, query, buildId)
+
+	if err != nil {
+		return nil, commonhelpers.AnalyzeDBErr(err)
+	}
+
+	return values, nil
+}
