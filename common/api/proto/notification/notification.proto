@@ -4,8 +4,8 @@ package notification;
 
 option go_package = "github.com/darkphotonKN/community-builds-microservice/common/api/proto/notification";
 
-import "google/protobuf/timestamp.proto";
-import "google/api/field_behavior.proto";
+// import "google/protobuf/timestamp.proto";
+// import "google/api/field_behavior.proto";
 
 service NotificationService {
   // get list of notifications for user
@@ -28,10 +28,10 @@ message Notification {
   string type = 3;
   string title = 4;
   string message = 5;
-  bool read = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+  // bool read = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
   bool emailSent = 7;
   string sourceId = 8;
-  google.protobuf.Timestamp created_at = 9;
+  // google.protobuf.Timestamp created_at = 9;
 }
 
 // Request message for getting an example by ID

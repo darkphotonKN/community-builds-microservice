@@ -352,17 +352,19 @@ func (h *BuildHandler) UpdateItemSetsToBuildHandler(c *gin.Context) {
 	grpcReq := &pb.UpdateItemSetsToBuildRequest{
 		MemberId:   userIdStr.(string),
 		Id:         id.String(),
-		Weapon:     request.Weapon,
-		Shield:     request.Shield,
-		Helmet:     request.Helmet,
-		BodyArmour: request.BodyArmour,
-		Boots:      request.Boots,
-		Gloves:     request.Gloves,
-		Belt:       request.Belt,
-		Amulet:     request.Amulet,
-		LeftRing:   request.LeftRing,
-		RightRing:  request.RightRing,
+		Weapon:     request.BuildSet.Weapon,
+		Shield:     request.BuildSet.Shield,
+		Helmet:     request.BuildSet.Helmet,
+		BodyArmour: request.BuildSet.BodyArmour,
+		Boots:      request.BuildSet.Boots,
+		Gloves:     request.BuildSet.Gloves,
+		Belt:       request.BuildSet.Belt,
+		Amulet:     request.BuildSet.Amulet,
+		LeftRing:   request.BuildSet.LeftRing,
+		RightRing:  request.BuildSet.RightRing,
 	}
+
+	fmt.Println("grpcReq", grpcReq)
 
 	_, err = h.Client.UpdateItemSetsToBuild(c.Request.Context(), grpcReq)
 

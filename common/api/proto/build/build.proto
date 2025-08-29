@@ -175,6 +175,7 @@ message CreateBuildRequest {
 }
 
 message CreateBuildResponse {
+  string id = 1;
 }
 
 message GetBuildsByMemberIdRequest {

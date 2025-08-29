@@ -1287,6 +1287,7 @@ func (x *CreateBuildRequest) GetAscendancyId() string {
 
 type CreateBuildResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1319,6 +1320,13 @@ func (x *CreateBuildResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use CreateBuildResponse.ProtoReflect.Descriptor instead.
 func (*CreateBuildResponse) Descriptor() ([]byte, []int) {
 	return file_api_proto_build_build_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *CreateBuildResponse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
 }
 
 type GetBuildsByMemberIdRequest struct {
@@ -2750,8 +2758,9 @@ const file_api_proto_build_build_proto_rawDesc = "" +
 	"\x05title\x18\x04 \x01(\tR\x05title\x12 \n" +
 	"\vdescription\x18\x05 \x01(\tR\vdescription\x12\x18\n" +
 	"\aclassId\x18\x06 \x01(\tR\aclassId\x12\"\n" +
-	"\fascendancyId\x18\a \x01(\tR\fascendancyId\"\x15\n" +
-	"\x13CreateBuildResponse\"8\n" +
+	"\fascendancyId\x18\a \x01(\tR\fascendancyId\"%\n" +
+	"\x13CreateBuildResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"8\n" +
 	"\x1aGetBuildsByMemberIdRequest\x12\x1a\n" +
 	"\bmemberId\x18\x01 \x01(\tR\bmemberId\"G\n" +
 	"\x1bGetBuildsByMemberIdResponse\x12(\n" +

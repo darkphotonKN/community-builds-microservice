@@ -248,7 +248,7 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	ratingRoutes := api.Group("/rating")
 
 	ratingRoutes.Use(auth.AuthMiddleware())
-	ratingRoutes.POST("/", ratingHandler.CreateRatingByBuildIdHandler)
+	ratingRoutes.POST("", ratingHandler.CreateRatingByBuildIdHandler)
 
 	return router
 }

@@ -147,6 +147,7 @@ func (r *repository) GetAllBuilds(
 			AvgCreativeRating:  build.AvgCreativeRating,
 			AvgSpeedFarmRating: build.AvgSpeedFarmRating,
 			AvgBossingRating:   build.AvgBossingRating,
+			AvgRating:          build.AvgRating,
 			Views:              build.Views,
 			Status:             build.Status,
 			CreatedAt:          build.CreatedAt,
@@ -898,6 +899,9 @@ func (r *repository) GetBuildItemSetIdTx(tx *sqlx.Tx, buildId uuid.UUID) (uuid.U
 **/
 func (r *repository) UpdateItemToSetTx(tx *sqlx.Tx, buildItemSetId uuid.UUID, slot string, itemId interface{}) error {
 
+	fmt.Println("buildItemSetId", buildItemSetId)
+	fmt.Println("slot", slot)
+	fmt.Println("itemId", itemId)
 	var itemSetSlotItemId uuid.UUID
 	// get item of update
 	query := `
@@ -965,4 +969,16 @@ func (r *repository) GetBuildById(buildId uuid.UUID) (*models.Build, error) {
 	}
 
 	return &build, nil
+}
+
+func (r *repository) UpdateStatus(buildId uuid.UUID, status types.Status) error {
+
+	query := `
+	UPDATE builds
+	SET status = $1
+	WHERE id = $2
+	`
+
+	r.db.Exec(query, status, buildId)
+	return nil
 }

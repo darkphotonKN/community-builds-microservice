@@ -53,6 +53,7 @@ type Repository interface {
 	UpdateItemToSetTx(tx *sqlx.Tx, buildItemSetId uuid.UUID, slot string, itemId interface{}) error
 	DeleteBuildByIdForMember(memberId uuid.UUID, buildId uuid.UUID) error
 	GetBuildById(buildId uuid.UUID) (*models.Build, error)
+	UpdateStatus(buildId uuid.UUID, status types.Status) error
 }
 
 func NewService(db *sqlx.DB, repo Repository, publishCh *amqp.Channel, skillService skill.Service, tagService tag.Service) Service {
@@ -187,7 +188,7 @@ func (s *service) GetCommunityBuilds(ctx context.Context, req *pb.GetCommunityBu
 	ratingCategory := types.RatingCategory(req.RatingCategory)
 
 	baseBuilds, err := s.repo.GetAllBuilds(pageNo, pageSize, sortOrder, sortBy, search, skillId, &minRating, ratingCategory)
-
+	fmt.Println("baseBuilds", baseBuilds)
 	if err != nil {
 		return nil, err
 	}
@@ -345,7 +346,9 @@ func (s *service) CreateBuild(ctx context.Context, req *pb.CreateBuildRequest) (
 		return nil, err
 	}
 
-	return &pb.CreateBuildResponse{}, nil
+	return &pb.CreateBuildResponse{
+		Id: buildId.String(),
+	}, nil
 }
 
 func (s *service) GetBuildInfo(ctx context.Context, req *pb.GetBuildInfoRequest) (*pb.GetBuildInfoResponse, error) {
@@ -867,6 +870,7 @@ func (s *service) AddSkillLinksToBuild(ctx context.Context, req *pb.AddSkillLink
 * rolling back on error.
 **/
 func (s *service) UpdateItemSetsToBuild(ctx context.Context, req *pb.UpdateItemSetsToBuildRequest) (*pb.UpdateItemSetsToBuildResponse, error) {
+	fmt.Println("UpdateItemSetsToBuild req", req)
 	memberId, err := uuid.Parse(req.MemberId)
 	if err != nil {
 		return nil, err
@@ -905,7 +909,7 @@ func (s *service) UpdateItemSetsToBuild(ctx context.Context, req *pb.UpdateItemS
 		}
 		// create item relations under this item set, one item at a time
 		for key, value := range itemSetsMap {
-			// 表示空值
+
 			var itemId interface{}
 			if value == "" {
 				itemId = nil
@@ -917,6 +921,10 @@ func (s *service) UpdateItemSetsToBuild(ctx context.Context, req *pb.UpdateItemS
 			fmt.Println("value", value)
 			s.repo.UpdateItemToSetTx(tx, itemSetId, key, itemId)
 		}
+		// after updating item sets, update build status to published
+		// todo: adjusted publish flow, only update status when publish endpoint is called
+		// func should only update set , temp flow
+		s.repo.UpdateStatus(buildId, types.IsPublished)
 
 		return nil
 	})

@@ -9,7 +9,6 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type service struct {
@@ -104,14 +103,14 @@ func (s *service) GetAllByMemberId(ctx context.Context, request *pb.GetNotificat
 		fmt.Printf("\nnotifications Read Field from DB, service layer before constructing grpc version: %+v\n\n", notification.Read)
 
 		notificationsData[index] = &pb.Notification{
-			Id:        notification.ID.String(),
-			MemberId:  notification.MemberID.String(),
-			Type:      notification.Type,
-			Title:     notification.Title,
-			Message:   notification.Message,
-			Read:      notification.Read,
+			Id:       notification.ID.String(),
+			MemberId: notification.MemberID.String(),
+			Type:     notification.Type,
+			Title:    notification.Title,
+			Message:  notification.Message,
+			// Read:      notification.Read,
 			EmailSent: notification.EmailSent,
-			CreatedAt: timestamppb.New(notification.CreatedAt),
+			// CreatedAt: timestamppb.New(notification.CreatedAt),
 		}
 
 		if notification.SourceID != nil {
@@ -123,10 +122,10 @@ func (s *service) GetAllByMemberId(ctx context.Context, request *pb.GetNotificat
 
 	fmt.Printf("\nAll Notifications from DB, service layer after constructing grpc version: %+v\n\n", notificationsData)
 
-	for _, notification := range notificationsData {
-		fmt.Printf("\nsingle Notification from DB, service layer after constructing grpc version, READ FIELD: %+v\n\n", notification.Read)
+	// for _, notification := range notificationsData {
+	// 	fmt.Printf("\nsingle Notification from DB, service layer after constructing grpc version, READ FIELD: %+v\n\n", notification.Read)
 
-	}
+	// }
 
 	notificationsResponse := &pb.GetNotificationsResponse{
 		Data: notificationsData,

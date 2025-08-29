@@ -46,7 +46,7 @@ type UpdateSkillsToBuildRequest struct {
 	AdditionalSkills []SkillLinks `json:"additionalSkills" binding:"required"`
 }
 
-type AddItemsToBuildRequest struct {
+type BuildSet struct {
 	Weapon     string `json:"weapon"`
 	Shield     string `json:"shield"`
 	Helmet     string `json:"helmet"`
@@ -57,6 +57,11 @@ type AddItemsToBuildRequest struct {
 	Amulet     string `json:"amulet"`
 	LeftRing   string `json:"leftRing"`
 	RightRing  string `json:"rightRing"`
+}
+
+type AddItemsToBuildRequest struct {
+	BuildSet BuildSet `json:"buildSet" binding:"required"`
+	Content  string   `json:"content"`
 }
 
 // --- Response ---
