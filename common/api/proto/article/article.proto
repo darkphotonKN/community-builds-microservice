@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package article;
+
+option go_package = "github.com/darkphotonKN/community-builds-microservices/common/api/proto/article";
+
+service ArticleService {
+  rpc CreateArticle(CreateArticleRequest) returns (CreateArticleResponse) {}
+  rpc GetArticles(GetArticlesRequest) returns (GetArticlesResponse) {}
+  rpc UpdateArticle(UpdateArticleRequest) returns (UpdateArticleResponse) {}
+}
+
+message Article {
+	string id = 1;
+  string name = 2;
+  string description = 3;
+  string imageUrl = 4;
+	string createdAt = 5;
+	string updatedAt = 6;
+
+}
+
+message CreateArticleRequest {
+  string content = 2;
+}
+
+message CreateArticleResponse {
+}
+
+message UpdateArticleRequest {
+  string id = 1;
+  string content = 2;
+}
+
+message UpdateArticleResponse {
+  
+}
+
+message GetArticlesRequest {
+}
+
+message GetArticlesResponse {
+}

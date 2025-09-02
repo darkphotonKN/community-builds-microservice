@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/darkphotonKN/community-builds-microservice/build-service/config"
+	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/article"
 	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/build"
 	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/class"
 	"github.com/darkphotonKN/community-builds-microservice/build-service/internal/rating"
@@ -15,6 +16,7 @@ import (
 	"github.com/darkphotonKN/community-builds-microservice/common/broker"
 	commonconstants "github.com/darkphotonKN/community-builds-microservice/common/constants"
 
+	articlePb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/article"
 	buildPb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/build"
 	classPb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/class"
 	ratingPb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/rating"
@@ -113,6 +115,13 @@ func main() {
 	tagHandler := tag.NewHandler(tagService)
 
 	tagPb.RegisterTagServiceServer(grpcServer, tagHandler)
+
+	// article
+	articleRepo := article.NewRepository(db)
+	articleService := article.NewService(articleRepo)
+	articleHandler := article.NewHandler(articleService)
+
+	articlePb.RegisterArticleServiceServer(grpcServer, articleHandler)
 
 	// build
 	buildRepo := build.NewRepository(db)

@@ -3,10 +3,10 @@ package config
 import (
 	"fmt"
 
-	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/article"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/auth"
 
 	// "github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/build"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/article"
 	authService "github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/auth"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/build"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/class"
@@ -219,9 +219,12 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 	// --- Article ---
 
 	// -- Article Setup --
-	articleRepo := article.NewArticleRepository(db)
-	articleService := article.NewArticleService(articleRepo)
-	articleHandler := article.NewArticleHandler(articleService)
+	// articleRepo := article.NewArticleRepository(db)
+	// articleService := article.NewArticleService(articleRepo)
+	// articleHandler := article.NewArticleHandler(articleService)
+
+	articleClient := article.NewClient(registry)
+	articleHandler := article.NewHandler(articleClient)
 
 	// -- Article Routes --
 	articleRoutes := api.Group("/article")

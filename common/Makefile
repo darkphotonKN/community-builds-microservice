@@ -11,3 +11,4 @@ gen:
 		api/proto/tag/tag.proto \
 		api/proto/class/class.proto \
 		api/proto/rating/rating.proto \
+		api/proto/article/article.proto \
