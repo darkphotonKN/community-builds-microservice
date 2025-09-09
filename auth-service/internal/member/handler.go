@@ -46,6 +46,7 @@ func (s *Handler) UpdateMemberInfo(ctx context.Context, req *pb.UpdateMemberInfo
 }
 
 func (s *Handler) UpdateMemberPassword(ctx context.Context, req *pb.UpdatePasswordRequest) (*pb.UpdatePasswordResponse, error) {
+	fmt.Printf("Updating member password through auth-service, request: %+v\n", req)
 	return s.service.UpdateMemberPassword(ctx, req)
 }
 

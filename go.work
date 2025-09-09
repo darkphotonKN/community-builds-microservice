@@ -1,12 +1,13 @@
 go 1.24.2
 
 use (
+	./analytics-service
 	./api-gateway
 	./auth-service
+	./build-service
+	./cache-service
 	./common
+	./example-service
 	./item-service
 	./notification-service
-	./analytics-service
-	./example-service
-	./build-service
 )

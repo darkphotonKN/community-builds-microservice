@@ -14,3 +14,9 @@ type AuthClient interface {
 	UpdateMemberPassword(ctx context.Context, req *pb.UpdatePasswordRequest) (*pb.UpdatePasswordResponse, error)
 	ValidateToken(ctx context.Context, req *pb.ValidateTokenRequest) (*pb.ValidateTokenResponse, error)
 }
+
+type UpdatePasswordRequest struct {
+	CurrentPassword   string `json:"currentPassword"`
+	NewPassword       string `json:"newPassword"`
+	RepeatNewPassword string `json:"repeatNewPassword"`
+}

@@ -175,6 +175,7 @@ func (s *service) UpdateMemberInfo(ctx context.Context, req *pb.UpdateMemberInfo
 }
 
 func (s *service) UpdateMemberPassword(ctx context.Context, req *pb.UpdatePasswordRequest) (*pb.UpdatePasswordResponse, error) {
+	fmt.Println("Rest Password Request: ", req)
 	id, err := uuid.Parse(req.Id)
 	if err != nil {
 		return nil, fmt.Errorf("invalid UUID: %w", err)
@@ -204,6 +205,13 @@ func (s *service) UpdateMemberPassword(ctx context.Context, req *pb.UpdatePasswo
 	}
 
 	// Hash the new password
+	if req.NewPassword != req.RepeatNewPassword {
+		return &pb.UpdatePasswordResponse{
+			Success: false,
+			Message: "New passwords do not match",
+		}, errors.New("new passwords do not match")
+	}
+
 	hashedPw, err := s.HashPassword(req.NewPassword)
 	if err != nil {
 		return &pb.UpdatePasswordResponse{
@@ -225,6 +233,34 @@ func (s *service) UpdateMemberPassword(ctx context.Context, req *pb.UpdatePasswo
 			Message: "Error updating password",
 		}, err
 	}
+
+	// publish to message broker
+	payload := commonconstants.PasswordResetEventPayload{
+		ID:       id.String(),
+		Password: hashedPw,
+		ResetAt:  time.Now().Format(time.RFC3339),
+	}
+
+	marshalledPayload, err := json.Marshal(payload)
+
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("Publishing password reset event")
+	err = s.publishCh.PublishWithContext(
+		ctx,
+		commonconstants.PasswordResetEvent,
+		"",
+		false,
+		false,
+		amqp.Publishing{
+			ContentType: "application/json",
+			Body:        marshalledPayload,
+			// persist message
+			DeliveryMode: amqp.Persistent,
+		})
+
+	fmt.Printf("\nError when attempting to publish password reset event: %v\n\n", err)
 
 	return &pb.UpdatePasswordResponse{
 		Success: true,

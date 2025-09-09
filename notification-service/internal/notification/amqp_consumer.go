@@ -24,6 +24,7 @@ func NewConsumer(service EventConsumerService, ch *amqp.Channel) *consumer {
 func (c *consumer) Listen() {
 	go c.memberSignedUpEventListener()
 	go c.ItemCreatedItemEventListener()
+	go c.memberRestPasswordEventListener()
 
 	fmt.Println("Notification consumer started - listening for member signup events.")
 }
@@ -172,6 +173,84 @@ func (c *consumer) ItemCreatedItemEventListener() {
 				Message:  template.Message,
 				Type:     string(template.Type),
 				MemberID: memberId,
+			})
+
+			// retry on error
+			if err != nil {
+				fmt.Printf("Failed to create notification on %d try, err: %s", i+1, err.Error())
+
+				// progressive delay / back-off before retrying
+				time.Sleep(time.Duration(math.Pow(2, float64(i))) * time.Second)
+				continue
+			}
+
+			// otherwise exit
+			break
+		}
+
+		if err != nil {
+			fmt.Println("Failed to create notification, err:", err)
+			continue
+		}
+
+		fmt.Printf("Notification created:\nid: %s\nType: %s\nTitle: %s\nMessage: %s\n", notification.ID, notification.Type, notification.Title, notification.Message)
+	}
+}
+
+func (c *consumer) memberRestPasswordEventListener() {
+	queueName := fmt.Sprintf("notification.%s", commonconstants.PasswordResetEvent)
+
+	queue, err := c.publishCh.QueueDeclare(queueName, true, false, false, false, nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// bind to the exchange that will publish ExampleCreateEvent events
+	err = c.publishCh.QueueBind(
+		queue.Name,
+		"",
+		commonconstants.PasswordResetEvent,
+		false,
+		nil,
+	)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("\nError when attempting to bind to event queue: %v\n\n", err)
+
+	// consume messages, delivers messages from the queue
+	msgs, err := c.publishCh.Consume(queue.Name, "", true, false, false, false, nil)
+
+	// start a goroutine to listen for events
+	for msg := range msgs {
+		var memberPasswordReset *commonconstants.PasswordResetEventPayload
+
+		err := json.Unmarshal(msg.Body, &memberPasswordReset)
+		if err != nil {
+			fmt.Printf("Error when unmarshalling member.signedup event body: %s\n", err.Error())
+		}
+
+		fmt.Printf("\nsuccessfully received event message: %+v\n\n", memberPasswordReset)
+
+		// get the correct notification template
+		template, err := c.service.GetNotificationTemplate(NotificationPasswordReset)
+
+		if err != nil {
+			fmt.Println("Failed on getting notification template. Error:", err)
+			continue
+		}
+
+		var notification *Notification
+
+		for i := 0; i < 3; i++ {
+			// create event TODO: sourceID missing, add later
+			notification, err = c.service.Create(&MemberCreatedNotification{
+				Title:    template.Title,
+				Message:  template.Message,
+				Type:     string(template.Type),
+				MemberID: memberPasswordReset.ID,
 			})
 
 			// retry on error
