@@ -350,6 +350,7 @@ const file_api_proto_notification_notification_proto_rawDesc = "" +
 	"\x18ReadNotificationResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"\x8b\x02\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\x8c\x02\n" +
 	"\fNotification\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\bmemberId\x18\x02 \x01(\tR\bmemberId\x12\x12\n" +

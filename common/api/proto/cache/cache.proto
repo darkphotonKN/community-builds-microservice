@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package cachegrpc;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/darkphotonKN/community-builds-microservice/common/api/proto/cache";
+
+service CacheService {
+  rpc Hello(HelloRequest) returns (HelloResponse) {}
+  rpc SetCache(SetCacheRequest) returns (SetCacheResponse) {}
+  rpc GetCache(GetCacheRequest) returns (GetCacheResponse) {}
+  rpc DeleteCache(DeleteCacheRequest) returns (DeleteCacheResponse) {}
+}
+
+message HelloRequest {
+  string name = 1;
+}
+
+message HelloResponse {
+  string message = 1;
+  string timestamp = 2;
+}
+
+message SetCacheRequest {
+  string key = 1;
+  string value = 2;
+  int32 ttl = 3; // Time to live in seconds
+}
+
+message SetCacheResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetCacheRequest {
+  string key = 1;
+}
+
+message GetCacheResponse {
+  bool found = 1;
+  string value = 2;
+  string message = 3;
+}
+
+message DeleteCacheRequest {
+  string key = 1;
+}
+
+message DeleteCacheResponse {
+  bool success = 1;
+  string message = 2;
+} 

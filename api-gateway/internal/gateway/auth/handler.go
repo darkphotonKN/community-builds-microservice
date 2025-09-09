@@ -21,6 +21,7 @@ func NewHandler(client AuthClient) *Handler {
 }
 
 func (h *Handler) CreateMemberHandler(c *gin.Context) {
+	fmt.Println("Create Member Request")
 	var req pb.CreateMemberRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -158,7 +159,7 @@ func (h *Handler) GetMemberByIdHandler(c *gin.Context) {
 }
 
 func (h *Handler) UpdatePasswordMemberHandler(c *gin.Context) {
-	var req pb.UpdatePasswordRequest
+	fmt.Println("Reset Password Request")
 
 	// Get the user ID string from context (set by auth middleware)
 	userIdStr, exists := c.Get("userIdStr")
@@ -170,15 +171,22 @@ func (h *Handler) UpdatePasswordMemberHandler(c *gin.Context) {
 		return
 	}
 
+	var req UpdatePasswordRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Println("Error parsing payload as JSON:", err)
 		c.JSON(http.StatusBadRequest, gin.H{"statusCode": http.StatusBadRequest, "message": "Error parsing payload as JSON"})
 		return
 	}
 
-	// Set the ID from context
-	req.Id = userIdStr.(string)
 
-	response, err := h.client.UpdateMemberPassword(c.Request.Context(), &req)
+	grpcReq := &pb.UpdatePasswordRequest{
+		Id:                userIdStr.(string),
+		CurrentPassword:   req.CurrentPassword,
+		NewPassword:       req.NewPassword,
+		RepeatNewPassword: req.RepeatNewPassword,
+	}
+
+	response, err := h.client.UpdateMemberPassword(c.Request.Context(), grpcReq)
 	if err != nil {
 		status, ok := status.FromError(err)
 		if !ok {

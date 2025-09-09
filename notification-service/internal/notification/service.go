@@ -226,6 +226,7 @@ const (
 	NotificationBuildCreated  NotificationType = "build_created"
 	NotificationItemCreated   NotificationType = "item_created"
 	NotificationRatingCreated NotificationType = "rating_created"
+	NotificationPasswordReset NotificationType = "password_reset"
 )
 
 type NotificationTemplate struct {
@@ -258,12 +259,19 @@ var ratingCreateNotificationMessage = NotificationTemplate{
 	Message: "Someone rated your build!",
 }
 
+var passwordResetNotificationMessage = NotificationTemplate{
+	Type:    NotificationPasswordReset,
+	Title:   "Password Reset",
+	Message: "Password was successfully reset.",
+}
+
 func (s *service) GetNotificationTemplate(notificationType NotificationType) (*NotificationTemplate, error) {
 	notificationTemplates := map[NotificationType]*NotificationTemplate{
 		NotificationWelcome:       &welcomeNotificationMessage,
 		NotificationBuildCreated:  &buildNotificationMessage,
 		NotificationItemCreated:   &itemCreateNotificationMessage,
 		NotificationRatingCreated: &ratingCreateNotificationMessage,
+		NotificationPasswordReset: &passwordResetNotificationMessage,
 	}
 
 	template, exists := notificationTemplates[notificationType]

@@ -70,12 +70,21 @@ type ItemCreatedItemEventPayload struct {
 	SignedUpAt string `json:"signedUpAt"`
 }
 
-/*
-* Published by build-service.
-* Consumed by:
-* - notification-service
-*
- */
 type RatingCreatedEventPayload struct {
 	UserID string `json:"userId"`
+}
+
+/*
+* PasswordResetEventPayload
+*
+* Published by auth-service.
+* Consumed by:
+* - notification-service
+* - analytics-service
+ */
+
+type PasswordResetEventPayload struct {
+	ID       string `json:"id"`
+	Password string `json:"password"`
+	ResetAt  string `json:"resetAt"`
 }
