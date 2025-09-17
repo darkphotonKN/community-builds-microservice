@@ -27,7 +27,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
-	github.com/stretchr/testify v1.10.0 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
 	golang.org/x/net v0.40.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
@@ -35,3 +35,5 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250528174236-200df99c418a // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 )
+
+replace github.com/darkphotonKN/community-builds-microservice/common => ../common
