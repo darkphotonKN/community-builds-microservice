@@ -129,7 +129,7 @@ type Notification struct {
 	Read          bool                   `protobuf:"varint,6,opt,name=read,proto3" json:"read,omitempty"`
 	EmailSent     bool                   `protobuf:"varint,7,opt,name=emailSent,proto3" json:"emailSent,omitempty"`
 	SourceId      string                 `protobuf:"bytes,8,opt,name=sourceId,proto3" json:"sourceId,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -349,7 +349,7 @@ const file_api_proto_notification_notification_proto_rawDesc = "" +
 	"\x04data\x18\x01 \x03(\v2\x1a.notification.NotificationR\x04data\"N\n" +
 	"\x18ReadNotificationResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\x8b\x02\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\x8c\x02\n" +
 	"\fNotification\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\bmemberId\x18\x02 \x01(\tR\bmemberId\x12\x12\n" +
@@ -358,8 +358,9 @@ const file_api_proto_notification_notification_proto_rawDesc = "" +
 	"\amessage\x18\x05 \x01(\tR\amessage\x12\x17\n" +
 	"\x04read\x18\x06 \x01(\bB\x03\xe0A\x03R\x04read\x12\x1c\n" +
 	"\temailSent\x18\a \x01(\bR\temailSent\x12\x1a\n" +
-	"\bsourceId\x18\b \x01(\tR\bsourceId\x128\n" +
-	"\tcreatedAt\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\x82\x01\n" +
+	"\bsourceId\x18\b \x01(\tR\bsourceId\x129\n" +
+	"\n" +
+	"created_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\x82\x01\n" +
 	"\x17GetNotificationsRequest\x12\x1a\n" +
 	"\bmemberId\x18\x01 \x01(\tR\bmemberId\x12\x19\n" +
 	"\x05limit\x18\x02 \x01(\x05H\x00R\x05limit\x88\x01\x01\x12\x1b\n" +
@@ -396,7 +397,7 @@ var file_api_proto_notification_notification_proto_goTypes = []any{
 }
 var file_api_proto_notification_notification_proto_depIdxs = []int32{
 	2, // 0: notification.GetNotificationsResponse.data:type_name -> notification.Notification
-	5, // 1: notification.Notification.createdAt:type_name -> google.protobuf.Timestamp
+	5, // 1: notification.Notification.created_at:type_name -> google.protobuf.Timestamp
 	3, // 2: notification.NotificationService.GetNotifications:input_type -> notification.GetNotificationsRequest
 	4, // 3: notification.NotificationService.ReadNotification:input_type -> notification.ReadNotificationRequest
 	0, // 4: notification.NotificationService.GetNotifications:output_type -> notification.GetNotificationsResponse

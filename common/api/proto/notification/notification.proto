@@ -31,7 +31,7 @@ message Notification {
   bool read = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
   bool emailSent = 7;
   string sourceId = 8;
-  google.protobuf.Timestamp createdAt = 9;
+  google.protobuf.Timestamp created_at = 9;
 }
 
 // Request message for getting an example by ID
