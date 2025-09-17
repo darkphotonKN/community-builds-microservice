@@ -110,8 +110,8 @@ func (r *repository) GetAll(ctx context.Context, request *QueryNotifications) ([
 
 func (r *repository) Update(ctx context.Context, request *UpdateNotification) error {
 	query := `
-	UPDATE notifications(read)
-	SET read =: :read
+	UPDATE notifications
+	SET read = :read
 	WHERE id = :id
 	AND member_id = :member_id
 	`
