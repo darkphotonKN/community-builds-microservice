@@ -634,6 +634,95 @@ func (x *ValidateTokenResponse) GetMemberId() string {
 	return ""
 }
 
+// Update Stripe Customer request
+type UpdateStripeCustomerRequest struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	MemberId         string                 `protobuf:"bytes,1,opt,name=member_id,json=memberId,proto3" json:"member_id,omitempty"`
+	StripeCustomerId string                 `protobuf:"bytes,2,opt,name=stripe_customer_id,json=stripeCustomerId,proto3" json:"stripe_customer_id,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *UpdateStripeCustomerRequest) Reset() {
+	*x = UpdateStripeCustomerRequest{}
+	mi := &file_api_proto_auth_auth_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateStripeCustomerRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateStripeCustomerRequest) ProtoMessage() {}
+
+func (x *UpdateStripeCustomerRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_auth_auth_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateStripeCustomerRequest.ProtoReflect.Descriptor instead.
+func (*UpdateStripeCustomerRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_auth_auth_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *UpdateStripeCustomerRequest) GetMemberId() string {
+	if x != nil {
+		return x.MemberId
+	}
+	return ""
+}
+
+func (x *UpdateStripeCustomerRequest) GetStripeCustomerId() string {
+	if x != nil {
+		return x.StripeCustomerId
+	}
+	return ""
+}
+
+type UpdateStripeCustomerResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateStripeCustomerResponse) Reset() {
+	*x = UpdateStripeCustomerResponse{}
+	mi := &file_api_proto_auth_auth_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateStripeCustomerResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateStripeCustomerResponse) ProtoMessage() {}
+
+func (x *UpdateStripeCustomerResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_auth_auth_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateStripeCustomerResponse.ProtoReflect.Descriptor instead.
+func (*UpdateStripeCustomerResponse) Descriptor() ([]byte, []int) {
+	return file_api_proto_auth_auth_proto_rawDescGZIP(), []int{11}
+}
+
 var File_api_proto_auth_auth_proto protoreflect.FileDescriptor
 
 const file_api_proto_auth_auth_proto_rawDesc = "" +
@@ -681,14 +770,19 @@ const file_api_proto_auth_auth_proto_rawDesc = "" +
 	"\x05token\x18\x01 \x01(\tR\x05token\"J\n" +
 	"\x15ValidateTokenResponse\x12\x14\n" +
 	"\x05valid\x18\x01 \x01(\bR\x05valid\x12\x1b\n" +
-	"\tmember_id\x18\x02 \x01(\tR\bmemberId2\x9b\x03\n" +
+	"\tmember_id\x18\x02 \x01(\tR\bmemberId\"h\n" +
+	"\x1bUpdateStripeCustomerRequest\x12\x1b\n" +
+	"\tmember_id\x18\x01 \x01(\tR\bmemberId\x12,\n" +
+	"\x12stripe_customer_id\x18\x02 \x01(\tR\x10stripeCustomerId\"\x1e\n" +
+	"\x1cUpdateStripeCustomerResponse2\xfc\x03\n" +
 	"\vAuthService\x128\n" +
 	"\vLoginMember\x12\x12.auth.LoginRequest\x1a\x13.auth.LoginResponse\"\x00\x123\n" +
 	"\tGetMember\x12\x16.auth.GetMemberRequest\x1a\f.auth.Member\"\x00\x129\n" +
 	"\fCreateMember\x12\x19.auth.CreateMemberRequest\x1a\f.auth.Member\"\x00\x12A\n" +
 	"\x10UpdateMemberInfo\x12\x1d.auth.UpdateMemberInfoRequest\x1a\f.auth.Member\"\x00\x12S\n" +
 	"\x14UpdateMemberPassword\x12\x1b.auth.UpdatePasswordRequest\x1a\x1c.auth.UpdatePasswordResponse\"\x00\x12J\n" +
-	"\rValidateToken\x12\x1a.auth.ValidateTokenRequest\x1a\x1b.auth.ValidateTokenResponse\"\x00BOZMgithub.com/darkphotonKN/community-builds-microservice/auth-service/proto/authb\x06proto3"
+	"\rValidateToken\x12\x1a.auth.ValidateTokenRequest\x1a\x1b.auth.ValidateTokenResponse\"\x00\x12_\n" +
+	"\x14UpdateStripeCustomer\x12!.auth.UpdateStripeCustomerRequest\x1a\".auth.UpdateStripeCustomerResponse\"\x00BOZMgithub.com/darkphotonKN/community-builds-microservice/auth-service/proto/authb\x06proto3"
 
 var (
 	file_api_proto_auth_auth_proto_rawDescOnce sync.Once
@@ -702,23 +796,25 @@ func file_api_proto_auth_auth_proto_rawDescGZIP() []byte {
 	return file_api_proto_auth_auth_proto_rawDescData
 }
 
-var file_api_proto_auth_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_api_proto_auth_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_api_proto_auth_auth_proto_goTypes = []any{
-	(*Member)(nil),                  // 0: auth.Member
-	(*LoginRequest)(nil),            // 1: auth.LoginRequest
-	(*LoginResponse)(nil),           // 2: auth.LoginResponse
-	(*GetMemberRequest)(nil),        // 3: auth.GetMemberRequest
-	(*CreateMemberRequest)(nil),     // 4: auth.CreateMemberRequest
-	(*UpdateMemberInfoRequest)(nil), // 5: auth.UpdateMemberInfoRequest
-	(*UpdatePasswordRequest)(nil),   // 6: auth.UpdatePasswordRequest
-	(*UpdatePasswordResponse)(nil),  // 7: auth.UpdatePasswordResponse
-	(*ValidateTokenRequest)(nil),    // 8: auth.ValidateTokenRequest
-	(*ValidateTokenResponse)(nil),   // 9: auth.ValidateTokenResponse
-	(*timestamppb.Timestamp)(nil),   // 10: google.protobuf.Timestamp
+	(*Member)(nil),                       // 0: auth.Member
+	(*LoginRequest)(nil),                 // 1: auth.LoginRequest
+	(*LoginResponse)(nil),                // 2: auth.LoginResponse
+	(*GetMemberRequest)(nil),             // 3: auth.GetMemberRequest
+	(*CreateMemberRequest)(nil),          // 4: auth.CreateMemberRequest
+	(*UpdateMemberInfoRequest)(nil),      // 5: auth.UpdateMemberInfoRequest
+	(*UpdatePasswordRequest)(nil),        // 6: auth.UpdatePasswordRequest
+	(*UpdatePasswordResponse)(nil),       // 7: auth.UpdatePasswordResponse
+	(*ValidateTokenRequest)(nil),         // 8: auth.ValidateTokenRequest
+	(*ValidateTokenResponse)(nil),        // 9: auth.ValidateTokenResponse
+	(*UpdateStripeCustomerRequest)(nil),  // 10: auth.UpdateStripeCustomerRequest
+	(*UpdateStripeCustomerResponse)(nil), // 11: auth.UpdateStripeCustomerResponse
+	(*timestamppb.Timestamp)(nil),        // 12: google.protobuf.Timestamp
 }
 var file_api_proto_auth_auth_proto_depIdxs = []int32{
-	10, // 0: auth.Member.created_at:type_name -> google.protobuf.Timestamp
-	10, // 1: auth.Member.updated_at:type_name -> google.protobuf.Timestamp
+	12, // 0: auth.Member.created_at:type_name -> google.protobuf.Timestamp
+	12, // 1: auth.Member.updated_at:type_name -> google.protobuf.Timestamp
 	0,  // 2: auth.LoginResponse.member_info:type_name -> auth.Member
 	1,  // 3: auth.AuthService.LoginMember:input_type -> auth.LoginRequest
 	3,  // 4: auth.AuthService.GetMember:input_type -> auth.GetMemberRequest
@@ -726,14 +822,16 @@ var file_api_proto_auth_auth_proto_depIdxs = []int32{
 	5,  // 6: auth.AuthService.UpdateMemberInfo:input_type -> auth.UpdateMemberInfoRequest
 	6,  // 7: auth.AuthService.UpdateMemberPassword:input_type -> auth.UpdatePasswordRequest
 	8,  // 8: auth.AuthService.ValidateToken:input_type -> auth.ValidateTokenRequest
-	2,  // 9: auth.AuthService.LoginMember:output_type -> auth.LoginResponse
-	0,  // 10: auth.AuthService.GetMember:output_type -> auth.Member
-	0,  // 11: auth.AuthService.CreateMember:output_type -> auth.Member
-	0,  // 12: auth.AuthService.UpdateMemberInfo:output_type -> auth.Member
-	7,  // 13: auth.AuthService.UpdateMemberPassword:output_type -> auth.UpdatePasswordResponse
-	9,  // 14: auth.AuthService.ValidateToken:output_type -> auth.ValidateTokenResponse
-	9,  // [9:15] is the sub-list for method output_type
-	3,  // [3:9] is the sub-list for method input_type
+	10, // 9: auth.AuthService.UpdateStripeCustomer:input_type -> auth.UpdateStripeCustomerRequest
+	2,  // 10: auth.AuthService.LoginMember:output_type -> auth.LoginResponse
+	0,  // 11: auth.AuthService.GetMember:output_type -> auth.Member
+	0,  // 12: auth.AuthService.CreateMember:output_type -> auth.Member
+	0,  // 13: auth.AuthService.UpdateMemberInfo:output_type -> auth.Member
+	7,  // 14: auth.AuthService.UpdateMemberPassword:output_type -> auth.UpdatePasswordResponse
+	9,  // 15: auth.AuthService.ValidateToken:output_type -> auth.ValidateTokenResponse
+	11, // 16: auth.AuthService.UpdateStripeCustomer:output_type -> auth.UpdateStripeCustomerResponse
+	10, // [10:17] is the sub-list for method output_type
+	3,  // [3:10] is the sub-list for method input_type
 	3,  // [3:3] is the sub-list for extension type_name
 	3,  // [3:3] is the sub-list for extension extendee
 	0,  // [0:3] is the sub-list for field type_name
@@ -750,7 +848,7 @@ func file_api_proto_auth_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_proto_auth_auth_proto_rawDesc), len(file_api_proto_auth_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

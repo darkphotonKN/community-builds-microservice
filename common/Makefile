@@ -1,6 +1,8 @@
 gen:
-	@protoc --go_out=. --go_opt=paths=source_relative \
-    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+	@protoc --proto_path=/Users/nick.peng/dev-tools/googleapis \
+		--proto_path=. \
+		--go_out=. --go_opt=paths=source_relative \
+		--go-grpc_out=. --go-grpc_opt=paths=source_relative \
 		api/proto/common/common.proto \
 		api/proto/example/example.proto \
 		api/proto/auth/auth.proto \
@@ -12,3 +14,4 @@ gen:
 		api/proto/class/class.proto \
 		api/proto/rating/rating.proto \
 		api/proto/article/article.proto \
+		api/proto/payment/payment.proto

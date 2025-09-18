@@ -5,7 +5,7 @@ package notification;
 option go_package = "github.com/darkphotonKN/community-builds-microservice/common/api/proto/notification";
 
 import "google/protobuf/timestamp.proto";
-import "google/api/field_behavior.proto"; 
+import "google/api/field_behavior.proto";
 
 service NotificationService {
   // get list of notifications for user

@@ -9,4 +9,5 @@ use (
 	./analytics-service
 	./example-service
 	./build-service
+	./payment-service
 )

@@ -14,6 +14,7 @@ import (
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/example"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/item"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/notification"
+	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/payment"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/rating"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/skill"
 	"github.com/darkphotonKN/community-builds-microservice/api-gateway/internal/gateway/tag"
@@ -252,6 +253,19 @@ func SetupRouter(registry discovery.Registry, db *sqlx.DB) *gin.Engine {
 
 	ratingRoutes.Use(auth.AuthMiddleware())
 	ratingRoutes.POST("", ratingHandler.CreateRatingByBuildIdHandler)
+
+	// --- Article ---
+
+	// -- Article Setup --
+	paymentClient := payment.NewClient(registry)
+	paymentHandler := payment.NewHandler(paymentClient)
+
+	// -- payment Routes --
+	paymentRoutes := api.Group("/payment")
+
+	paymentRoutes.Use(auth.AuthMiddleware())
+	paymentRoutes.POST("/create-subscription", paymentHandler.CreateSubscriptionHandler)
+	paymentRoutes.POST("/create-customer", paymentHandler.CreateCustomerHandler)
 
 	return router
 }

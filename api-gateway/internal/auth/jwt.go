@@ -25,6 +25,7 @@ func GenerateJWT(user models.Member, tokenType TokenType, expiration time.Durati
 	// Define the custom claims for the token
 	claims := jwt.MapClaims{
 		"sub":       user.Id.String(),
+		"email":     user.Email,
 		"exp":       time.Now().Add(expiration).Unix(),
 		"iat":       time.Now().Unix(),
 		"tokenType": tokenType,

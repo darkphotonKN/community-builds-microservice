@@ -1,6 +1,7 @@
 package member
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/darkphotonKN/community-builds-microservice/auth-service/internal/models"
@@ -141,4 +142,15 @@ func (r *Repository) CreateDefaultMembers(members []CreateDefaultMember) error {
 	}
 
 	return nil
+}
+
+// stripe
+func (r *Repository) UpdateStripeCustomer(ctx context.Context, userID uuid.UUID, stripeCustomerID string) error {
+	query := `
+		UPDATE members 
+		SET stripe_customer_id = $1, updated_at = NOW() 
+		WHERE id = $2
+	`
+	_, err := r.DB.ExecContext(ctx, query, stripeCustomerID, userID)
+	return err
 }

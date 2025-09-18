@@ -16,11 +16,12 @@ import (
 **/
 type Member struct {
 	BaseDBDateModel
-	Email         string  `db:"email" json:"email"`
-	Name          string  `db:"name" json:"name"`
-	Password      string  `db:"password" json:"password,omitempty"`
-	Status        string  `db:"status" json:"status"`
-	AverageRating float64 `db:"average_rating"`
+	Email            string  `db:"email" json:"email"`
+	Name             string  `db:"name" json:"name"`
+	Password         string  `db:"password" json:"password,omitempty"`
+	Status           string  `db:"status" json:"status"`
+	AverageRating    float64 `db:"average_rating"`
+	StripeCustomerId string  `db:"stripe_customer_id" json:"stripeCustomerId"`
 }
 
 /**

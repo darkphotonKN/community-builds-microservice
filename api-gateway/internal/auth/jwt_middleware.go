@@ -57,11 +57,15 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		email := claims["email"].(string)
+
 		// store userId in the context for usage in the actual API handlers
 		c.Set("userId", userId)
 
 		// store string version for cleaner transfer to external microservices via grpc
 		c.Set("userIdStr", userIdStr)
+
+		c.Set("email", email)
 
 		// passdown the flow to next handler
 		c.Next()

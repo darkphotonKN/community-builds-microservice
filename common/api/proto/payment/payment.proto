@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package payment;
+
+option go_package = "github.com/darkphotonKN/community-builds-microservices/common/api/proto/payment";
+
+service PaymentService {
+  rpc CreateSubscription(CreateSubscriptionRequest) returns (CreateSubscriptionResponse) {}
+  rpc CreateCustomer(CreateCustomerRequest) returns (CreateCustomerResponse) {}
+}
+
+
+message CreateSubscriptionRequest {
+  string Name = 1;
+  string Description = 2;
+  int64 Price = 3;
+  string MemberId = 4;
+  string Email = 5;
+}
+message CreateSubscriptionResponse {}
+message CreateCustomerRequest {
+  string MemberId = 1;
+  string Email = 2;
+}
+
+message CreateCustomerResponse {
+  string CustomerId = 1;
+}
