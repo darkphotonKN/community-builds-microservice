@@ -20,6 +20,8 @@ service AuthService {
   rpc UpdateMemberPassword(UpdatePasswordRequest) returns (UpdatePasswordResponse) {}
   // Validate token
   rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse) {}
+
+  rpc UpdateStripeCustomer(UpdateStripeCustomerRequest) returns (UpdateStripeCustomerResponse) {}
 }
 
 // Member message represents a user in the system
@@ -91,3 +93,12 @@ message ValidateTokenResponse {
   bool valid = 1;
   string member_id = 2;
 }
+
+
+// Update Stripe Customer request
+message UpdateStripeCustomerRequest {
+  string member_id = 1;
+  string stripe_customer_id = 2;
+}
+
+message UpdateStripeCustomerResponse {}

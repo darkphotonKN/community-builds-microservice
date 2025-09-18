@@ -10,4 +10,8 @@ use (
 	./example-service
 	./item-service
 	./notification-service
+	./analytics-service
+	./example-service
+	./build-service
+	./payment-service
 )

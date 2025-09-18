@@ -2,7 +2,6 @@ package member
 
 import (
 	"context"
-	"fmt"
 
 	pb "github.com/darkphotonKN/community-builds-microservice/common/api/proto/auth"
 )
@@ -20,6 +19,8 @@ type Service interface {
 	UpdateMemberPassword(ctx context.Context, req *pb.UpdatePasswordRequest) (*pb.UpdatePasswordResponse, error)
 	ValidateToken(ctx context.Context, req *pb.ValidateTokenRequest) (*pb.ValidateTokenResponse, error)
 	CreateDefaultMembers(members []CreateDefaultMember) error
+	// stripe
+	UpdateStripeCustomer(ctx context.Context, req *pb.UpdateStripeCustomerRequest) (*pb.UpdateStripeCustomerResponse, error)
 }
 
 func NewHandler(service Service) *Handler {
@@ -37,7 +38,6 @@ func (s *Handler) GetMember(ctx context.Context, req *pb.GetMemberRequest) (*pb.
 }
 
 func (s *Handler) CreateMember(ctx context.Context, req *pb.CreateMemberRequest) (*pb.Member, error) {
-	fmt.Printf("Creating member through auth-service, request: %+v\n", req)
 	return s.service.CreateMember(ctx, req)
 }
 
@@ -52,4 +52,8 @@ func (s *Handler) UpdateMemberPassword(ctx context.Context, req *pb.UpdatePasswo
 
 func (s *Handler) ValidateToken(ctx context.Context, req *pb.ValidateTokenRequest) (*pb.ValidateTokenResponse, error) {
 	return s.service.ValidateToken(ctx, req)
+}
+
+func (s *Handler) UpdateStripeCustomer(ctx context.Context, req *pb.UpdateStripeCustomerRequest) (*pb.UpdateStripeCustomerResponse, error) {
+	return s.service.UpdateStripeCustomer(ctx, req)
 }

@@ -325,3 +325,15 @@ func (s *service) CreateDefaultMembers(members []CreateDefaultMember) error {
 
 	return s.Repo.CreateDefaultMembers(hashedPwMembers)
 }
+
+// stripe
+func (s *service) UpdateStripeCustomer(ctx context.Context, req *pb.UpdateStripeCustomerRequest) (*pb.UpdateStripeCustomerResponse, error) {
+	memberId, err := uuid.Parse(req.MemberId)
+	if err != nil {
+		return nil, fmt.Errorf("invalid UUID: %w", err)
+	}
+	customerId := req.StripeCustomerId
+
+	s.Repo.UpdateStripeCustomer(ctx, memberId, customerId)
+	return &pb.UpdateStripeCustomerResponse{}, nil
+}
