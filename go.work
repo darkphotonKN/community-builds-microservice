@@ -5,7 +5,6 @@ use (
 	./api-gateway
 	./auth-service
 	./build-service
-	./cache-service
 	./common
 	./example-service
 	./item-service
