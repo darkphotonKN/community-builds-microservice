@@ -14,7 +14,7 @@ services:
 
   community-builds-rabbitmq:
     image: "rabbitmq:3-management"
-    container_name: community-builds-rabbitmq
+    container_name: community-builds-rabbitmqzx
     ports:
       - "15682:15672" # Changed from 15672 to avoid conflicts
       - "5682:5672" # Changed from 5672 to avoid conflicts
